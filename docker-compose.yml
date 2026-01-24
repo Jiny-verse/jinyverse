@@ -5,13 +5,13 @@ services:
       dockerfile: docker/Dockerfile
       target: database
     ports:
-      - "5432:5432"
+      - "5000:5432"
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-jinyverse}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ${POSTGRES_DATA_PATH:-postgres_data}:/var/lib/postgresql/data
       - ./sql:/docker-entrypoint-initdb.d
 
   backend:
@@ -50,3 +50,4 @@ services:
 
 volumes:
   postgres_data:
+

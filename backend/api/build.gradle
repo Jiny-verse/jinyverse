@@ -5,6 +5,40 @@ plugins {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
 	runtimeOnly 'org.postgresql:postgresql'
+}
+
+// .env 파일에서 환경 변수 로드
+def loadEnvFile() {
+	def envFile = file("${project.rootProject.projectDir}/../.env")
+	if (envFile.exists()) {
+		envFile.readLines().each { line ->
+			if (line && !line.startsWith("#") && line.contains("=")) {
+				def (key, value) = line.split("=", 2)
+				if (key && value) {
+					project.ext.set(key.trim(), value.trim())
+				}
+			}
+		}
+	}
+}
+
+loadEnvFile()
+
+// bootRun 태스크에 환경 변수 전달
+tasks.named('bootRun') {
+	doFirst {
+		def envFile = file("${project.rootProject.projectDir}/../.env")
+		if (envFile.exists()) {
+			envFile.readLines().each { line ->
+				if (line && !line.startsWith("#") && line.contains("=")) {
+					def (key, value) = line.split("=", 2)
+					if (key && value) {
+						environment key.trim(), value.trim()
+					}
+				}
+			}
+		}
+	}
 }

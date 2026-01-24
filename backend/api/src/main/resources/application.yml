@@ -1,6 +1,11 @@
 spring:
   application:
     name: backend
+  banner:
+    location: classpath:banner.txt
+  output:
+    ansi:
+      enabled: always
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/jinyverse}
     username: ${SPRING_DATASOURCE_USERNAME:user}

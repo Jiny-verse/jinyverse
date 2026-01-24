@@ -21,7 +21,7 @@ pnpm, Next.js, Spring Boot, Postgres를 사용하는 모노레포 프로젝트�
 
 ```bash
 # 전체 스택 실행 (Postgres, Backend, Frontend)
-docker-compose up --build
+docker compose up --build
 ```
 
 ### 개별 실행
