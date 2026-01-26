@@ -1,0 +1,74 @@
+{
+  "ui": {
+    "button": {
+      "accept": "승인",
+      "cancel": "취소",
+      "confirm": "확인",
+      "delete": "삭제",
+      "save": "저장",
+      "edit": "수정",
+      "close": "닫기"
+    },
+    "input": {
+      "placeholder": "입력하세요",
+      "search": "검색"
+    }
+  },
+  "message": {
+    "warning": "다음과 같은 것에 주의하세요",
+    "error": "오류가 발생했습니다",
+    "success": "성공적으로 완료되었습니다",
+    "confirm": "정말로 진행하시겠습니까?"
+  },
+  "validation": {
+    "required": "필수 입력 항목입니다",
+    "email": "올바른 이메일 형식이 아닙니다",
+    "minLength": "최소 {{min}}자 이상 입력해주세요",
+    "maxLength": "최대 {{max}}자까지 입력 가능합니다",
+    "pattern": "올바른 형식이 아닙니다",
+    "passwordMismatch": "비밀번호가 일치하지 않습니다"
+  },
+  "error": {
+    "notFound": "요청한 페이지를 찾을 수 없습니다",
+    "unauthorized": "인증이 필요합니다",
+    "forbidden": "접근 권한이 없습니다",
+    "serverError": "서버 오류가 발생했습니다",
+    "networkError": "네트워크 오류가 발생했습니다",
+    "timeout": "요청 시간이 초과되었습니다"
+  },
+  "common": {
+    "loading": "로딩 중...",
+    "noData": "데이터가 없습니다",
+    "retry": "다시 시도",
+    "back": "뒤로",
+    "next": "다음",
+    "previous": "이전",
+    "submit": "제출",
+    "reset": "초기화"
+  },
+  "form": {
+    "label": {
+      "email": "이메일",
+      "password": "비밀번호",
+      "name": "이름",
+      "phone": "전화번호"
+    },
+    "placeholder": {
+      "email": "이메일을 입력하세요",
+      "password": "비밀번호를 입력하세요",
+      "name": "이름을 입력하세요",
+      "phone": "전화번호를 입력하세요"
+    }
+  },
+  "table": {
+    "noData": "표시할 데이터가 없습니다",
+    "loading": "데이터를 불러오는 중...",
+    "pageInfo": "{{current}} / {{total}} 페이지",
+    "rowsPerPage": "페이지당 행 수"
+  },
+  "modal": {
+    "close": "닫기",
+    "confirm": "확인",
+    "cancel": "취소"
+  }
+}

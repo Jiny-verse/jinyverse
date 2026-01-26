@@ -1,0 +1,38 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+.next/
+out/
+build/
+*.jar
+*.war
+
+# Java files (use Google Java Format or similar)
+backend/**/*.java
+*.java
+
+# Logs
+*.log
+
+# Environment
+.env
+.env.*
+
+# Lock files
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Generated files
+*.generated.*
+coverage/
+
+# IDE
+.idea/
+.vscode/
+
+# OS
+.DS_Store

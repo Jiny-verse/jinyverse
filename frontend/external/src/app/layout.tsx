@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { HorizontalNavigation } from "common/components";
 
 export const metadata: Metadata = {
   title: "Jinyverse",
@@ -12,8 +13,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="ko">
+      <body className="bg-[#141414] text-white min-h-screen antialiased">
+        <HorizontalNavigation channel="external" />
+        <main className="relative z-0">
+          {children}
+        </main>
+      </body>
     </html>
   );
 }

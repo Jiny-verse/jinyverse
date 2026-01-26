@@ -1,0 +1,74 @@
+{
+  "ui": {
+    "button": {
+      "accept": "Accept",
+      "cancel": "Cancel",
+      "confirm": "Confirm",
+      "delete": "Delete",
+      "save": "Save",
+      "edit": "Edit",
+      "close": "Close"
+    },
+    "input": {
+      "placeholder": "Please enter",
+      "search": "Search"
+    }
+  },
+  "message": {
+    "warning": "Please note the following",
+    "error": "An error has occurred",
+    "success": "Completed successfully",
+    "confirm": "Are you sure you want to proceed?"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email address",
+    "minLength": "Please enter at least {{min}} characters",
+    "maxLength": "Please enter no more than {{max}} characters",
+    "pattern": "Invalid format",
+    "passwordMismatch": "Passwords do not match"
+  },
+  "error": {
+    "notFound": "The requested page could not be found",
+    "unauthorized": "Authentication required",
+    "forbidden": "Access denied",
+    "serverError": "A server error occurred",
+    "networkError": "A network error occurred",
+    "timeout": "Request timeout"
+  },
+  "common": {
+    "loading": "Loading...",
+    "noData": "No data available",
+    "retry": "Retry",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "reset": "Reset"
+  },
+  "form": {
+    "label": {
+      "email": "Email",
+      "password": "Password",
+      "name": "Name",
+      "phone": "Phone"
+    },
+    "placeholder": {
+      "email": "Enter your email",
+      "password": "Enter your password",
+      "name": "Enter your name",
+      "phone": "Enter your phone number"
+    }
+  },
+  "table": {
+    "noData": "No data to display",
+    "loading": "Loading data...",
+    "pageInfo": "Page {{current}} / {{total}}",
+    "rowsPerPage": "Rows per page"
+  },
+  "modal": {
+    "close": "Close",
+    "confirm": "Confirm",
+    "cancel": "Cancel"
+  }
+}

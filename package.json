@@ -6,7 +6,13 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "internal": "pnpm --filter @jinyverse/internal",
-    "external": "pnpm --filter @jinyverse/external"
+    "external": "pnpm --filter @jinyverse/external",
+    "translate": "pnpm --filter @jinyverse/common translate",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,css,scss,md,yml,yaml}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,css,scss,md,yml,yaml}\""
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5"
   },
   "keywords": [],
   "author": "",
