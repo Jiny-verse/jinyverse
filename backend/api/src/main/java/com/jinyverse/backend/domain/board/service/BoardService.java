@@ -4,17 +4,23 @@ import com.jinyverse.backend.domain.board.dto.BoardRequestDto;
 import com.jinyverse.backend.domain.board.dto.BoardResponseDto;
 import com.jinyverse.backend.domain.board.entity.Board;
 import com.jinyverse.backend.domain.board.repository.BoardRepository;
+import com.jinyverse.backend.domain.common.util.Channel;
 import com.jinyverse.backend.domain.common.util.CommonSpecifications;
 import com.jinyverse.backend.domain.common.util.RequestContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
+
+import static com.jinyverse.backend.domain.common.util.CommonSpecifications.PAGINATION_KEYS;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +30,10 @@ public class BoardService {
     private final BoardRepository boardRepository;
 
     @Transactional
-    public BoardResponseDto create(BoardRequestDto requestDto) {
+    public BoardResponseDto create(BoardRequestDto requestDto, RequestContext ctx) {
+        if (ctx == null || !ctx.isAdmin() || ctx.getChannel() != Channel.INTERNAL) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Board create requires ADMIN on INTERNAL channel");
+        }
         Board board = Board.fromRequestDto(requestDto);
         Board saved = boardRepository.save(board);
         return saved.toResponseDto();
@@ -36,12 +45,19 @@ public class BoardService {
         return board.toResponseDto();
     }
 
-    public Page<BoardResponseDto> getAll(Pageable pageable, RequestContext ctx) {
-        return boardRepository.findAll(spec(ctx), pageable).map(Board::toResponseDto);
+    public Page<BoardResponseDto> getAll(Map<String, Object> filter, Pageable pageable, RequestContext ctx) {
+        return boardRepository.findAll(spec(ctx, filter), pageable).map(Board::toResponseDto);
+    }
+
+    public long count() {
+        return boardRepository.countByDeletedAtIsNull();
     }
 
     @Transactional
-    public BoardResponseDto update(UUID id, BoardRequestDto requestDto) {
+    public BoardResponseDto update(UUID id, BoardRequestDto requestDto, RequestContext ctx) {
+        if (ctx == null || !ctx.isAdmin() || ctx.getChannel() != Channel.INTERNAL) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Board update requires ADMIN on INTERNAL channel");
+        }
         Board board = boardRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new RuntimeException("Board not found with id: " + id));
 
@@ -51,7 +67,10 @@ public class BoardService {
     }
 
     @Transactional
-    public void delete(UUID id) {
+    public void delete(UUID id, RequestContext ctx) {
+        if (ctx == null || !ctx.isAdmin() || ctx.getChannel() != Channel.INTERNAL) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Board delete requires ADMIN on INTERNAL channel");
+        }
         Board board = boardRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new RuntimeException("Board not found with id: " + id));
 
@@ -59,16 +78,19 @@ public class BoardService {
         boardRepository.save(board);
     }
 
-    /**
-     * 권한 및 채널에 따른 강제 조건
-     */
-    private Specification<Board> spec(RequestContext ctx) {
-        Specification<Board> result = CommonSpecifications.notDeleted();
-
+    /** 접근 제어 전용: 삭제 여부, 채널별 노출 */
+    private Specification<Board> accessControlSpec(RequestContext ctx) {
+        Specification<Board> s = CommonSpecifications.notDeleted();
         if (ctx != null && ctx.getChannel() != null && "EXTERNAL".equals(ctx.getChannel().name())) {
-            result = result.and(CommonSpecifications.eqIfPresent("isPublic", true));
+            s = CommonSpecifications.and(s, CommonSpecifications.eqIfPresent("isPublic", true));
         }
+        return s;
+    }
 
-        return result;
+    private Specification<Board> spec(RequestContext ctx, Map<String, Object> filter) {
+        return CommonSpecifications.and(
+                accessControlSpec(ctx),
+                CommonSpecifications.filterSpec(filter, PAGINATION_KEYS, "q", new String[]{"name", "description", "type"})
+        );
     }
 }

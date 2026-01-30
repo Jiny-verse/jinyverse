@@ -11,4 +11,6 @@ import java.util.UUID;
 @Repository
 public interface TopicRepository extends JpaRepository<Topic, UUID>, JpaSpecificationExecutor<Topic> {
     Optional<Topic> findByIdAndDeletedAtIsNull(UUID id);
+    
+    long countByDeletedAtIsNull();
 }

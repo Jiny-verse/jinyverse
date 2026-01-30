@@ -4,10 +4,15 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
 
 public final class CommonSpecifications {
 
     private CommonSpecifications() {}
+
+    /** 쿼리 파라미터 중 엔티티 필터가 아닌 것 (spec에 넣지 않음) */
+    public static final Set<String> PAGINATION_KEYS = Set.of("page", "size", "sort");
 
     public static <T> Specification<T> and(Specification<T> left, Specification<T> right) {
         if (left == null) return right;
@@ -21,7 +26,17 @@ public final class CommonSpecifications {
 
     public static <T> Specification<T> eqIfPresent(String field, Object value) {
         if (value == null) return null;
-        return (root, query, cb) -> cb.equal(root.get(field), value);
+        final Object finalValue = value instanceof String str && ("true".equals(str) || "false".equals(str))
+                ? Boolean.parseBoolean(str)
+                : value;
+        return (root, query, cb) -> cb.equal(root.get(field), finalValue);
+    }
+
+    public static <T> Specification<T> andEqAll(Specification<T> spec, Map<String, Object> fields) {
+        for (Map.Entry<String, Object> entry : fields.entrySet()) {
+            spec = and(spec, eqIfPresent(entry.getKey(), entry.getValue()));
+        }
+        return spec;
     }
 
     public static <T> Specification<T> likeContainsIfPresent(String field, String value) {
@@ -49,5 +64,37 @@ public final class CommonSpecifications {
                         .map(f -> cb.like(root.get(f), pattern))
                         .toArray(jakarta.persistence.criteria.Predicate[]::new)
         );
+    }
+
+    /**
+     * 쿼리 파라미터 Map으로 필터 전용 Specification 생성.
+     * - skipKeys(page, size, sort 등) 제외
+     * - searchKey(q 등)는 keywordLikeAny(searchFields)로 처리
+     * - 그 외 키는 eq 조건으로 적용. "true"/"false" 문자열은 Boolean으로 변환 (엔티티 Boolean 필드와 타입 일치)
+     */
+    public static <T> Specification<T> filterSpec(
+            Map<String, Object> filter,
+            Set<String> skipKeys,
+            String searchKey,
+            String[] searchFields
+    ) {
+        if (filter == null || filter.isEmpty()) return null;
+        Specification<T> s = null;
+        Object searchValue = filter.get(searchKey);
+        if (searchKey != null && searchFields != null && searchFields.length > 0
+                && searchValue != null && !searchValue.toString().isBlank()) {
+            s = keywordLikeAny(searchValue.toString(), searchFields);
+        }
+        for (Map.Entry<String, Object> entry : filter.entrySet()) {
+            String key = entry.getKey();
+            if (skipKeys != null && skipKeys.contains(key)) continue;
+            if (searchKey != null && searchKey.equals(key)) continue;
+            Object val = entry.getValue();
+            if (val instanceof String str && ("true".equals(str) || "false".equals(str))) {
+                val = Boolean.parseBoolean(str);
+            }
+            s = and(s, eqIfPresent(key, val));
+        }
+        return s;
     }
 }

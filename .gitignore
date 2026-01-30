@@ -6,12 +6,21 @@ node_modules/
 dist/
 .next/
 out/
+.turbo
+.vercel
+*.tsbuildinfo
+.eslintcache
+.cache/
 
 # IDE & OS
 .idea/
 .vscode/
+.cursor/
 .DS_Store
+Thumbs.db
 *.log
+*.swp
+*.swo
 
 # Environment variables & Secrets
 .env
@@ -54,3 +63,8 @@ build/
 .gradle/
 backend/**/build/
 backend/**/.gradle/
+
+# Test & coverage
+coverage/
+*.lcov
+.pnpm-debug.log*

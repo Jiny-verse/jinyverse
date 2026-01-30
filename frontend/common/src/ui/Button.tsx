@@ -21,7 +21,8 @@ export function Button({
   const baseStyles = 'inline-flex items-center justify-center font-medium rounded transition-colors';
   
   const variantStyles = {
-    primary: 'bg-blue-600 text-white hover:bg-blue-700 disabled:bg-blue-300',
+    primary:
+      'text-white bg-[var(--btn-primary,#374151)] hover:bg-[var(--btn-primary-hover,#1f2937)] disabled:bg-[var(--btn-primary-disabled,#9ca3af)] focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring,#6b7280)]',
     secondary: 'bg-gray-600 text-white hover:bg-gray-700 disabled:bg-gray-300',
     danger: 'bg-red-600 text-white hover:bg-red-700 disabled:bg-red-300',
     ghost: 'bg-transparent text-gray-700 hover:bg-gray-100 disabled:text-gray-400',

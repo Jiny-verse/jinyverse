@@ -1,7 +1,5 @@
 'use client';
 
-import { Button } from './Button';
-
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
@@ -15,12 +13,14 @@ export function Pagination({
   onPageChange,
   showPageNumbers = true,
 }: PaginationProps) {
+  const effectiveTotalPages = Math.max(1, totalPages);
+
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
     const maxVisible = 5;
 
-    if (totalPages <= maxVisible) {
-      for (let i = 1; i <= totalPages; i++) {
+    if (effectiveTotalPages <= maxVisible) {
+      for (let i = 1; i <= effectiveTotalPages; i++) {
         pages.push(i);
       }
     } else {
@@ -29,11 +29,11 @@ export function Pagination({
           pages.push(i);
         }
         pages.push('...');
-        pages.push(totalPages);
-      } else if (currentPage >= totalPages - 2) {
+        pages.push(effectiveTotalPages);
+      } else if (currentPage >= effectiveTotalPages - 2) {
         pages.push(1);
         pages.push('...');
-        for (let i = totalPages - 3; i <= totalPages; i++) {
+        for (let i = effectiveTotalPages - 3; i <= effectiveTotalPages; i++) {
           pages.push(i);
         }
       } else {
@@ -43,54 +43,60 @@ export function Pagination({
           pages.push(i);
         }
         pages.push('...');
-        pages.push(totalPages);
+        pages.push(effectiveTotalPages);
       }
     }
 
     return pages;
   };
 
+  const boxSize = 'min-w-7 h-7';
+  const boxClass = `inline-flex items-center justify-center rounded border border-gray-200 bg-gray-100 px-1.5 py-1 text-xs text-gray-600 transition-colors ${boxSize}`;
+  const selectedBoxClass = `inline-flex items-center justify-center rounded border border-gray-200 bg-gray-700 px-1.5 py-1 text-xs text-white ${boxSize}`;
+  const disabledClass = 'cursor-not-allowed opacity-50';
+
   return (
-    <div className="flex items-center gap-2">
-      <Button
-        variant="ghost"
-        size="sm"
+    <div className="inline-flex shrink-0 items-center gap-1">
+      <button
+        type="button"
+        className={`${boxClass} ${currentPage === 1 ? disabledClass : 'hover:bg-gray-200'}`}
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
       >
         이전
-      </Button>
+      </button>
 
       {showPageNumbers &&
         getPageNumbers().map((page, index) => {
           if (page === '...') {
             return (
-              <span key={`ellipsis-${index}`} className="px-2">
+              <span key={`ellipsis-${index}`} className="flex h-7 min-w-7 items-center justify-center text-xs text-gray-500">
                 ...
               </span>
             );
           }
 
+          const isSelected = currentPage === page;
           return (
-            <Button
+            <button
               key={page}
-              variant={currentPage === page ? 'primary' : 'ghost'}
-              size="sm"
+              type="button"
+              className={isSelected ? selectedBoxClass : `${boxClass} hover:bg-gray-200`}
               onClick={() => onPageChange(page as number)}
             >
               {page}
-            </Button>
+            </button>
           );
         })}
 
-      <Button
-        variant="ghost"
-        size="sm"
+      <button
+        type="button"
+        className={`${boxClass} ${currentPage === effectiveTotalPages ? disabledClass : 'hover:bg-gray-200'}`}
         onClick={() => onPageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
+        disabled={currentPage === effectiveTotalPages}
       >
         다음
-      </Button>
+      </button>
     </div>
   );
 }

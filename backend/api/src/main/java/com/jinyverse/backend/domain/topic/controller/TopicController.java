@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -23,19 +24,31 @@ public class TopicController {
     private final TopicService topicService;
 
     @PostMapping
-    public ResponseEntity<TopicResponseDto> create(@Valid @RequestBody TopicRequestDto requestDto) {
-        TopicResponseDto response = topicService.create(requestDto);
+    public ResponseEntity<TopicResponseDto> create(
+            @Valid @RequestBody TopicRequestDto requestDto,
+            @RequestHeader(value = "X-Channel", required = false) String channel,
+            @RequestHeader(value = "X-Role", required = false) String role
+    ) {
+        TopicResponseDto response = topicService.create(requestDto, RequestContext.fromHeaders(channel, role));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
     public ResponseEntity<Page<TopicResponseDto>> getAll(
-            @PageableDefault(size = 20) Pageable pageable,
-            @RequestHeader(value = "X-Channel", required = false) String channel
+            @RequestParam Map<String, Object> filter,
+            Pageable pageable,
+            @RequestHeader(value = "X-Channel", required = false) String channel,
+            @RequestHeader(value = "X-Role", required = false) String role
     ) {
         Page<TopicResponseDto> responses =
-                topicService.getAll(pageable, RequestContext.fromChannelHeader(channel));
+                topicService.getAll(filter, pageable, RequestContext.fromHeaders(channel, role));
         return ResponseEntity.ok(responses);
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<Map<String, Long>> count() {
+        long count = topicService.count();
+        return ResponseEntity.ok(Map.of("count", count));
     }
 
     @GetMapping("/{id}")
@@ -44,17 +57,24 @@ public class TopicController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{id}")
+    @PostMapping("/{id}")
     public ResponseEntity<TopicResponseDto> update(
             @PathVariable UUID id,
-            @Valid @RequestBody TopicRequestDto requestDto) {
-        TopicResponseDto response = topicService.update(id, requestDto);
+            @Valid @RequestBody TopicRequestDto requestDto,
+            @RequestHeader(value = "X-Channel", required = false) String channel,
+            @RequestHeader(value = "X-Role", required = false) String role
+    ) {
+        TopicResponseDto response = topicService.update(id, requestDto, RequestContext.fromHeaders(channel, role));
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        topicService.delete(id);
+    public ResponseEntity<Void> delete(
+            @PathVariable UUID id,
+            @RequestHeader(value = "X-Channel", required = false) String channel,
+            @RequestHeader(value = "X-Role", required = false) String role
+    ) {
+        topicService.delete(id, RequestContext.fromHeaders(channel, role));
         return ResponseEntity.noContent().build();
     }
 }

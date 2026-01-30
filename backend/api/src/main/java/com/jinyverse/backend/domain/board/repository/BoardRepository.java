@@ -11,4 +11,6 @@ import java.util.UUID;
 @Repository
 public interface BoardRepository extends JpaRepository<Board, UUID>, JpaSpecificationExecutor<Board> {
     Optional<Board> findByIdAndDeletedAtIsNull(UUID id);
+    
+    long countByDeletedAtIsNull();
 }

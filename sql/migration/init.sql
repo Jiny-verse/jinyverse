@@ -626,3 +626,18 @@ ALTER TABLE "notification" ADD FOREIGN KEY ("user_id") REFERENCES "user" ("id");
 ALTER TABLE "notification" ADD FOREIGN KEY ("type_category_code") REFERENCES "code_category" ("code");
 
 ALTER TABLE "notification" ADD FOREIGN KEY ("type_category_code", "type") REFERENCES "code" ("category_code", "code");
+
+-- order(순서) 중복 방지: 스코프별 unique 제약
+CREATE UNIQUE INDEX code_category_order_unique ON "code" (category_code, "order")
+  WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX board_order_unique ON "board" ("order")
+  WHERE deleted_at IS NULL;
+
+CREATE UNIQUE INDEX menu_order_root_unique ON "menu" ("order")
+  WHERE upper_code IS NULL AND deleted_at IS NULL;
+
+CREATE UNIQUE INDEX menu_order_child_unique ON "menu" (upper_code, "order")
+  WHERE upper_code IS NOT NULL AND deleted_at IS NULL;
+
+CREATE UNIQUE INDEX rel_topic_file_topic_order_unique ON "rel__topic_file" (topic_id, "order");

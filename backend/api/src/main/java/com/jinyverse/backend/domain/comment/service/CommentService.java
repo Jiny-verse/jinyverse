@@ -8,13 +8,18 @@ import com.jinyverse.backend.domain.common.util.CommonSpecifications;
 import com.jinyverse.backend.domain.common.util.RequestContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
+
+import static com.jinyverse.backend.domain.common.util.CommonSpecifications.PAGINATION_KEYS;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +29,10 @@ public class CommentService {
     private final CommentRepository commentRepository;
 
     @Transactional
-    public CommentResponseDto create(CommentRequestDto requestDto) {
+    public CommentResponseDto create(CommentRequestDto requestDto, RequestContext ctx) {
+        if (ctx == null || !ctx.hasRole()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Comment create requires logged-in user (USER or ADMIN)");
+        }
         Comment comment = Comment.fromRequestDto(requestDto);
         Comment saved = commentRepository.save(comment);
         return saved.toResponseDto();
@@ -36,17 +44,15 @@ public class CommentService {
         return comment.toResponseDto();
     }
 
-    public Page<CommentResponseDto> getAll(UUID topicId, Pageable pageable, RequestContext ctx) {
-        Specification<Comment> spec = spec(ctx);
-        if (topicId != null) {
-            spec = spec.and(CommonSpecifications.eqIfPresent("topicId", topicId));
-        }
-        
-        return commentRepository.findAll(spec, pageable).map(Comment::toResponseDto);
+    public Page<CommentResponseDto> getAll(Map<String, Object> filter, Pageable pageable, RequestContext ctx) {
+        return commentRepository.findAll(spec(ctx, filter), pageable).map(Comment::toResponseDto);
     }
 
     @Transactional
-    public CommentResponseDto update(UUID id, CommentRequestDto requestDto) {
+    public CommentResponseDto update(UUID id, CommentRequestDto requestDto, RequestContext ctx) {
+        if (ctx == null || !ctx.hasRole()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Comment update requires logged-in user (USER or ADMIN)");
+        }
         Comment comment = commentRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new RuntimeException("Comment not found with id: " + id));
 
@@ -56,7 +62,10 @@ public class CommentService {
     }
 
     @Transactional
-    public void delete(UUID id) {
+    public void delete(UUID id, RequestContext ctx) {
+        if (ctx == null || !ctx.isAdmin()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Comment delete requires ADMIN");
+        }
         Comment comment = commentRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new RuntimeException("Comment not found with id: " + id));
 
@@ -64,10 +73,14 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
-    /**
-     * 권한 및 채널에 따른 강제 조건
-     */
-    private Specification<Comment> spec(RequestContext ctx) {
-        return CommonSpecifications.notDeleted();
+    private Specification<Comment> spec(RequestContext ctx, Map<String, Object> filter) {
+        Specification<Comment> s = CommonSpecifications.notDeleted();
+        
+        for (Map.Entry<String, Object> entry : filter.entrySet()) {
+            if (PAGINATION_KEYS.contains(entry.getKey())) continue;
+            s = CommonSpecifications.and(s, CommonSpecifications.eqIfPresent(entry.getKey(), entry.getValue()));
+        }
+        
+        return s;
     }
 }

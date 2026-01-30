@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -23,19 +24,24 @@ public class CommentController {
     private final CommentService commentService;
 
     @PostMapping
-    public ResponseEntity<CommentResponseDto> create(@Valid @RequestBody CommentRequestDto requestDto) {
-        CommentResponseDto response = commentService.create(requestDto);
+    public ResponseEntity<CommentResponseDto> create(
+            @Valid @RequestBody CommentRequestDto requestDto,
+            @RequestHeader(value = "X-Channel", required = false) String channel,
+            @RequestHeader(value = "X-Role", required = false) String role
+    ) {
+        CommentResponseDto response = commentService.create(requestDto, RequestContext.fromHeaders(channel, role));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
     public ResponseEntity<Page<CommentResponseDto>> getAll(
-            @RequestParam(required = false) UUID topicId,
-            @PageableDefault(size = 20) Pageable pageable,
-            @RequestHeader(value = "X-Channel", required = false) String channel
+            @RequestParam Map<String, Object> filter,
+            Pageable pageable,
+            @RequestHeader(value = "X-Channel", required = false) String channel,
+            @RequestHeader(value = "X-Role", required = false) String role
     ) {
         Page<CommentResponseDto> responses =
-                commentService.getAll(topicId, pageable, RequestContext.fromChannelHeader(channel));
+                commentService.getAll(filter, pageable, RequestContext.fromHeaders(channel, role));
         return ResponseEntity.ok(responses);
     }
 
@@ -45,17 +51,24 @@ public class CommentController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{id}")
+    @PostMapping("/{id}")
     public ResponseEntity<CommentResponseDto> update(
             @PathVariable UUID id,
-            @Valid @RequestBody CommentRequestDto requestDto) {
-        CommentResponseDto response = commentService.update(id, requestDto);
+            @Valid @RequestBody CommentRequestDto requestDto,
+            @RequestHeader(value = "X-Channel", required = false) String channel,
+            @RequestHeader(value = "X-Role", required = false) String role
+    ) {
+        CommentResponseDto response = commentService.update(id, requestDto, RequestContext.fromHeaders(channel, role));
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable UUID id) {
-        commentService.delete(id);
+    public ResponseEntity<Void> delete(
+            @PathVariable UUID id,
+            @RequestHeader(value = "X-Channel", required = false) String channel,
+            @RequestHeader(value = "X-Role", required = false) String role
+    ) {
+        commentService.delete(id, RequestContext.fromHeaders(channel, role));
         return ResponseEntity.noContent().build();
     }
 }
