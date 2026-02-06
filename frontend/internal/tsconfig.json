@@ -1,10 +1,6 @@
 {
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
+    "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -22,43 +18,18 @@
       }
     ],
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "common": [
-        "../common/src"
-      ],
-      "common/components": [
-        "../common/src/components"
-      ],
-      "common/utils": [
-        "../common/src/utils"
-      ],
-      "common/schemas": [
-        "../common/src/schemas"
-      ],
-      "common/types": [
-        "../common/src/types"
-      ],
-      "common/data": [
-        "../common/src/data"
-      ],
-      "common/ui": [
-        "../common/src/ui"
-      ],
-      "common/services": [
-        "../common/src/services"
-      ]
+      "@/*": ["./src/*"],
+      "common": ["../common/src"],
+      "common/components": ["../common/src/components"],
+      "common/utils": ["../common/src/utils"],
+      "common/schemas": ["../common/src/schemas"],
+      "common/types": ["../common/src/types"],
+      "common/data": ["../common/src/data"],
+      "common/ui": ["../common/src/ui"],
+      "common/services": ["../common/src/services"]
     },
     "target": "ES2017"
   },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    ".next/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
 }

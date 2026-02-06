@@ -1,4 +1,4 @@
-export const commonValue = "This is from common";
+export const commonValue = 'This is from common';
 
 // Navigation components
 export { HorizontalNavigation, SideNavigation } from './components/navigation';
@@ -21,6 +21,9 @@ export {
 
 // UI components
 export * from './ui';
+
+// Hooks
+export * from './hooks';
 
 // i18n
 export { t, i18n, useLanguage, I18nProvider } from './utils/i18n';

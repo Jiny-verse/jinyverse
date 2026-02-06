@@ -1,17 +1,30 @@
 'use client';
 
-import { Pagination } from '../../ui';
-import { Select } from '../../ui';
-import type { TablePaginationConfig } from './types';
+import { Pagination } from './Pagination';
+import { Select } from './Select';
 
 const DEFAULT_SIZE_OPTIONS = [10, 20, 50, 100];
 
-export interface TablePaginationFooterProps extends TablePaginationConfig {
-  /** 현재 페이지에 보이는 데이터 개수 (로딩 시 등) */
+export interface PaginationFooterProps {
+  /** 0-based 현재 페이지 */
+  page: number;
+  /** 페이지당 개수 */
+  size: number;
+  /** 전체 항목 수 */
+  totalElements: number;
+  /** 전체 페이지 수 */
+  totalPages: number;
+  onPageChange: (page: number) => void;
+  onSizeChange?: (size: number) => void;
+  sizeOptions?: number[];
+  /** 현재 페이지에 보이는 개수 */
   currentCount?: number;
 }
 
-export function TablePaginationFooter({
+/** 페이지네이션 공통 (카운트 + 페이지 + 사이즈) */
+export type PaginationConfig = Omit<PaginationFooterProps, 'currentCount'>;
+
+export function PaginationFooter({
   page,
   size,
   totalElements,
@@ -20,7 +33,7 @@ export function TablePaginationFooter({
   onSizeChange,
   sizeOptions = DEFAULT_SIZE_OPTIONS,
   currentCount,
-}: TablePaginationFooterProps) {
+}: PaginationFooterProps) {
   const count = currentCount ?? 0;
 
   return (

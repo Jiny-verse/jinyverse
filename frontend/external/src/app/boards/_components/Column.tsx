@@ -10,7 +10,10 @@ export interface BoardColumnOptions {
 }
 
 /** 게시판 목록 컬럼 */
-export function getBoardColumns(boardIdPrefix: string, options?: BoardColumnOptions): ColumnDef<Board>[] {
+export function getBoardColumns(
+  boardIdPrefix: string,
+  options?: BoardColumnOptions
+): ColumnDef<Board>[] {
   const previewMode = options?.previewMode ?? false;
   return [
     {
@@ -20,13 +23,23 @@ export function getBoardColumns(boardIdPrefix: string, options?: BoardColumnOpti
         previewMode ? (
           <span className="text-blue-400 hover:underline cursor-pointer">{row.name}</span>
         ) : (
-          <Link href={`${boardIdPrefix}/${row.id}/topics`} className="text-blue-400 hover:underline">
+          <Link
+            href={`${boardIdPrefix}/${row.id}/topics`}
+            className="text-blue-400 hover:underline"
+          >
             {row.name}
           </Link>
         ),
     },
     { key: 'type', header: '타입' },
-    { key: 'description', header: '설명', render: (row) => (row.description ? String(row.description).slice(0, 60) + (String(row.description).length > 60 ? '…' : '') : '-') },
+    {
+      key: 'description',
+      header: '설명',
+      render: (row) =>
+        row.description
+          ? String(row.description).slice(0, 60) + (String(row.description).length > 60 ? '…' : '')
+          : '-',
+    },
     { key: 'isPublic', header: '공개', render: (row) => (row.isPublic ? 'Y' : 'N') },
   ];
 }

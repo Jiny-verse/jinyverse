@@ -27,13 +27,7 @@ const iconStyles: Record<AlertVariant, string> = {
   error: 'text-red-500',
 };
 
-export function Alert({
-  variant = 'info',
-  title,
-  children,
-  onClose,
-  className = '',
-}: AlertProps) {
+export function Alert({ variant = 'info', title, children, onClose, className = '' }: AlertProps) {
   return (
     <div
       role="alert"
@@ -41,9 +35,7 @@ export function Alert({
     >
       <div className="flex items-start gap-3">
         <div className="flex-1 min-w-0">
-          {title && (
-            <p className="font-medium text-sm mb-0.5">{title}</p>
-          )}
+          {title && <p className="font-medium text-sm mb-0.5">{title}</p>}
           <div className="text-sm">{children}</div>
         </div>
         {onClose && (

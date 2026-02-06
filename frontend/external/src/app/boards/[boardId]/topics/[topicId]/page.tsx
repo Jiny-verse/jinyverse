@@ -19,10 +19,7 @@ export default function TopicDetailPage() {
   useEffect(() => {
     let cancelled = false;
     setError(null);
-    Promise.all([
-      getTopic(options, topicId),
-      getComments(options, { topicId, size: 50 }),
-    ])
+    Promise.all([getTopic(options, topicId), getComments(options, { topicId, size: 50 })])
       .then(([t, res]) => {
         if (!cancelled) {
           setTopic(t);
@@ -41,7 +38,10 @@ export default function TopicDetailPage() {
     return (
       <div className="min-h-screen pt-[90px]">
         <p className="text-red-400">{error}</p>
-        <Link href={`/boards/${boardId}/topics`} className="mt-4 inline-block text-gray-400 hover:text-white">
+        <Link
+          href={`/boards/${boardId}/topics`}
+          className="mt-4 inline-block text-gray-400 hover:text-white"
+        >
           게시글 목록
         </Link>
       </div>
@@ -58,7 +58,10 @@ export default function TopicDetailPage() {
 
   return (
     <div className="min-h-screen pt-[90px]">
-      <Link href={`/boards/${boardId}/topics`} className="text-gray-400 hover:text-white mb-4 inline-block">
+      <Link
+        href={`/boards/${boardId}/topics`}
+        className="text-gray-400 hover:text-white mb-4 inline-block"
+      >
         ← 게시글 목록
       </Link>
       <article className="rounded-lg border border-gray-700 bg-gray-800/50 p-6 mb-8">

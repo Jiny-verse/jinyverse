@@ -18,15 +18,8 @@ export function ApiProvider({
   channel?: ApiOptions['channel'];
   role?: ApiOptions['role'];
 }) {
-  const value = useMemo<ApiOptions>(
-    () => ({ baseUrl, channel, role }),
-    [baseUrl, channel, role]
-  );
-  return (
-    <ApiOptionsContext.Provider value={value}>
-      {children}
-    </ApiOptionsContext.Provider>
-  );
+  const value = useMemo<ApiOptions>(() => ({ baseUrl, channel, role }), [baseUrl, channel, role]);
+  return <ApiOptionsContext.Provider value={value}>{children}</ApiOptionsContext.Provider>;
 }
 
 export function useApiOptions(): ApiOptions {

@@ -12,7 +12,15 @@ import type { ApiOptions } from '../types/api';
 import type { Board, BoardCreateInput, BoardUpdateInput, BoardFilter } from '../types/api';
 import { apiGet, apiPost, apiDelete } from './api';
 
-type BoardPageResponse = { content: Board[]; totalElements: number; totalPages: number; size: number; number: number; first: boolean; last: boolean };
+type BoardPageResponse = {
+  content: Board[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+};
 
 const boardPageSchema = pageResponseSchema(boardSchema);
 
@@ -32,7 +40,10 @@ function toQuery(params: ListBoardsParams): Record<string, string | number | boo
   return out;
 }
 
-const listBoardsParamsSchema = paginationSchema.merge(boardFilterSchema).extend({ q: z.string().optional() }).partial();
+const listBoardsParamsSchema = paginationSchema
+  .merge(boardFilterSchema)
+  .extend({ q: z.string().optional() })
+  .partial();
 
 export async function getBoards(
   options: ApiOptions,
@@ -59,7 +70,11 @@ export async function createBoard(options: ApiOptions, body: BoardCreateInput): 
   return boardSchema.parse(data);
 }
 
-export async function updateBoard(options: ApiOptions, id: string, body: BoardUpdateInput): Promise<Board> {
+export async function updateBoard(
+  options: ApiOptions,
+  id: string,
+  body: BoardUpdateInput
+): Promise<Board> {
   const parsed = boardUpdateSchema.parse(body);
   const data = await apiPost<Board>(options, `/api/boards/${id}`, parsed);
   return boardSchema.parse(data);

@@ -1,38 +1,22 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { Spinner } from '../../ui';
-import { Checkbox } from '../../ui';
-import { TableToolbar } from './TableToolbar';
-import { TablePaginationFooter } from './TablePaginationFooter';
-import type { ColumnDef, TablePaginationConfig, TableSearchConfig, TableSelectionConfig } from './types';
+import { Spinner, Checkbox, Toolbar, PaginationFooter } from '../../ui';
+import type { ColumnDef, PaginationConfig, SearchConfig, TableSelectionConfig } from './types';
 
 export interface TableProps<T extends Record<string, unknown>> {
-  /** 목록 데이터 */
   data: T[];
-  /** 컬럼 정의 */
   columns: ColumnDef<T>[];
-  /** 로딩 여부 */
   isLoading?: boolean;
-  /** 데이터 없을 때 메시지 */
   emptyMessage?: string;
-  /** 페이징 설정 */
-  pagination?: TablePaginationConfig;
-  /** 검색 (상단 툴바) */
-  search?: TableSearchConfig;
-  /** 필터 슬롯 (검색 옆) */
+  pagination?: PaginationConfig;
+  search?: SearchConfig;
   filterSlot?: ReactNode;
-  /** 체크박스 열 사용 시 선택 설정 */
   selection?: TableSelectionConfig<T>;
-  /** 액션 툴바 (일괄삭제 등, 선택 시 노출) */
   actionToolSlot?: ReactNode;
-  /** 상단 고정 액션 (추가 버튼 등) */
   toolbarActionSlot?: ReactNode;
-  /** 행 클릭 (미리보기용 setState 또는 router.push 등 부모가 결정) */
   onRowClick?: (row: T) => void;
-  /** 선택된 행 ID (미리보기 열림 시 하이라이트) */
   selectedRowId?: string | null;
-  /** 행 ID 추출 (기본: row.id) */
   getRowId?: (row: T) => string;
 }
 
@@ -59,7 +43,9 @@ export function Table<T extends Record<string, unknown>>({
 
   const toggleRow = (id: string) => {
     if (!selection) return;
-    const next = selectedSet.has(id) ? [...selection.selectedIds].filter((x) => x !== id) : [...selection.selectedIds, id];
+    const next = selectedSet.has(id)
+      ? [...selection.selectedIds].filter((x) => x !== id)
+      : [...selection.selectedIds, id];
     selection.onSelectionChange(next);
   };
 
@@ -75,7 +61,7 @@ export function Table<T extends Record<string, unknown>>({
 
   return (
     <div className="w-full rounded-lg border border-gray-200 bg-white shadow-md overflow-hidden">
-      <TableToolbar
+      <Toolbar
         search={search}
         filterSlot={filterSlot}
         rightSlot={
@@ -93,18 +79,18 @@ export function Table<T extends Record<string, unknown>>({
             <tr>
               {selection && (
                 <th className="px-4 py-3 text-left w-10">
-                  <Checkbox
-                    checked={allSelected}
-                    onChange={toggleAll}
-                    aria-label="전체 선택"
-                  />
+                  <Checkbox checked={allSelected} onChange={toggleAll} aria-label="전체 선택" />
                 </th>
               )}
               {columns.map((col) => (
                 <th
                   key={col.key}
                   className={`px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${
-                    col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'
+                    col.align === 'right'
+                      ? 'text-right'
+                      : col.align === 'center'
+                        ? 'text-center'
+                        : 'text-left'
                   }`}
                   style={col.width ? { width: col.width } : undefined}
                 >
@@ -166,7 +152,9 @@ export function Table<T extends Record<string, unknown>>({
                       onClick={onRowClick ? handleRowClick : undefined}
                       role={onRowClick ? 'button' : undefined}
                       tabIndex={onRowClick ? 0 : undefined}
-                      onKeyDown={onRowClick ? (e) => e.key === 'Enter' && onRowClick(row) : undefined}
+                      onKeyDown={
+                        onRowClick ? (e) => e.key === 'Enter' && onRowClick(row) : undefined
+                      }
                     >
                       {selection && (
                         <td className="px-4 py-3">
@@ -181,7 +169,11 @@ export function Table<T extends Record<string, unknown>>({
                         <td
                           key={col.key}
                           className={`px-4 py-3 text-sm text-gray-900 whitespace-nowrap ${
-                            col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left'
+                            col.align === 'right'
+                              ? 'text-right'
+                              : col.align === 'center'
+                                ? 'text-center'
+                                : 'text-left'
                           }`}
                         >
                           {col.render ? col.render(row) : (row[col.key] as ReactNode)}
@@ -192,7 +184,9 @@ export function Table<T extends Record<string, unknown>>({
                 })}
                 {Array.from({ length: emptyRowCount }).map((_, i) => (
                   <tr key={`empty-${i}`}>
-                    <td colSpan={colSpanTotal} className="px-4 py-3 text-sm text-gray-400">&nbsp;</td>
+                    <td colSpan={colSpanTotal} className="px-4 py-3 text-sm text-gray-400">
+                      &nbsp;
+                    </td>
                   </tr>
                 ))}
               </>
@@ -201,12 +195,7 @@ export function Table<T extends Record<string, unknown>>({
         </table>
       </div>
 
-      {pagination && (
-        <TablePaginationFooter
-          {...pagination}
-          currentCount={data.length}
-        />
-      )}
+      {pagination && <PaginationFooter {...pagination} currentCount={data.length} />}
     </div>
   );
 }

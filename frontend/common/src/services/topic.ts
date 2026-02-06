@@ -11,11 +11,21 @@ import type { ApiOptions } from '../types/api';
 import type { Topic, TopicCreateInput, TopicUpdateInput, TopicFilter } from '../types/api';
 import { apiGet, apiPost, apiDelete } from './api';
 
-type TopicPageResponse = { content: Topic[]; totalElements: number; totalPages: number; size: number; number: number; first: boolean; last: boolean };
+type TopicPageResponse = {
+  content: Topic[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+};
 
 const topicPageSchema = pageResponseSchema(topicSchema);
 
-function toQuery(params: { page?: number; size?: number; sort?: string } & TopicFilter): Record<string, string | number | boolean | undefined> {
+function toQuery(
+  params: { page?: number; size?: number; sort?: string } & TopicFilter
+): Record<string, string | number | boolean | undefined> {
   const { page, size, sort, boardId, statusCategoryCode, status, q, isNotice, isPinned } = params;
   const query: Record<string, string | number | boolean | undefined> = {};
   if (page !== undefined) query.page = page;
@@ -55,7 +65,11 @@ export async function createTopic(options: ApiOptions, body: TopicCreateInput): 
   return topicSchema.parse(data);
 }
 
-export async function updateTopic(options: ApiOptions, id: string, body: TopicUpdateInput): Promise<Topic> {
+export async function updateTopic(
+  options: ApiOptions,
+  id: string,
+  body: TopicUpdateInput
+): Promise<Topic> {
   const parsed = topicUpdateSchema.parse(body);
   const data = await apiPost<Topic>(options, `/api/topics/${id}`, parsed);
   return topicSchema.parse(data);

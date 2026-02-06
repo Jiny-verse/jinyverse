@@ -23,7 +23,14 @@ export interface TopicTableProps {
 }
 
 /** 게시글 목록 테이블 */
-export function TopicTable({ boardId, data, isLoading, pagination, onRowClick, selectedRowId }: TopicTableProps) {
+export function TopicTable({
+  boardId,
+  data,
+  isLoading,
+  pagination,
+  onRowClick,
+  selectedRowId,
+}: TopicTableProps) {
   const columns = getTopicColumns(boardId, {
     previewMode: !!onRowClick,
     onDetailView: onRowClick ?? undefined,
@@ -34,7 +41,11 @@ export function TopicTable({ boardId, data, isLoading, pagination, onRowClick, s
       columns={columns}
       isLoading={isLoading}
       emptyMessage="등록된 게시글이 없습니다."
-      pagination={pagination ? { ...pagination, sizeOptions: [10, 20, 50], onSizeChange: pagination.onSizeChange } : undefined}
+      pagination={
+        pagination
+          ? { ...pagination, sizeOptions: [10, 20, 50], onSizeChange: pagination.onSizeChange }
+          : undefined
+      }
       onRowClick={onRowClick}
       selectedRowId={selectedRowId}
     />

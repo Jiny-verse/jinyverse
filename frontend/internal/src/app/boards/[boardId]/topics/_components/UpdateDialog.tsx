@@ -17,14 +17,14 @@ const topicUpdateFields: AutoDialogField[] = [
   { key: 'isPublic', label: '공개', type: 'checkbox', optional: true },
 ];
 
-export type TopicUpdateDialogProps = {
+export type UpdateDialogProps = {
   open: boolean;
   topic: Topic | null;
   onClose: () => void;
   onSubmit: (values: TopicUpdateInput) => void | Promise<void>;
 };
 
-export function TopicUpdateDialog({ open, topic, onClose, onSubmit }: TopicUpdateDialogProps) {
+export function UpdateDialog({ open, topic, onClose, onSubmit }: UpdateDialogProps) {
   const initialValues = topic
     ? {
         authorUserId: topic.authorUserId,

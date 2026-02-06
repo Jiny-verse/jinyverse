@@ -9,7 +9,14 @@ interface AvatarProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'src' | 
   fallback?: string;
 }
 
-export function Avatar({ src, alt = '', size = 'md', fallback, className = '', ...props }: AvatarProps) {
+export function Avatar({
+  src,
+  alt = '',
+  size = 'md',
+  fallback,
+  className = '',
+  ...props
+}: AvatarProps) {
   const sizeStyles = {
     sm: 'w-8 h-8',
     md: 'w-10 h-10',
@@ -17,7 +24,9 @@ export function Avatar({ src, alt = '', size = 'md', fallback, className = '', .
   };
 
   return (
-    <div className={`${sizeStyles[size]} rounded-full overflow-hidden bg-gray-200 flex items-center justify-center ${className}`}>
+    <div
+      className={`${sizeStyles[size]} rounded-full overflow-hidden bg-gray-200 flex items-center justify-center ${className}`}
+    >
       {src ? (
         <img src={src} alt={alt} className="w-full h-full object-cover" {...props} />
       ) : (

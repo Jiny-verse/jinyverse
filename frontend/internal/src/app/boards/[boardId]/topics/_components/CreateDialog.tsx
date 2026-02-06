@@ -5,7 +5,7 @@ import type { AutoDialogField } from 'common/components';
 import { topicCreateSchema } from 'common/schemas';
 import type { TopicCreateInput } from 'common/types';
 
-export type TopicCreateDialogProps = {
+export type CreateDialogProps = {
   open: boolean;
   boardId: string;
   onClose: () => void;
@@ -24,7 +24,7 @@ const topicCreateFields: AutoDialogField[] = [
   { key: 'isPublic', label: '공개', type: 'checkbox', optional: true },
 ];
 
-export function TopicCreateDialog({ open, boardId, onClose, onSubmit }: TopicCreateDialogProps) {
+export function CreateDialog({ open, boardId, onClose, onSubmit }: CreateDialogProps) {
   return (
     <AutoDialog
       open={open}

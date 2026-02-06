@@ -3,7 +3,7 @@
 import { ReactNode } from 'react';
 import { Button } from '../../ui';
 
-export interface ActionToolProps {
+export interface ActionToolbarProps {
   /** 선택된 개수 */
   selectedCount: number;
   /** 일괄 삭제 버튼 (클릭 시 onBatchDelete 호출) */
@@ -16,7 +16,7 @@ export interface ActionToolProps {
  * 테이블 상단 액션 툴바 (선택 시 노출)
  * 일괄삭제, 커스텀 버튼
  */
-export function ActionTool({ selectedCount, onBatchDelete, children }: ActionToolProps) {
+export function ActionToolbar({ selectedCount, onBatchDelete, children }: ActionToolbarProps) {
   if (selectedCount === 0) return null;
   return (
     <div className="flex items-center gap-2">

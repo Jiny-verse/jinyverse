@@ -3,8 +3,19 @@ import type { Topic, TopicFilter, TopicJoined } from '../schemas/topic';
 import type { Comment, CommentFilter } from '../schemas/comment';
 
 export type { Board, BoardFilter, BoardCreateInput, BoardUpdateInput } from '../schemas/board';
-export type { Topic, TopicFilter, TopicJoined, TopicCreateInput, TopicUpdateInput } from '../schemas/topic';
-export type { Comment, CommentFilter, CommentCreateInput, CommentUpdateInput } from '../schemas/comment';
+export type {
+  Topic,
+  TopicFilter,
+  TopicJoined,
+  TopicCreateInput,
+  TopicUpdateInput,
+} from '../schemas/topic';
+export type {
+  Comment,
+  CommentFilter,
+  CommentCreateInput,
+  CommentUpdateInput,
+} from '../schemas/comment';
 
 /** Spring Page 응답 형태 */
 export interface PageResponse<T> {

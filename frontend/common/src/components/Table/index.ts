@@ -1,16 +1,14 @@
 export { Table } from './Table';
-export { TableActionButtons } from './TableActionButtons';
-export type { TableActionButtonsProps } from './TableActionButtons';
-export { ActionTool } from './ActionTool';
-export { SearchInput } from './SearchInput';
-export { FilterSelect } from './FilterSelect';
-export { TableToolbar } from './TableToolbar';
-export { TablePaginationFooter } from './TablePaginationFooter';
-export { columnsFromData } from './columnHelper';
-export type { ColumnDef, TablePaginationConfig, TableSearchConfig, TableSelectionConfig } from './types';
 export type { TableProps } from './Table';
-export type { ActionToolProps } from './ActionTool';
-export type { SearchInputProps } from './SearchInput';
-export type { FilterSelectProps, FilterSelectOption } from './FilterSelect';
-export type { TableToolbarProps } from './TableToolbar';
-export type { TablePaginationFooterProps } from './TablePaginationFooter';
+export { DataTable } from './DataTable';
+export type { DataTableProps } from './DataTable';
+export { ActionToolbar } from './ActionToolbar';
+export type { ActionToolbarProps } from './ActionToolbar';
+export { createActionColumn } from './columnHelpers';
+export { createColumnsFromData, updateColumn, addColumn, removeColumn } from './columnHelpers';
+export type { ActionColumnOptions } from './columnHelpers';
+export type { ColumnDef, PaginationConfig, SearchConfig, TableSelectionConfig } from './types';
+
+// 공통 UI re-export (테이블 무관 사용 가능)
+export { SearchInput, FilterSelect } from '../../ui';
+export type { SearchInputProps, FilterSelectProps, FilterSelectOption } from '../../ui';

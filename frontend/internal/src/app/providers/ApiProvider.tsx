@@ -22,11 +22,7 @@ export function ApiProvider({
     () => ({ baseUrl, channel, role: role ?? undefined }),
     [baseUrl, channel, role]
   );
-  return (
-    <ApiOptionsContext.Provider value={value}>
-      {children}
-    </ApiOptionsContext.Provider>
-  );
+  return <ApiOptionsContext.Provider value={value}>{children}</ApiOptionsContext.Provider>;
 }
 
 export function useApiOptions(): ApiOptions {

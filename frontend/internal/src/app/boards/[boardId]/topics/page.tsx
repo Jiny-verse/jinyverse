@@ -3,19 +3,32 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { getTopics, getTopic, getComments, createTopic, updateTopic, deleteTopic } from 'common/services';
+import {
+  getTopics,
+  getTopic,
+  getComments,
+  createTopic,
+  updateTopic,
+  deleteTopic,
+} from 'common/services';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import { DetailPreviewPanel } from 'common/components';
 import type { Topic, TopicCreateInput, TopicUpdateInput, Comment } from 'common/types';
-import { TopicTable } from './_components/Table';
-import { TopicCreateDialog } from './_components/CreateDialog';
-import { TopicUpdateDialog } from './_components/UpdateDialog';
+import { Table } from './_components/Table';
+import { CreateDialog } from './_components/CreateDialog';
+import { UpdateDialog } from './_components/UpdateDialog';
 
 export default function TopicsPage() {
   const params = useParams();
   const boardId = params.boardId as string;
   const options = useApiOptions();
-  const [data, setData] = useState<{ content: Topic[]; totalElements: number; totalPages: number; first: boolean; last: boolean } | null>(null);
+  const [data, setData] = useState<{
+    content: Topic[];
+    totalElements: number;
+    totalPages: number;
+    first: boolean;
+    last: boolean;
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
@@ -98,7 +111,9 @@ export default function TopicsPage() {
     return (
       <div className="">
         <p className="text-red-400">{error}</p>
-        <Link href="/boards" className="mt-4 inline-block text-gray-400 hover:text-white">게시판 목록</Link>
+        <Link href="/boards" className="mt-4 inline-block text-gray-400 hover:text-white">
+          게시판 목록
+        </Link>
       </div>
     );
   }
@@ -107,11 +122,13 @@ export default function TopicsPage() {
 
   return (
     <div className="">
-      <Link href="/boards" className="text-gray-400 hover:text-white mb-4 inline-block">← 게시판 목록</Link>
+      <Link href="/boards" className="text-gray-400 hover:text-white mb-4 inline-block">
+        ← 게시판 목록
+      </Link>
       <h1 className="text-2xl font-bold mb-6">게시글 관리</h1>
       <div className={hasPreview ? 'flex gap-0 h-[calc(100vh-10rem)] min-h-[400px]' : ''}>
         <div className={hasPreview ? 'w-1/2 min-w-0 pr-4 flex flex-col' : ''}>
-          <TopicTable
+          <Table
             boardId={boardId}
             data={data?.content ?? []}
             isLoading={!data}
@@ -153,15 +170,22 @@ export default function TopicsPage() {
                     <p className="text-sm text-gray-500 mb-2">
                       작성일 {previewTopic.createdAt} · 조회 {previewTopic.viewCount ?? 0}
                     </p>
-                    <div className="prose prose-sm max-w-none whitespace-pre-wrap text-gray-900">{previewTopic.content}</div>
+                    <div className="prose prose-sm max-w-none whitespace-pre-wrap text-gray-900">
+                      {previewTopic.content}
+                    </div>
                   </article>
                   <section>
-                    <h2 className="text-sm font-semibold text-gray-700 mb-2">댓글 ({previewComments.length})</h2>
+                    <h2 className="text-sm font-semibold text-gray-700 mb-2">
+                      댓글 ({previewComments.length})
+                    </h2>
                     <ul className="space-y-2">
                       {previewComments
                         .filter((c) => !c.isDeleted)
                         .map((c) => (
-                          <li key={c.id} className="rounded border border-gray-200 p-2 bg-white text-sm">
+                          <li
+                            key={c.id}
+                            className="rounded border border-gray-200 p-2 bg-white text-sm"
+                          >
                             <p className="text-gray-500 text-xs">작성자 {c.userId}</p>
                             <p className="mt-0.5 text-gray-900">{c.content}</p>
                           </li>
@@ -174,13 +198,13 @@ export default function TopicsPage() {
           </div>
         )}
       </div>
-      <TopicCreateDialog
+      <CreateDialog
         open={createDialogOpen}
         boardId={boardId}
         onClose={() => setCreateDialogOpen(false)}
         onSubmit={handleCreate}
       />
-      <TopicUpdateDialog
+      <UpdateDialog
         open={!!editing}
         topic={editing}
         onClose={() => setEditing(null)}

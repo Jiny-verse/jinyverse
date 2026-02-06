@@ -3,21 +3,31 @@
 import { AutoDialog } from 'common/components';
 import type { AutoDialogField } from 'common/components';
 import { boardCreateSchema } from 'common/schemas';
-import type { BoardCreateInput } from 'common/types';
+import { useBoardContext } from '../_hooks/useBoardContext';
 
 const BOARD_TYPE_CATEGORY = 'BOARD_TYPE';
 
-export type BoardCreateDialogProps = {
-  open: boolean;
-  onClose: () => void;
-  onSubmit: (values: BoardCreateInput) => void | Promise<void>;
+export interface CreateDialogProps {
   typeOptions: { value: string; label: string }[];
-};
+}
 
-export function BoardCreateDialog({ open, onClose, onSubmit, typeOptions }: BoardCreateDialogProps) {
+export function CreateDialog({ typeOptions }: CreateDialogProps) {
+  const domain = useBoardContext();
+  const { open, onClose, onSubmit } = domain.dialogs.create;
   const fields: AutoDialogField[] = [
-    { key: 'typeCategoryCode', label: '타입 분류 코드', type: 'text', hidden: true, defaultValue: BOARD_TYPE_CATEGORY },
-    { key: 'type', label: '타입', type: 'select', options: [{ value: '', label: '선택하세요' }, ...typeOptions] },
+    {
+      key: 'typeCategoryCode',
+      label: '타입 분류 코드',
+      type: 'text',
+      hidden: true,
+      defaultValue: BOARD_TYPE_CATEGORY,
+    },
+    {
+      key: 'type',
+      label: '타입',
+      type: 'select',
+      options: [{ value: '', label: '선택하세요' }, ...typeOptions],
+    },
     { key: 'name', label: '이름', type: 'text' },
     { key: 'description', label: '설명', type: 'textarea', optional: true },
     { key: 'note', label: '비고', type: 'textarea', optional: true },

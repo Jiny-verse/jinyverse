@@ -18,8 +18,9 @@ export function Button({
   className = '',
   ...props
 }: ButtonProps) {
-  const baseStyles = 'inline-flex items-center justify-center font-medium rounded transition-colors';
-  
+  const baseStyles =
+    'inline-flex items-center justify-center font-medium rounded transition-colors';
+
   const variantStyles = {
     primary:
       'text-white bg-[var(--btn-primary,#374151)] hover:bg-[var(--btn-primary-hover,#1f2937)] disabled:bg-[var(--btn-primary-disabled,#9ca3af)] focus:outline-none focus:ring-2 focus:ring-[var(--focus-ring,#6b7280)]',
@@ -27,7 +28,7 @@ export function Button({
     danger: 'bg-red-600 text-white hover:bg-red-700 disabled:bg-red-300',
     ghost: 'bg-transparent text-gray-700 hover:bg-gray-100 disabled:text-gray-400',
   };
-  
+
   const sizeStyles = {
     sm: 'px-3 py-1.5 text-sm',
     md: 'px-4 py-2 text-base',

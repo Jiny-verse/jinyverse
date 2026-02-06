@@ -14,7 +14,7 @@ export interface FilterSelectProps {
   'aria-label'?: string;
 }
 
-/** 라벨 + 버튼 그룹 형태 필터 (셀렉트 대신 터치하기 좋은 토글) */
+/** 라벨 + 버튼 그룹 형태 필터 */
 export function FilterSelect({
   label,
   value,

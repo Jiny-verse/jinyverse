@@ -1,8 +1,7 @@
 'use client';
 
-import { ReactNode } from 'react';
-import { TableActionButtons } from 'common/components';
 import type { ColumnDef } from 'common/components';
+import { createActionColumn } from 'common/components';
 import type { Topic } from 'common/types';
 import Link from 'next/link';
 
@@ -22,9 +21,14 @@ export function getTopicColumns(boardId: string, options?: TopicColumnOptions): 
       header: '제목',
       render: (row) =>
         previewMode ? (
-          <span className="text-blue-400 hover:underline line-clamp-1 cursor-pointer">{row.title}</span>
+          <span className="text-blue-400 hover:underline line-clamp-1 cursor-pointer">
+            {row.title}
+          </span>
         ) : (
-          <Link href={`/boards/${boardId}/topics/${row.id}`} className="text-blue-400 hover:underline line-clamp-1">
+          <Link
+            href={`/boards/${boardId}/topics/${row.id}`}
+            className="text-blue-400 hover:underline line-clamp-1"
+          >
             {row.title}
           </Link>
         ),
@@ -32,16 +36,18 @@ export function getTopicColumns(boardId: string, options?: TopicColumnOptions): 
     { key: 'status', header: '상태' },
     { key: 'viewCount', header: '조회', render: (row) => row.viewCount ?? 0 },
     { key: 'isNotice', header: '공지', render: (row) => (row.isNotice ? 'Y' : 'N') },
-    { key: 'createdAt', header: '작성일', render: (row) => (row.createdAt ? String(row.createdAt).slice(0, 10) : '-') },
+    {
+      key: 'createdAt',
+      header: '작성일',
+      render: (row) => (row.createdAt ? String(row.createdAt).slice(0, 10) : '-'),
+    },
   ];
   if (options?.onDetailView) {
-    cols.push({
-      key: '_actions',
-      header: '작업',
-      render: (row): ReactNode => (
-        <TableActionButtons<Topic> row={row} onDetailView={options.onDetailView} />
-      ),
-    });
+    cols.push(
+      createActionColumn<Topic>({
+        onDetailView: options.onDetailView,
+      })
+    );
   }
   return cols;
 }

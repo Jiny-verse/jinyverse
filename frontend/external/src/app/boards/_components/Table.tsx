@@ -22,7 +22,13 @@ export interface BoardTableProps {
 }
 
 /** 게시판 목록 테이블 */
-export function BoardTable({ data, isLoading, pagination, onRowClick, selectedRowId }: BoardTableProps) {
+export function BoardTable({
+  data,
+  isLoading,
+  pagination,
+  onRowClick,
+  selectedRowId,
+}: BoardTableProps) {
   const columns = getBoardColumns('/boards', { previewMode: !!onRowClick });
   return (
     <CommonTable<Board>
@@ -30,7 +36,11 @@ export function BoardTable({ data, isLoading, pagination, onRowClick, selectedRo
       columns={columns}
       isLoading={isLoading}
       emptyMessage="등록된 게시판이 없습니다."
-      pagination={pagination ? { ...pagination, sizeOptions: [10, 20, 50], onSizeChange: pagination.onSizeChange } : undefined}
+      pagination={
+        pagination
+          ? { ...pagination, sizeOptions: [10, 20, 50], onSizeChange: pagination.onSizeChange }
+          : undefined
+      }
       onRowClick={onRowClick}
       selectedRowId={selectedRowId}
     />

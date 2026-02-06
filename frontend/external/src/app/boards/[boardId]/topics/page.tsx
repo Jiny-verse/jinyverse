@@ -13,7 +13,11 @@ export default function TopicsPage() {
   const params = useParams();
   const boardId = params.boardId as string;
   const options = useApiOptions();
-  const [data, setData] = useState<{ content: Topic[]; totalElements: number; totalPages: number } | null>(null);
+  const [data, setData] = useState<{
+    content: Topic[];
+    totalElements: number;
+    totalPages: number;
+  } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
@@ -124,15 +128,22 @@ export default function TopicsPage() {
                     <p className="text-sm text-gray-500 mb-2">
                       작성일 {previewTopic.createdAt} · 조회 {previewTopic.viewCount ?? 0}
                     </p>
-                    <div className="prose prose-sm max-w-none whitespace-pre-wrap text-gray-900">{previewTopic.content}</div>
+                    <div className="prose prose-sm max-w-none whitespace-pre-wrap text-gray-900">
+                      {previewTopic.content}
+                    </div>
                   </article>
                   <section>
-                    <h2 className="text-sm font-semibold text-gray-700 mb-2">댓글 ({previewComments.length})</h2>
+                    <h2 className="text-sm font-semibold text-gray-700 mb-2">
+                      댓글 ({previewComments.length})
+                    </h2>
                     <ul className="space-y-2">
                       {previewComments
                         .filter((c) => !c.isDeleted)
                         .map((c) => (
-                          <li key={c.id} className="rounded border border-gray-200 p-2 bg-white text-sm">
+                          <li
+                            key={c.id}
+                            className="rounded border border-gray-200 p-2 bg-white text-sm"
+                          >
                             <p className="text-gray-500 text-xs">작성자 {c.userId}</p>
                             <p className="mt-0.5 text-gray-900">{c.content}</p>
                           </li>

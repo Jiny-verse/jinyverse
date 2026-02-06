@@ -35,4 +35,3 @@ export const pageResponseSchema = <T extends z.ZodTypeAny>(itemSchema: T) =>
     first: z.boolean(),
     last: z.boolean(),
   });
-

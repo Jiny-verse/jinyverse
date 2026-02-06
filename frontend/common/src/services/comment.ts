@@ -10,11 +10,21 @@ import type { ApiOptions } from '../types/api';
 import type { Comment, CommentCreateInput, CommentUpdateInput, CommentFilter } from '../types/api';
 import { apiGet, apiPost, apiDelete } from './api';
 
-type CommentPageResponse = { content: Comment[]; totalElements: number; totalPages: number; size: number; number: number; first: boolean; last: boolean };
+type CommentPageResponse = {
+  content: Comment[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+};
 
 const commentPageSchema = pageResponseSchema(commentSchema);
 
-function toQuery(params: { page?: number; size?: number; sort?: string } & CommentFilter): Record<string, string | number | boolean | undefined> {
+function toQuery(
+  params: { page?: number; size?: number; sort?: string } & CommentFilter
+): Record<string, string | number | boolean | undefined> {
   const { page, size, sort, topicId, userId } = params;
   const query: Record<string, string | number | boolean | undefined> = {};
   if (page !== undefined) query.page = page;
@@ -39,13 +49,20 @@ export async function getComment(options: ApiOptions, id: string): Promise<Comme
   return commentSchema.parse(data);
 }
 
-export async function createComment(options: ApiOptions, body: CommentCreateInput): Promise<Comment> {
+export async function createComment(
+  options: ApiOptions,
+  body: CommentCreateInput
+): Promise<Comment> {
   const parsed = commentCreateSchema.parse(body);
   const data = await apiPost<Comment>(options, '/api/comments', parsed);
   return commentSchema.parse(data);
 }
 
-export async function updateComment(options: ApiOptions, id: string, body: CommentUpdateInput): Promise<Comment> {
+export async function updateComment(
+  options: ApiOptions,
+  id: string,
+  body: CommentUpdateInput
+): Promise<Comment> {
   const parsed = commentUpdateSchema.parse(body);
   const data = await apiPost<Comment>(options, `/api/comments/${id}`, parsed);
   return commentSchema.parse(data);

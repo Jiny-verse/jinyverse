@@ -5,7 +5,7 @@ services:
       dockerfile: docker/Dockerfile
       target: database
     ports:
-      - "5433:5432"
+      - '5433:5432'
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-jinyverse}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
@@ -20,7 +20,7 @@ services:
       dockerfile: docker/Dockerfile
       target: backend-runner
     ports:
-      - "8080:8080"
+      - '8080:8080'
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-jinyverse}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-postgres}
@@ -34,7 +34,7 @@ services:
       dockerfile: docker/Dockerfile
       target: external-runner
     ports:
-      - "3000:3000"
+      - '3000:3000'
     depends_on:
       - backend
 
@@ -44,10 +44,9 @@ services:
       dockerfile: docker/Dockerfile
       target: internal-runner
     ports:
-      - "3001:3001"
+      - '3001:3001'
     depends_on:
       - backend
 
 volumes:
   postgres_data:
-

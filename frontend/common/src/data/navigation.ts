@@ -87,16 +87,12 @@ export const mockChannelConfig = [
 /**
  * 채널에 따라 필터링된 네비게이션 아이템 반환
  */
-export function getNavigationItemsByChannel(
-  channel: 'external' | 'internal'
-): NavigationItem[] {
+export function getNavigationItemsByChannel(channel: 'external' | 'internal'): NavigationItem[] {
   return mockNavigationItems.filter((item) => {
     const config = mockChannelConfig.find((c) => c.itemId === item.id);
     if (!config) return false;
 
-    return (
-      config.channels.includes(channel) || config.channels.includes('both')
-    );
+    return config.channels.includes(channel) || config.channels.includes('both');
   });
 }
 

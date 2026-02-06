@@ -9,9 +9,7 @@ interface Props {
   channel?: 'external' | 'internal';
 }
 
-export function Navigation({
-  channel = 'external',
-}: Props) {
+export function Navigation({ channel = 'external' }: Props) {
   const items = getNavigationItemsByChannel(channel);
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);

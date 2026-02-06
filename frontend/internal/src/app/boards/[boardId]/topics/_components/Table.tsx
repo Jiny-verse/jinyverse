@@ -1,12 +1,11 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { Table as CommonTable } from 'common/components';
+import { DataTable } from 'common/components';
 import type { Topic } from 'common/types';
-import { getTopicColumns } from './Column';
-import { TopicActionTool, TopicToolbarAction } from './ActionTool';
+import { getColumns } from './Column';
 
-export interface TopicTableProps {
+export interface TableProps {
   boardId: string;
   data: Topic[];
   isLoading?: boolean;
@@ -29,7 +28,10 @@ export interface TopicTableProps {
   selectedRowId?: string | null;
 }
 
-export function TopicTable({
+/**
+ * 테이블 (컬럼 정의만 도메인)
+ */
+export function Table({
   boardId,
   data,
   isLoading,
@@ -43,25 +45,27 @@ export function TopicTable({
   onDelete,
   onRowClick,
   selectedRowId,
-}: TopicTableProps) {
-  const columns = getTopicColumns(boardId, {
+}: TableProps) {
+  const columns = getColumns(boardId, {
     onDetailView: onRowClick,
     onEdit,
     onDelete,
     previewMode: !!onRowClick,
   });
+
   return (
-    <CommonTable<Topic>
+    <DataTable<Topic>
       data={data}
       columns={columns}
       isLoading={isLoading}
       emptyMessage="등록된 게시글이 없습니다."
-      pagination={pagination ? { ...pagination, sizeOptions: [10, 20, 50], onSizeChange: pagination.onSizeChange } : undefined}
+      pagination={pagination}
       search={search}
       filterSlot={filterSlot}
-      selection={selection ? { idKey: 'id', ...selection } : undefined}
-      actionToolSlot={selection?.selectedIds.length ? <TopicActionTool selectedCount={selection.selectedIds.length} onBatchDelete={onBatchDelete} /> : null}
-      toolbarActionSlot={onAdd ? <TopicToolbarAction onAdd={onAdd} /> : null}
+      selection={selection}
+      onBatchDelete={onBatchDelete}
+      onAdd={onAdd}
+      addButtonLabel="게시글 추가"
       onRowClick={onRowClick}
       selectedRowId={selectedRowId}
     />

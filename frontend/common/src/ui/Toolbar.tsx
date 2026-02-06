@@ -2,15 +2,21 @@
 
 import { ReactNode } from 'react';
 import { SearchInput } from './SearchInput';
-import type { TableSearchConfig } from './types';
 
-export interface TableToolbarProps {
-  search?: TableSearchConfig;
+export interface SearchConfig {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+}
+
+export interface ToolbarProps {
+  search?: SearchConfig;
   filterSlot?: ReactNode;
   rightSlot?: ReactNode;
 }
 
-export function TableToolbar({ search, filterSlot, rightSlot }: TableToolbarProps) {
+/** 목록 상단 툴바 (검색 + 필터 + 액션) */
+export function Toolbar({ search, filterSlot, rightSlot }: ToolbarProps) {
   const hasLeft = search || filterSlot;
   if (!hasLeft && !rightSlot) return null;
 

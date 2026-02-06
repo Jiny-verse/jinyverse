@@ -163,7 +163,10 @@ export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
                   type={f.type === 'number' ? 'number' : f.type === 'uuid' ? 'text' : 'text'}
                   value={String(values[f.key] ?? '')}
                   onChange={(e) =>
-                    handleChange(f.key, f.type === 'number' ? e.target.valueAsNumber : e.target.value)
+                    handleChange(
+                      f.key,
+                      f.type === 'number' ? e.target.valueAsNumber : e.target.value
+                    )
                   }
                   error={errors[f.key]}
                 />

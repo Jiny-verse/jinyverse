@@ -3,19 +3,23 @@
 import { AutoDialog } from 'common/components';
 import type { AutoDialogField } from 'common/components';
 import { boardUpdateSchema } from 'common/schemas';
-import type { Board, BoardUpdateInput } from 'common/types';
+import { useBoardContext } from '../_hooks/useBoardContext';
 
-export type BoardUpdateDialogProps = {
-  open: boolean;
-  board: Board | null;
-  onClose: () => void;
-  onSubmit: (values: BoardUpdateInput) => void | Promise<void>;
+export interface UpdateDialogProps {
   typeOptions: { value: string; label: string }[];
-};
+}
 
-export function BoardUpdateDialog({ open, board, onClose, onSubmit, typeOptions }: BoardUpdateDialogProps) {
+export function UpdateDialog({ typeOptions }: UpdateDialogProps) {
+  const domain = useBoardContext();
+  const { open, board, onClose, onSubmit } = domain.dialogs.update;
   const fields: AutoDialogField[] = [
-    { key: 'typeCategoryCode', label: '타입 분류 코드', type: 'text', hidden: true, defaultValue: 'BOARD_TYPE' },
+    {
+      key: 'typeCategoryCode',
+      label: '타입 분류 코드',
+      type: 'text',
+      hidden: true,
+      defaultValue: 'BOARD_TYPE',
+    },
     { key: 'type', label: '타입', type: 'select', options: typeOptions },
     { key: 'name', label: '이름', type: 'text' },
     { key: 'description', label: '설명', type: 'textarea', optional: true },

@@ -11,7 +11,11 @@ const headers = (options: ApiOptions): HeadersInit => {
   return h;
 };
 
-const buildUrl = (baseUrl: string, path: string, params?: Record<string, string | number | boolean | undefined>) => {
+const buildUrl = (
+  baseUrl: string,
+  path: string,
+  params?: Record<string, string | number | boolean | undefined>
+) => {
   const url = new URL(path, baseUrl);
   if (params) {
     Object.entries(params).forEach(([k, v]) => {
@@ -23,7 +27,11 @@ const buildUrl = (baseUrl: string, path: string, params?: Record<string, string 
   return url.toString();
 };
 
-export async function apiGet<T>(options: ApiOptions, path: string, params?: Record<string, string | number | boolean | undefined>): Promise<T> {
+export async function apiGet<T>(
+  options: ApiOptions,
+  path: string,
+  params?: Record<string, string | number | boolean | undefined>
+): Promise<T> {
   const url = buildUrl(options.baseUrl, path, params);
   const res = await fetch(url, { method: 'GET', headers: headers(options) });
   if (!res.ok) {
