@@ -23,3 +23,10 @@ spring:
 
 server:
   port: 8080
+
+# JWT (환경변수 필수, 기본값 없음)
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    access-expire-minutes: 30
+    refresh-expire-days: 7

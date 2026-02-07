@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,10 +23,12 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Transactional
     public UserResponseDto create(UserRequestDto requestDto) {
-        User user = User.fromRequestDto(requestDto);
+        String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
+        User user = User.fromRequestDto(requestDto, encodedPassword);
         User saved = userRepository.save(user);
         return saved.toResponseDto();
     }
@@ -45,6 +48,9 @@ public class UserService {
         User user = userRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
 
+        if (requestDto.getPassword() != null && !requestDto.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
+        }
         user.applyUpdate(requestDto);
         User updated = userRepository.save(user);
         return updated.toResponseDto();
@@ -59,9 +65,7 @@ public class UserService {
         userRepository.save(user);
     }
 
-    /**
-     * 권한 및 채널에 따른 강제 조건
-     */
+    /** 삭제되지 않은 유저만 조회 */
     private Specification<User> spec(RequestContext ctx) {
         return CommonSpecifications.notDeleted();
     }

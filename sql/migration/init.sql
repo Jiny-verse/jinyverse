@@ -108,7 +108,6 @@ CREATE TABLE "user" (
   "role" VARCHAR(40) NOT NULL DEFAULT 'user',
   "username" VARCHAR(50) NOT NULL UNIQUE,
   "password" VARCHAR(256) NOT NULL,
-  "salt" VARCHAR(16) NOT NULL,
   "email" VARCHAR(256) UNIQUE NOT NULL,
   "name" VARCHAR(20) NOT NULL,
   "nickname" VARCHAR(20) NOT NULL,
@@ -388,8 +387,6 @@ COMMENT ON COLUMN "user"."role" IS '권한 코드 값';
 COMMENT ON COLUMN "user"."username" IS '로그인 아이디';
 
 COMMENT ON COLUMN "user"."password" IS '비밀번호 해시';
-
-COMMENT ON COLUMN "user"."salt" IS '비밀번호 해시 솔트';
 
 COMMENT ON COLUMN "user"."email" IS '이메일';
 

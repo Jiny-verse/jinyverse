@@ -1,6 +1,6 @@
 package com.jinyverse.backend.domain.user.controller;
 
-import com.jinyverse.backend.domain.common.util.RequestContext;
+import com.jinyverse.backend.domain.common.util.RequestContextHolder;
 import com.jinyverse.backend.domain.user.dto.UserRequestDto;
 import com.jinyverse.backend.domain.user.dto.UserResponseDto;
 import com.jinyverse.backend.domain.user.service.UserService;
@@ -28,12 +28,9 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<UserResponseDto>> getAll(
-            Pageable pageable,
-            @RequestHeader(value = "X-Channel", required = false) String channel
-    ) {
+    public ResponseEntity<Page<UserResponseDto>> getAll(Pageable pageable) {
         Page<UserResponseDto> responses =
-                userService.getAll(pageable, RequestContext.fromChannelHeader(channel));
+                userService.getAll(pageable, RequestContextHolder.get());
         return ResponseEntity.ok(responses);
     }
 

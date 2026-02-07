@@ -114,7 +114,6 @@ Table user {
   role varchar(40) [not null, default: 'user', note: "권한 코드 값"]
   username varchar(50) [not null, unique, note: "로그인 아이디"]
   password varchar(256) [not null, note: "비밀번호 해시"]
-  salt varchar(16) [not null, note: "비밀번호 해시 솔트"]
   email varchar(256) [not null, unique, note: "이메일"]
   name varchar(20) [not null, note: "사용자 실명"]
   nickname varchar(20) [not null, note: "닉네임"]

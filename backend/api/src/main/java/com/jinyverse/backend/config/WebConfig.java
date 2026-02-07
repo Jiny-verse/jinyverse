@@ -1,7 +1,11 @@
 package com.jinyverse.backend.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jinyverse.backend.domain.common.util.JwtUtil;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -10,6 +14,18 @@ import java.util.List;
 
 @Configuration
 public class WebConfig {
+
+    @Bean
+    public FilterRegistrationBean<JwtAuthenticationFilter> jwtAuthenticationFilter(
+            JwtUtil jwtUtil,
+            ObjectMapper objectMapper
+    ) {
+        FilterRegistrationBean<JwtAuthenticationFilter> registration = new FilterRegistrationBean<>();
+        registration.setFilter(new JwtAuthenticationFilter(jwtUtil, objectMapper));
+        registration.addUrlPatterns("/api/*", "/api/*/*", "/api/*/*/*", "/api/*/*/*/*");
+        registration.setOrder(Ordered.LOWEST_PRECEDENCE);
+        return registration;
+    }
 
     @Bean
     public CorsFilter corsFilter() {

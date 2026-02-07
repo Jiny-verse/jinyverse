@@ -47,13 +47,9 @@ public class User extends BaseEntity {
     @Column(name = "username", length = 50, nullable = false)
     private String username;
 
-    /** 비밀번호 해시 */
+    /** 비밀번호 해시 (BCrypt) */
     @Column(name = "password", length = 256, nullable = false)
     private String password;
-
-    /** 비밀번호 해시 솔트 */
-    @Column(name = "salt", length = 16, nullable = false)
-    private String salt;
 
     /** 이메일 */
     @Column(name = "email", length = 256, nullable = false, unique = true)
@@ -98,14 +94,17 @@ public class User extends BaseEntity {
     @Builder.Default
     private List<Verification> verifications = new ArrayList<>();
 
-    public static User fromRequestDto(UserRequestDto dto) {
+    /**
+     * Service에서 비밀번호를 BCrypt로 해시한 뒤 encodedPassword로 넘긴다.
+     */
+    public static User fromRequestDto(UserRequestDto dto, String encodedPassword) {
         if (dto == null) throw new IllegalArgumentException("UserRequestDto is null");
+        if (encodedPassword == null || encodedPassword.isBlank()) throw new IllegalArgumentException("encodedPassword is required");
         return User.builder()
                 .roleCategoryCode(dto.getRoleCategoryCode() != null ? dto.getRoleCategoryCode() : "role")
                 .role(dto.getRole() != null ? dto.getRole() : "user")
                 .username(dto.getUsername())
-                .password(dto.getPassword())
-                .salt("") // TODO: salt 생성 로직 필요
+                .password(encodedPassword)
                 .email(dto.getEmail())
                 .name(dto.getName())
                 .nickname(dto.getNickname())
@@ -114,12 +113,14 @@ public class User extends BaseEntity {
                 .build();
     }
 
+    /**
+     * 비밀번호는 Service에서 해시 후 setPassword()로 별도 설정한다.
+     */
     public void applyUpdate(UserRequestDto dto) {
         if (dto == null) return;
         if (dto.getRoleCategoryCode() != null) this.roleCategoryCode = dto.getRoleCategoryCode();
         if (dto.getRole() != null) this.role = dto.getRole();
         if (dto.getUsername() != null) this.username = dto.getUsername();
-        if (dto.getPassword() != null) this.password = dto.getPassword();
         if (dto.getEmail() != null) this.email = dto.getEmail();
         if (dto.getName() != null) this.name = dto.getName();
         if (dto.getNickname() != null) this.nickname = dto.getNickname();
@@ -127,12 +128,12 @@ public class User extends BaseEntity {
         if (dto.getIsLocked() != null) this.isLocked = dto.getIsLocked();
     }
 
+    /** 비밀번호는 노출하지 않는다. */
     public UserRequestDto toDto() {
         return UserRequestDto.builder()
                 .roleCategoryCode(this.roleCategoryCode)
                 .role(this.role)
                 .username(this.username)
-                .password(this.password)
                 .email(this.email)
                 .name(this.name)
                 .nickname(this.nickname)
