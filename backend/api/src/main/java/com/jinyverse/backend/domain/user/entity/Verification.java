@@ -40,11 +40,13 @@ public class Verification extends BaseEntity {
     @Column(name = "session_id", columnDefinition = "UUID")
     private UUID sessionId;
 
-    /** 인증 유형 분류 코드 */
+    /** 인증 유형 분류 코드
+     * 값: verification_type */
     @Column(name = "type_category_code", length = 40, nullable = false)
     private String typeCategoryCode;
 
-    /** 인증 유형 코드 */
+    /** 인증 유형 코드
+     * 값: email_verify, password_reset */
     @Column(name = "type", length = 40, nullable = false)
     private String type;
 

@@ -20,7 +20,7 @@ public class BoardResponseDto {
     private UUID id;
     /** 연결된 메뉴 코드 */
     private String menuCode;
-    /** 게시판 타입 분류 코드 (BOARD_TYPE) */
+    /** 게시판 타입 분류 코드 (board_type) */
     private String typeCategoryCode;
     /** 게시판 타입 코드 값 */
     private String type;

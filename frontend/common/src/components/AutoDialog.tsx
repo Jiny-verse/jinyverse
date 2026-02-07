@@ -44,7 +44,7 @@ export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
   onSubmit,
 }: AutoDialogProps<S>) {
   const defaultFor = (f: AutoDialogField) => {
-    if (f.hidden && f.defaultValue !== undefined) return f.defaultValue;
+    if (f.defaultValue !== undefined) return f.defaultValue;
     if (f.type === 'checkbox' || f.type === 'toggle') return false;
     if (f.type === 'select') return '';
     return '';

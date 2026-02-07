@@ -27,12 +27,12 @@ export const topicSchema = z.object({
 
 export type Topic = z.infer<typeof topicSchema>;
 
-/** 게시글 생성 요청 */
+/** 게시글 생성 요청 (statusCategoryCode/status 미입력 시 DB DEFAULT) */
 export const topicCreateSchema = z.object({
   authorUserId: uuid,
   menuCode: optionalString,
-  statusCategoryCode: z.string().min(1).max(40),
-  status: z.string().min(1).max(40),
+  statusCategoryCode: optionalString,
+  status: optionalString,
   boardId: uuid,
   title: z.string().min(1).max(200),
   content: z.string().min(1),
@@ -57,6 +57,7 @@ export const topicFilterSchema = z.object({
   q: z.string().max(200).optional(),
   isNotice: z.boolean().optional(),
   isPinned: z.boolean().optional(),
+  isPublic: z.boolean().optional(),
 });
 
 export type TopicFilter = z.infer<typeof topicFilterSchema>;

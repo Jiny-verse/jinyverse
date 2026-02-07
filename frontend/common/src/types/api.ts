@@ -32,5 +32,5 @@ export interface PageResponse<T> {
 export interface ApiOptions {
   baseUrl: string;
   channel: 'INTERNAL' | 'EXTERNAL';
-  role?: 'ADMIN' | 'USER' | null;
+  role?: 'admin' | 'user' | null;
 }

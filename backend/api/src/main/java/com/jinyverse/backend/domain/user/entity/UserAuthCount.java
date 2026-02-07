@@ -40,11 +40,13 @@ public class UserAuthCount extends BaseEntity {
     @Column(name = "email", length = 256, nullable = false)
     private String email;
 
-    /** 인증 시도 유형 분류 코드 */
+    /** 인증 시도 유형 분류 코드
+     * 값: user_auth_count_type */
     @Column(name = "type_category_code", length = 40, nullable = false)
     private String typeCategoryCode;
 
-    /** 인증 시도 유형 코드 */
+    /** 인증 시도 유형 코드
+     * 값: login_attempt */
     @Column(name = "type", length = 40, nullable = false)
     private String type;
 

@@ -11,7 +11,7 @@ export function ApiProvider({
   children,
   baseUrl = defaultBaseUrl,
   channel = 'INTERNAL',
-  role = 'ADMIN',
+  role = 'admin',
 }: {
   children: React.ReactNode;
   baseUrl?: string;

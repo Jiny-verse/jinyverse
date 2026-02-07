@@ -19,13 +19,11 @@ public class BoardRequestDto {
     @Size(max = 40, message = "메뉴 코드는 40자 이하여야 합니다")
     private String menuCode;
 
-    /** 게시판 타입 분류 코드 (BOARD_TYPE) */
-    @NotBlank(message = "타입 분류 코드는 필수입니다")
+    /** 게시판 타입 분류 코드 (미입력 시 board_type) */
     @Size(max = 40, message = "타입 분류 코드는 40자 이하여야 합니다")
     private String typeCategoryCode;
 
-    /** 게시판 타입 코드 값 */
-    @NotBlank(message = "타입은 필수입니다")
+    /** 게시판 타입 코드 값 (미입력 시 project) */
     @Size(max = 40, message = "타입은 40자 이하여야 합니다")
     private String type;
 

@@ -34,8 +34,8 @@ export function Modal({ isOpen, onClose, title, children, footer, size = 'md' }:
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black bg-opacity-50" onClick={onClose} />
+      {/* Backdrop - 반투명으로 뒤 화면이 비치도록 */}
+      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
 
       {/* Modal */}
       <div className={`relative bg-white rounded-lg shadow-xl ${sizeStyles[size]} w-full mx-4`}>

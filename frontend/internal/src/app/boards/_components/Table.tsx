@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { DataTable, FilterSelect } from 'common/components';
 import type { Board } from 'common/types';
 import type { ApiOptions } from 'common/types';
@@ -15,8 +16,10 @@ export interface TableProps {
 
 /**
  * 테이블 (상태 관리 + 데이터 fetching + 필터 내장)
+ * 행 클릭 시 해당 게시판의 게시글 목록 페이지로 이동
  */
 export function Table({ apiOptions, boardIdPrefix = '/boards' }: TableProps) {
+  const router = useRouter();
   const domain = useBoardContext();
   const [data, setData] = useState<{
     content: Board[];
@@ -37,19 +40,23 @@ export function Table({ apiOptions, boardIdPrefix = '/boards' }: TableProps) {
 
   useEffect(() => {
     load();
-  }, [load]);
+  }, [load, domain.reloadTrigger]);
 
   const handleBatchDelete = async () => {
     await domain.crud.batchDelete(selectedIds);
     setSelectedIds([]);
-    load();
   };
 
+  const goToTopics = useCallback(
+    (row: Board) => router.push(`${boardIdPrefix}/${row.id}/topics`),
+    [router, boardIdPrefix]
+  );
+
   const columns = getColumns(boardIdPrefix, {
-    onDetailView: (row) => domain.preview.onSelect(row.id),
+    onDetailView: goToTopics,
     onEdit: domain.dialogs.update.onOpen,
     onDelete: domain.crud.delete,
-    previewMode: true,
+    previewMode: false,
   });
 
   return (
@@ -96,8 +103,7 @@ export function Table({ apiOptions, boardIdPrefix = '/boards' }: TableProps) {
       onBatchDelete={selectedIds.length ? handleBatchDelete : undefined}
       onAdd={domain.dialogs.create.onOpen}
       addButtonLabel="게시판 추가"
-      onRowClick={(row) => domain.preview.onSelect(row.id)}
-      selectedRowId={domain.preview.selectedId}
+      onRowClick={goToTopics}
     />
   );
 }

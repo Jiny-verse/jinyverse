@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, ReactNode } from 'react';
 import { useDomainContext } from 'common';
-import { getBoard, createBoard, updateBoard, deleteBoard } from 'common/services';
+import { createBoard, updateBoard, deleteBoard } from 'common/services';
 import type { Board, BoardCreateInput, BoardUpdateInput } from 'common/types';
 import type { ApiOptions } from 'common/types';
 
@@ -25,7 +25,6 @@ export function BoardProvider({
       create: createBoard,
       update: updateBoard,
       delete: deleteBoard,
-      getOne: getBoard,
     },
   });
 

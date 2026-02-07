@@ -1,221 +1,221 @@
 CREATE TABLE "code_category" (
-  "code" varchar(40) PRIMARY KEY NOT NULL,
-  "is_sealed" boolean NOT NULL DEFAULT false,
-  "name" varchar(50) NOT NULL,
+  "code" VARCHAR(40) PRIMARY KEY NOT NULL,
+  "is_sealed" BOOLEAN NOT NULL DEFAULT false,
+  "name" VARCHAR(50) NOT NULL,
   "description" text,
   "note" text,
-  "created_at" timestamp NOT NULL DEFAULT (now()),
-  "updated_at" timestamp NOT NULL DEFAULT (now()),
+  "created_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
+  "updated_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
   "deleted_at" timestamp
 );
 
 CREATE TABLE "code" (
-  "category_code" varchar(40) NOT NULL,
-  "code" varchar(40) NOT NULL,
-  "name" varchar(50) NOT NULL,
+  "category_code" VARCHAR(40) NOT NULL,
+  "code" VARCHAR(40) NOT NULL,
+  "name" VARCHAR(50) NOT NULL,
   "value" text,
   "description" text,
   "note" text,
-  "order" int NOT NULL DEFAULT 0,
-  "upper_category_code" varchar(40),
-  "upper_code" varchar(40),
-  "created_at" timestamp NOT NULL DEFAULT (now()),
-  "updated_at" timestamp NOT NULL DEFAULT (now()),
+  "order" INT NOT NULL DEFAULT 0,
+  "upper_category_code" VARCHAR(40),
+  "upper_code" VARCHAR(40),
+  "created_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
+  "updated_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
   "deleted_at" timestamp,
   PRIMARY KEY ("category_code", "code")
 );
 
 CREATE TABLE "board" (
-  "id" uuid PRIMARY KEY NOT NULL,
-  "menu_code" varchar(40),
-  "type_category_code" varchar(40) NOT NULL DEFAULT 'BOARD_TYPE',
-  "type" varchar(40) NOT NULL DEFAULT 'project',
-  "name" varchar(50) NOT NULL,
+  "id" UUID PRIMARY KEY NOT NULL,
+  "menu_code" VARCHAR(40),
+  "type_category_code" VARCHAR(40) NOT NULL DEFAULT 'board_type',
+  "type" VARCHAR(40) NOT NULL DEFAULT 'project',
+  "name" VARCHAR(50) NOT NULL,
   "description" text,
   "note" text,
-  "is_public" boolean NOT NULL DEFAULT true,
-  "order" int NOT NULL DEFAULT 0,
-  "created_at" timestamp NOT NULL DEFAULT (now()),
-  "updated_at" timestamp NOT NULL DEFAULT (now()),
+  "is_public" BOOLEAN NOT NULL DEFAULT true,
+  "order" INT NOT NULL DEFAULT 0,
+  "created_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
+  "updated_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
   "deleted_at" timestamp
 );
 
 CREATE TABLE "topic" (
-  "id" uuid PRIMARY KEY NOT NULL,
-  "author_user_id" uuid NOT NULL,
-  "menu_code" varchar(40),
-  "status_category_code" varchar(40) NOT NULL DEFAULT 'TOPIC_STATUS',
-  "status" varchar(40) NOT NULL DEFAULT 'created',
-  "board_id" uuid NOT NULL,
-  "title" varchar(200) NOT NULL,
-  "content" text NOT NULL,
-  "is_notice" boolean NOT NULL DEFAULT false,
-  "is_pinned" boolean NOT NULL DEFAULT false,
-  "is_public" boolean NOT NULL DEFAULT true,
-  "view_count" int NOT NULL DEFAULT 0,
+  "id" UUID PRIMARY KEY NOT NULL,
+  "author_user_id" UUID NOT NULL,
+  "menu_code" VARCHAR(40),
+  "status_category_code" VARCHAR(40) NOT NULL DEFAULT 'topic_status',
+  "status" VARCHAR(40) NOT NULL DEFAULT 'created',
+  "board_id" UUID NOT NULL,
+  "title" VARCHAR(200) NOT NULL,
+  "content" TEXT NOT NULL,
+  "is_notice" BOOLEAN NOT NULL DEFAULT false,
+  "is_pinned" BOOLEAN NOT NULL DEFAULT false,
+  "is_public" BOOLEAN NOT NULL DEFAULT true,
+  "view_count" INT NOT NULL DEFAULT 0,
   "published_at" timestamp,
-  "created_at" timestamp NOT NULL DEFAULT (now()),
-  "updated_at" timestamp NOT NULL DEFAULT (now()),
+  "created_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
+  "updated_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
   "deleted_at" timestamp
 );
 
 CREATE TABLE "common_file" (
-  "id" uuid PRIMARY KEY NOT NULL,
-  "session_id" varchar(64),
-  "original_name" varchar(255) NOT NULL,
-  "stored_name" varchar(255) NOT NULL,
-  "file_path" text NOT NULL,
-  "file_size" bigint NOT NULL,
-  "mime_type" varchar(100) NOT NULL,
-  "file_ext" varchar(20),
-  "created_at" timestamp NOT NULL DEFAULT (now())
+  "id" UUID PRIMARY KEY NOT NULL,
+  "session_id" VARCHAR(64),
+  "original_name" VARCHAR(255) NOT NULL,
+  "stored_name" VARCHAR(255) NOT NULL,
+  "file_path" TEXT NOT NULL,
+  "file_size" BIGINT NOT NULL,
+  "mime_type" VARCHAR(100) NOT NULL,
+  "file_ext" VARCHAR(20),
+  "created_at" TIMESTAMP NOT NULL DEFAULT (NOW())
 );
 
 CREATE TABLE "rel__topic_file" (
-  "id" uuid PRIMARY KEY NOT NULL,
-  "topic_id" uuid NOT NULL,
-  "file_id" uuid NOT NULL,
-  "order" int NOT NULL DEFAULT 0,
-  "is_main" boolean NOT NULL DEFAULT false,
-  "created_at" timestamp NOT NULL DEFAULT (now())
+  "id" UUID PRIMARY KEY NOT NULL,
+  "topic_id" UUID NOT NULL,
+  "file_id" UUID NOT NULL,
+  "order" INT NOT NULL DEFAULT 0,
+  "is_main" BOOLEAN NOT NULL DEFAULT false,
+  "created_at" TIMESTAMP NOT NULL DEFAULT (NOW())
 );
 
 CREATE TABLE "rel__user_file" (
-  "id" uuid PRIMARY KEY NOT NULL,
-  "user_id" uuid NOT NULL,
-  "file_id" uuid NOT NULL,
-  "usage" varchar(40),
-  "is_main" boolean NOT NULL DEFAULT true,
-  "created_at" timestamp NOT NULL DEFAULT (now())
+  "id" UUID PRIMARY KEY NOT NULL,
+  "user_id" UUID NOT NULL,
+  "file_id" UUID NOT NULL,
+  "usage" VARCHAR(40),
+  "is_main" BOOLEAN NOT NULL DEFAULT true,
+  "created_at" TIMESTAMP NOT NULL DEFAULT (NOW())
 );
 
 CREATE TABLE "menu" (
-  "code" varchar(40) PRIMARY KEY NOT NULL,
-  "name" varchar(50) NOT NULL,
+  "code" VARCHAR(40) PRIMARY KEY NOT NULL,
+  "name" VARCHAR(50) NOT NULL,
   "description" text,
-  "is_active" boolean NOT NULL DEFAULT true,
-  "is_admin" boolean NOT NULL DEFAULT false,
-  "order" int NOT NULL DEFAULT 0,
-  "upper_code" varchar(40),
-  "created_at" timestamp NOT NULL DEFAULT (now()),
-  "updated_at" timestamp NOT NULL DEFAULT (now()),
+  "is_active" BOOLEAN NOT NULL DEFAULT true,
+  "is_admin" BOOLEAN NOT NULL DEFAULT false,
+  "order" INT NOT NULL DEFAULT 0,
+  "upper_code" VARCHAR(40),
+  "created_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
+  "updated_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
   "deleted_at" timestamp
 );
 
 CREATE TABLE "user" (
-  "id" uuid PRIMARY KEY NOT NULL,
-  "role_category_code" varchar(40) NOT NULL DEFAULT 'ROLE',
-  "role" varchar(40) NOT NULL DEFAULT 'USER',
-  "username" varchar(50) NOT NULL,
-  "password" varchar(256) NOT NULL,
-  "salt" varchar(16) NOT NULL,
-  "email" varchar(256) UNIQUE NOT NULL,
-  "name" varchar(20) NOT NULL,
-  "nickname" varchar(20) NOT NULL,
-  "is_active" boolean NOT NULL DEFAULT true,
-  "is_locked" boolean NOT NULL DEFAULT false,
-  "created_at" timestamp NOT NULL DEFAULT (now()),
-  "updated_at" timestamp NOT NULL DEFAULT (now()),
+  "id" UUID PRIMARY KEY NOT NULL,
+  "role_category_code" VARCHAR(40) NOT NULL DEFAULT 'role',
+  "role" VARCHAR(40) NOT NULL DEFAULT 'user',
+  "username" VARCHAR(50) NOT NULL,
+  "password" VARCHAR(256) NOT NULL,
+  "salt" VARCHAR(16) NOT NULL,
+  "email" VARCHAR(256) UNIQUE NOT NULL,
+  "name" VARCHAR(20) NOT NULL,
+  "nickname" VARCHAR(20) NOT NULL,
+  "is_active" BOOLEAN NOT NULL DEFAULT true,
+  "is_locked" BOOLEAN NOT NULL DEFAULT false,
+  "created_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
+  "updated_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
   "deleted_at" timestamp
 );
 
 CREATE TABLE "user_auth_count" (
-  "id" uuid PRIMARY KEY NOT NULL,
-  "user_id" uuid,
-  "email" varchar(256) NOT NULL,
-  "type_category_code" varchar(40) NOT NULL DEFAULT 'USER_AUTH_COUNT_TYPE',
-  "type" varchar(40) NOT NULL,
-  "count" integer NOT NULL DEFAULT 0,
-  "created_at" timestamp NOT NULL DEFAULT (now()),
-  "updated_at" timestamp NOT NULL DEFAULT (now()),
+  "id" UUID PRIMARY KEY NOT NULL,
+  "user_id" UUID,
+  "email" VARCHAR(256) NOT NULL,
+  "type_category_code" VARCHAR(40) NOT NULL DEFAULT 'user_auth_count_type',
+  "type" VARCHAR(40) NOT NULL,
+  "count" INTEGER NOT NULL DEFAULT 0,
+  "created_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
+  "updated_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
   "deleted_at" timestamp,
   "expired_at" timestamp
 );
 
 CREATE TABLE "verification" (
-  "id" uuid PRIMARY KEY NOT NULL,
-  "user_id" uuid,
-  "session_id" uuid,
-  "type_category_code" varchar(40) NOT NULL DEFAULT 'VERIFICATION_TYPE',
-  "type" varchar(40) NOT NULL,
-  "email" varchar(256) NOT NULL,
-  "code" varchar(50) NOT NULL,
-  "is_verified" boolean NOT NULL DEFAULT false,
-  "is_sent" boolean NOT NULL DEFAULT false,
-  "created_at" timestamp NOT NULL DEFAULT (now()),
-  "updated_at" timestamp NOT NULL DEFAULT (now()),
+  "id" UUID PRIMARY KEY NOT NULL,
+  "user_id" UUID,
+  "session_id" UUID,
+  "type_category_code" VARCHAR(40) NOT NULL DEFAULT 'verification_type',
+  "type" VARCHAR(40) NOT NULL,
+  "email" VARCHAR(256) NOT NULL,
+  "code" VARCHAR(50) NOT NULL,
+  "is_verified" BOOLEAN NOT NULL DEFAULT false,
+  "is_sent" BOOLEAN NOT NULL DEFAULT false,
+  "created_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
+  "updated_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
   "deleted_at" timestamp,
   "expired_at" timestamp
 );
 
 CREATE TABLE "user_session" (
-  "id" uuid PRIMARY KEY NOT NULL,
-  "user_id" uuid NOT NULL,
-  "refresh_token" varchar(512) NOT NULL,
-  "user_agent" varchar(255),
-  "ip_address" varchar(45),
-  "is_revoked" boolean NOT NULL DEFAULT false,
-  "created_at" timestamp NOT NULL DEFAULT (now()),
-  "updated_at" timestamp NOT NULL DEFAULT (now()),
+  "id" UUID PRIMARY KEY NOT NULL,
+  "user_id" UUID NOT NULL,
+  "refresh_token" VARCHAR(512) NOT NULL,
+  "user_agent" VARCHAR(255),
+  "ip_address" VARCHAR(45),
+  "is_revoked" BOOLEAN NOT NULL DEFAULT false,
+  "created_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
+  "updated_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
   "deleted_at" timestamp,
-  "expired_at" timestamp NOT NULL
+  "expired_at" TIMESTAMP NOT NULL
 );
 
 CREATE TABLE "audit_log" (
-  "id" uuid PRIMARY KEY NOT NULL,
-  "target_type" varchar(40) NOT NULL,
-  "target_id" uuid,
-  "action" varchar(40) NOT NULL,
-  "before_data" jsonb,
-  "after_data" jsonb,
-  "actor_user_id" uuid,
-  "ip_address" varchar(45),
-  "created_at" timestamp NOT NULL DEFAULT (now()),
-  "updated_at" timestamp NOT NULL DEFAULT (now()),
+  "id" UUID PRIMARY KEY NOT NULL,
+  "target_type" VARCHAR(40) NOT NULL,
+  "target_id" UUID,
+  "action" VARCHAR(40) NOT NULL,
+  "before_data" JSONB,
+  "after_data" JSONB,
+  "actor_user_id" UUID,
+  "ip_address" VARCHAR(45),
+  "created_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
+  "updated_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
   "deleted_at" timestamp
 );
 
 CREATE TABLE "notification" (
-  "id" uuid PRIMARY KEY NOT NULL,
-  "user_id" uuid NOT NULL,
-  "type_category_code" varchar(40) NOT NULL DEFAULT 'NOTIFICATION_TYPE',
-  "type" varchar(40) NOT NULL,
-  "message" text NOT NULL,
+  "id" UUID PRIMARY KEY NOT NULL,
+  "user_id" UUID NOT NULL,
+  "type_category_code" VARCHAR(40) NOT NULL DEFAULT 'notification_type',
+  "type" VARCHAR(40) NOT NULL,
+  "message" TEXT NOT NULL,
   "link" text,
-  "is_read" boolean NOT NULL DEFAULT false,
-  "created_at" timestamp NOT NULL DEFAULT (now()),
-  "updated_at" timestamp NOT NULL DEFAULT (now()),
+  "is_read" BOOLEAN NOT NULL DEFAULT false,
+  "created_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
+  "updated_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
   "deleted_at" timestamp,
   "read_at" timestamp
 );
 
 CREATE TABLE "comment" (
-  "id" uuid PRIMARY KEY NOT NULL,
-  "topic_id" uuid NOT NULL,
-  "user_id" uuid NOT NULL,
-  "upper_comment_id" uuid,
-  "content" text NOT NULL,
-  "is_deleted" boolean NOT NULL DEFAULT false,
-  "created_at" timestamp NOT NULL DEFAULT (now()),
-  "updated_at" timestamp NOT NULL DEFAULT (now()),
+  "id" UUID PRIMARY KEY NOT NULL,
+  "topic_id" UUID NOT NULL,
+  "user_id" UUID NOT NULL,
+  "upper_comment_id" UUID,
+  "content" TEXT NOT NULL,
+  "is_deleted" BOOLEAN NOT NULL DEFAULT false,
+  "created_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
+  "updated_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
   "deleted_at" timestamp
 );
 
 CREATE TABLE "tag" (
-  "id" uuid PRIMARY KEY NOT NULL,
-  "name" varchar(50) UNIQUE NOT NULL,
+  "id" UUID PRIMARY KEY NOT NULL,
+  "name" VARCHAR(50) UNIQUE NOT NULL,
   "description" text,
-  "created_at" timestamp NOT NULL DEFAULT (now()),
-  "updated_at" timestamp NOT NULL DEFAULT (now()),
+  "created_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
+  "updated_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
   "deleted_at" timestamp
 );
 
 CREATE TABLE "rel__topic_tag" (
-  "id" uuid PRIMARY KEY NOT NULL,
-  "topic_id" uuid NOT NULL,
-  "tag_id" uuid NOT NULL,
-  "created_at" timestamp NOT NULL DEFAULT (now()),
-  "updated_at" timestamp NOT NULL DEFAULT (now()),
+  "id" UUID PRIMARY KEY NOT NULL,
+  "topic_id" UUID NOT NULL,
+  "tag_id" UUID NOT NULL,
+  "created_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
+  "updated_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
   "deleted_at" timestamp
 );
 
@@ -265,7 +265,7 @@ COMMENT ON COLUMN "board"."id" IS '게시판 고유 ID';
 
 COMMENT ON COLUMN "board"."menu_code" IS '연결된 메뉴 코드';
 
-COMMENT ON COLUMN "board"."type_category_code" IS '게시판 타입 분류 코드 (BOARD_TYPE)';
+COMMENT ON COLUMN "board"."type_category_code" IS '게시판 타입 분류 코드 (board_type)';
 
 COMMENT ON COLUMN "board"."type" IS '게시판 타입 코드 값';
 

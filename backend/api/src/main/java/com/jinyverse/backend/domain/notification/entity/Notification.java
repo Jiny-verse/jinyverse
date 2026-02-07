@@ -37,11 +37,13 @@ public class Notification extends BaseEntity {
     @Column(name = "user_id", columnDefinition = "UUID", nullable = false)
     private UUID userId;
 
-    /** 알림 타입 분류 */
+    /** 알림 타입 분류 코드
+     * 값: notification_type */
     @Column(name = "type_category_code", length = 40, nullable = false)
     private String typeCategoryCode;
 
-    /** 알림 타입 코드 (COMMENT, REPLY, SYSTEM 등) */
+    /** 알림 타입 코드
+     * 값: comment, reply, system */
     @Column(name = "type", length = 40, nullable = false)
     private String type;
 
@@ -80,7 +82,7 @@ public class Notification extends BaseEntity {
         if (dto == null) throw new IllegalArgumentException("NotificationRequestDto is null");
         return Notification.builder()
                 .userId(dto.getUserId())
-                .typeCategoryCode(dto.getTypeCategoryCode() != null ? dto.getTypeCategoryCode() : "NOTIFICATION_TYPE")
+                .typeCategoryCode(dto.getTypeCategoryCode() != null ? dto.getTypeCategoryCode() : "notification_type")
                 .type(dto.getType())
                 .message(dto.getMessage())
                 .link(dto.getLink())

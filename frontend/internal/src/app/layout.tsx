@@ -19,7 +19,7 @@ export default function RootLayout({
         <ApiProvider
           baseUrl={process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'}
           channel="INTERNAL"
-          role="ADMIN"
+          role="admin"
         >
           <div className="flex min-h-screen">
             <SideNavigation channel="internal" />

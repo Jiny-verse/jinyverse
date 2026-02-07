@@ -1,13 +1,12 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useCallback } from 'react';
 import type { ApiOptions } from '../types';
 
 export interface DomainServices<T, CreateInput, UpdateInput> {
   create: (opts: ApiOptions, input: CreateInput) => Promise<T>;
   update: (opts: ApiOptions, id: string, input: UpdateInput) => Promise<T>;
   delete: (opts: ApiOptions, id: string) => Promise<void>;
-  getOne: (opts: ApiOptions, id: string) => Promise<T>;
 }
 
 export interface UseDomainContextOptions<T, CreateInput, UpdateInput> {
@@ -17,7 +16,7 @@ export interface UseDomainContextOptions<T, CreateInput, UpdateInput> {
 }
 
 /**
- * 도메인 CRUD + 다이얼로그 + 미리보기 통합 hook
+ * 도메인 CRUD + 다이얼로그 통합 hook
  */
 export function useDomainContext<T, CreateInput = Partial<T>, UpdateInput = Partial<T>>({
   apiOptions,
@@ -35,43 +34,21 @@ export function useDomainContext<T, CreateInput = Partial<T>, UpdateInput = Part
   const [readOnlyDialogOpen, setReadOnlyDialogOpen] = useState(false);
   const [readOnlyTarget, setReadOnlyTarget] = useState<T | null>(null);
 
-  // 미리보기
-  const [previewId, setPreviewId] = useState<string | null>(null);
-  const [previewData, setPreviewData] = useState<T | null>(null);
-  const [previewLoading, setPreviewLoading] = useState(false);
+  const [reloadTrigger, setReloadTrigger] = useState(0);
 
-  // 미리보기 데이터 로드
-  useEffect(() => {
-    if (!previewId) {
-      setPreviewData(null);
-      return;
-    }
-    let cancelled = false;
-    setPreviewLoading(true);
-    services
-      .getOne(apiOptions, previewId)
-      .then((data) => {
-        if (!cancelled) setPreviewData(data);
-      })
-      .catch(() => {
-        if (!cancelled) setPreviewData(null);
-      })
-      .finally(() => {
-        if (!cancelled) setPreviewLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [apiOptions.baseUrl, apiOptions.channel, previewId]);
+  const triggerReload = useCallback(() => {
+    setReloadTrigger((t) => t + 1);
+    onReload?.();
+  }, [onReload]);
 
   // 생성
   const handleCreate = useCallback(
     async (input: CreateInput) => {
       await services.create(apiOptions, input);
       setCreateDialogOpen(false);
-      onReload?.();
+      triggerReload();
     },
-    [apiOptions, services.create, onReload]
+    [apiOptions, services.create, triggerReload]
   );
 
   // 수정
@@ -80,9 +57,9 @@ export function useDomainContext<T, CreateInput = Partial<T>, UpdateInput = Part
       await services.update(apiOptions, id, input);
       setUpdateDialogOpen(false);
       setUpdateTarget(null);
-      onReload?.();
+      triggerReload();
     },
-    [apiOptions, services.update, onReload]
+    [apiOptions, services.update, triggerReload]
   );
 
   // 삭제
@@ -90,9 +67,9 @@ export function useDomainContext<T, CreateInput = Partial<T>, UpdateInput = Part
     async (id: string) => {
       if (!confirm('삭제하시겠습니까?')) return;
       await services.delete(apiOptions, id);
-      onReload?.();
+      triggerReload();
     },
-    [apiOptions, services.delete, onReload]
+    [apiOptions, services.delete, triggerReload]
   );
 
   // 일괄 삭제
@@ -102,9 +79,9 @@ export function useDomainContext<T, CreateInput = Partial<T>, UpdateInput = Part
       for (const id of ids) {
         await services.delete(apiOptions, id);
       }
-      onReload?.();
+      triggerReload();
     },
-    [apiOptions, services.delete, onReload]
+    [apiOptions, services.delete, triggerReload]
   );
 
   return {
@@ -145,15 +122,10 @@ export function useDomainContext<T, CreateInput = Partial<T>, UpdateInput = Part
         },
       },
     },
-    preview: {
-      selectedId: previewId,
-      data: previewData,
-      isLoading: previewLoading,
-      onSelect: setPreviewId,
-    },
     crud: {
       delete: handleDelete,
       batchDelete: handleBatchDelete,
     },
+    reloadTrigger,
   };
 }

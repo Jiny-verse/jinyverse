@@ -5,8 +5,6 @@ import type { AutoDialogField } from 'common/components';
 import { boardCreateSchema } from 'common/schemas';
 import { useBoardContext } from '../_hooks/useBoardContext';
 
-const BOARD_TYPE_CATEGORY = 'BOARD_TYPE';
-
 export interface CreateDialogProps {
   typeOptions: { value: string; label: string }[];
 }
@@ -16,17 +14,11 @@ export function CreateDialog({ typeOptions }: CreateDialogProps) {
   const { open, onClose, onSubmit } = domain.dialogs.create;
   const fields: AutoDialogField[] = [
     {
-      key: 'typeCategoryCode',
-      label: '타입 분류 코드',
-      type: 'text',
-      hidden: true,
-      defaultValue: BOARD_TYPE_CATEGORY,
-    },
-    {
       key: 'type',
       label: '타입',
       type: 'select',
-      options: [{ value: '', label: '선택하세요' }, ...typeOptions],
+      options: typeOptions,
+      defaultValue: 'project',
     },
     { key: 'name', label: '이름', type: 'text' },
     { key: 'description', label: '설명', type: 'textarea', optional: true },

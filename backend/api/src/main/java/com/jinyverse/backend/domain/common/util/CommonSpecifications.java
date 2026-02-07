@@ -2,10 +2,12 @@ package com.jinyverse.backend.domain.common.util;
 
 import org.springframework.data.jpa.domain.Specification;
 
+import jakarta.persistence.criteria.Path;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 public final class CommonSpecifications {
 
@@ -24,12 +26,28 @@ public final class CommonSpecifications {
         return (root, query, cb) -> cb.isNull(root.get("deletedAt"));
     }
 
+    /**
+     * 필드값이 있으면 equal 조건 추가.
+     * - "true"/"false" 문자열은 Boolean으로 변환.
+     * - 엔티티 필드가 UUID인데 값이 String이면 UUID로 파싱 (요청 파라미터는 보통 String으로 옴).
+     */
     public static <T> Specification<T> eqIfPresent(String field, Object value) {
         if (value == null) return null;
         final Object finalValue = value instanceof String str && ("true".equals(str) || "false".equals(str))
                 ? Boolean.parseBoolean(str)
                 : value;
-        return (root, query, cb) -> cb.equal(root.get(field), finalValue);
+        return (root, query, cb) -> {
+            Path<?> path = root.get(field);
+            Object toUse = finalValue;
+            if (path.getJavaType() == UUID.class && finalValue instanceof String s) {
+                try {
+                    toUse = UUID.fromString(s);
+                } catch (IllegalArgumentException e) {
+                    return cb.disjunction();
+                }
+            }
+            return cb.equal(path, toUse);
+        };
     }
 
     public static <T> Specification<T> andEqAll(Specification<T> spec, Map<String, Object> fields) {

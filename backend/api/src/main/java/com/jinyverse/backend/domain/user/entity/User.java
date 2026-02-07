@@ -33,11 +33,13 @@ public class User extends BaseEntity {
     @Column(name = "id", columnDefinition = "UUID", nullable = false)
     private UUID id;
 
-    /** 권한 분류 코드 */
+    /** 권한 분류 코드
+     * 값: role */
     @Column(name = "role_category_code", length = 40, nullable = false)
     private String roleCategoryCode;
 
-    /** 권한 코드 값 */
+    /** 권한 코드 값
+     * 값: user, admin */
     @Column(name = "role", length = 40, nullable = false)
     private String role;
 
@@ -99,8 +101,8 @@ public class User extends BaseEntity {
     public static User fromRequestDto(UserRequestDto dto) {
         if (dto == null) throw new IllegalArgumentException("UserRequestDto is null");
         return User.builder()
-                .roleCategoryCode(dto.getRoleCategoryCode() != null ? dto.getRoleCategoryCode() : "ROLE")
-                .role(dto.getRole() != null ? dto.getRole() : "USER")
+                .roleCategoryCode(dto.getRoleCategoryCode() != null ? dto.getRoleCategoryCode() : "role")
+                .role(dto.getRole() != null ? dto.getRole() : "user")
                 .username(dto.getUsername())
                 .password(dto.getPassword())
                 .salt("") // TODO: salt 생성 로직 필요

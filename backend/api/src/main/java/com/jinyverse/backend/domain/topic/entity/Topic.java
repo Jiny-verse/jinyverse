@@ -45,11 +45,13 @@ public class Topic extends BaseEntity {
     @Column(name = "menu_code", length = 40)
     private String menuCode;
 
-    /** 게시글 상태 분류 코드 */
+    /** 게시글 상태 분류 코드
+     * 값: topic_status */
     @Column(name = "status_category_code", length = 40, nullable = false)
     private String statusCategoryCode;
 
-    /** 게시글 상태 코드 값 */
+    /** 게시글 상태 코드 값
+     * 값: created, temporary */
     @Column(name = "status", length = 40, nullable = false)
     private String status;
 
@@ -119,8 +121,8 @@ public class Topic extends BaseEntity {
         return Topic.builder()
                 .authorUserId(dto.getAuthorUserId())
                 .menuCode(dto.getMenuCode())
-                .statusCategoryCode(dto.getStatusCategoryCode() != null ? dto.getStatusCategoryCode() : "TOPIC_STATUS")
-                .status(dto.getStatus() != null ? dto.getStatus() : "created")
+                .statusCategoryCode(blankToNull(dto.getStatusCategoryCode()) != null ? dto.getStatusCategoryCode() : "topic_status")
+                .status(blankToNull(dto.getStatus()) != null ? dto.getStatus() : "created")
                 .boardId(dto.getBoardId())
                 .title(dto.getTitle())
                 .content(dto.getContent())
@@ -129,6 +131,10 @@ public class Topic extends BaseEntity {
                 .isPublic(dto.getIsPublic() != null ? dto.getIsPublic() : true)
                 .publishedAt(dto.getPublishedAt())
                 .build();
+    }
+
+    private static String blankToNull(String s) {
+        return s != null && !s.isBlank() ? s : null;
     }
 
     public void applyUpdate(TopicRequestDto dto) {

@@ -27,13 +27,11 @@ public class TopicRequestDto {
     @Size(max = 40, message = "메뉴 코드는 40자 이하여야 합니다")
     private String menuCode;
 
-    /** 게시글 상태 분류 코드 */
-    @NotBlank(message = "상태 분류 코드는 필수입니다")
+    /** 게시글 상태 분류 코드 (미입력 시 topic_status) */
     @Size(max = 40, message = "상태 분류 코드는 40자 이하여야 합니다")
     private String statusCategoryCode;
 
-    /** 게시글 상태 코드 값 */
-    @NotBlank(message = "상태는 필수입니다")
+    /** 게시글 상태 코드 값 (미입력 시 created) */
     @Size(max = 40, message = "상태는 40자 이하여야 합니다")
     private String status;
 

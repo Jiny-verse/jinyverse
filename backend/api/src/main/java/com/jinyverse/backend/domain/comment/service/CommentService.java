@@ -75,12 +75,12 @@ public class CommentService {
 
     private Specification<Comment> spec(RequestContext ctx, Map<String, Object> filter) {
         Specification<Comment> s = CommonSpecifications.notDeleted();
-        
+        // q(검색)는 Comment 도메인에서 미지원 - 스킵 (eq 필드가 없음)
         for (Map.Entry<String, Object> entry : filter.entrySet()) {
-            if (PAGINATION_KEYS.contains(entry.getKey())) continue;
-            s = CommonSpecifications.and(s, CommonSpecifications.eqIfPresent(entry.getKey(), entry.getValue()));
+            String key = entry.getKey();
+            if (PAGINATION_KEYS.contains(key) || "q".equals(key)) continue;
+            s = CommonSpecifications.and(s, CommonSpecifications.eqIfPresent(key, entry.getValue()));
         }
-        
         return s;
     }
 }

@@ -1,18 +1,19 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import {
   getTopics,
   getTopic,
   getComments,
+  getCodes,
   createTopic,
   updateTopic,
   deleteTopic,
 } from 'common/services';
 import { useApiOptions } from '@/app/providers/ApiProvider';
-import { DetailPreviewPanel } from 'common/components';
+import { DetailPreviewPanel, FilterSelect } from 'common/components';
 import type { Topic, TopicCreateInput, TopicUpdateInput, Comment } from 'common/types';
 import { Table } from './_components/Table';
 import { CreateDialog } from './_components/CreateDialog';
@@ -32,6 +33,8 @@ export default function TopicsPage() {
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(10);
+  const [search, setSearch] = useState('');
+  const [isPublic, setIsPublic] = useState<boolean | undefined>(undefined);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const [previewTopic, setPreviewTopic] = useState<Topic | null>(null);
@@ -39,16 +42,38 @@ export default function TopicsPage() {
   const [previewLoading, setPreviewLoading] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Topic | null>(null);
+  const [statusOptions, setStatusOptions] = useState<{ value: string; label: string }[]>([]);
 
-  const load = () => {
-    getTopics(options, { page, size, boardId })
+  const TOPIC_STATUS_CATEGORY = 'topic_status';
+  /** 공개/비공개는 isPublic 토글로 처리 → 상태 선택지에서 제외 */
+  const STATUS_CODES_EXCLUDED = new Set(['published', 'hidden']);
+  useEffect(() => {
+    getCodes(options, { categoryCode: TOPIC_STATUS_CATEGORY })
+      .then((codes) =>
+        setStatusOptions(
+          codes
+            .filter((c) => !STATUS_CODES_EXCLUDED.has(c.code))
+            .map((c) => ({ value: c.code, label: c.name }))
+        )
+      )
+      .catch(() => setStatusOptions([]));
+  }, [options.baseUrl, options.channel]);
+
+  const load = useCallback(() => {
+    getTopics(options, {
+      page,
+      size,
+      boardId,
+      q: search.trim() || undefined,
+      isPublic,
+    })
       .then(setData)
       .catch((e) => setError(e instanceof Error ? e.message : String(e)));
-  };
+  }, [options.baseUrl, options.channel, boardId, page, size, search, isPublic]);
 
   useEffect(() => {
     load();
-  }, [options.baseUrl, options.channel, boardId, page, size]);
+  }, [load]);
 
   useEffect(() => {
     if (!selectedTopicId) {
@@ -147,6 +172,29 @@ export default function TopicsPage() {
                   }
                 : undefined
             }
+            search={{
+              value: search,
+              onChange: (v) => {
+                setSearch(v);
+                setPage(0);
+              },
+              placeholder: '제목·내용 검색',
+            }}
+            filterSlot={
+              <FilterSelect
+                label="공개 여부"
+                value={isPublic === undefined ? '' : isPublic ? 'true' : 'false'}
+                options={[
+                  { value: 'true', label: '공개' },
+                  { value: 'false', label: '비공개' },
+                ]}
+                placeholder="전체"
+                onChange={(v) => {
+                  setIsPublic(v === '' ? undefined : v === 'true');
+                  setPage(0);
+                }}
+              />
+            }
             selection={{ selectedIds, onSelectionChange: setSelectedIds }}
             onBatchDelete={selectedIds.length ? handleBatchDelete : undefined}
             onAdd={() => setCreateDialogOpen(true)}
@@ -201,12 +249,14 @@ export default function TopicsPage() {
       <CreateDialog
         open={createDialogOpen}
         boardId={boardId}
+        statusOptions={statusOptions}
         onClose={() => setCreateDialogOpen(false)}
         onSubmit={handleCreate}
       />
       <UpdateDialog
         open={!!editing}
         topic={editing}
+        statusOptions={statusOptions}
         onClose={() => setEditing(null)}
         onSubmit={handleUpdate}
       />

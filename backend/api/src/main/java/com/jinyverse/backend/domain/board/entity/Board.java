@@ -39,11 +39,13 @@ public class Board extends BaseEntity {
     @Column(name = "menu_code", length = 40)
     private String menuCode;
 
-    /** 게시판 타입 분류 코드 (BOARD_TYPE) */
+    /** 게시판 타입 분류 코드
+     * 값: board_type */
     @Column(name = "type_category_code", length = 40, nullable = false)
     private String typeCategoryCode;
 
-    /** 게시판 타입 코드 값 */
+    /** 게시판 타입 코드 값
+     * 값: project, notice, qna, free */
     @Column(name = "type", length = 40, nullable = false)
     private String type;
 
@@ -90,14 +92,18 @@ public class Board extends BaseEntity {
         if (dto == null) throw new IllegalArgumentException("BoardRequestDto is null");
         return Board.builder()
                 .menuCode(dto.getMenuCode())
-                .typeCategoryCode(dto.getTypeCategoryCode() != null ? dto.getTypeCategoryCode() : "BOARD_TYPE")
-                .type(dto.getType() != null ? dto.getType() : "project")
+                .typeCategoryCode(blankToNull(dto.getTypeCategoryCode()) != null ? dto.getTypeCategoryCode() : "board_type")
+                .type(blankToNull(dto.getType()) != null ? dto.getType() : "project")
                 .name(dto.getName())
                 .description(dto.getDescription())
                 .note(dto.getNote())
                 .isPublic(dto.getIsPublic() != null ? dto.getIsPublic() : true)
                 .order(dto.getOrder() != null ? dto.getOrder() : 0)
                 .build();
+    }
+
+    private static String blankToNull(String s) {
+        return s != null && !s.isBlank() ? s : null;
     }
 
     public void applyUpdate(BoardRequestDto dto) {

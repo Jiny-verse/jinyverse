@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import {
   commentSchema,
   commentCreateSchema,
@@ -22,24 +23,32 @@ type CommentPageResponse = {
 
 const commentPageSchema = pageResponseSchema(commentSchema);
 
-function toQuery(
-  params: { page?: number; size?: number; sort?: string } & CommentFilter
-): Record<string, string | number | boolean | undefined> {
-  const { page, size, sort, topicId, userId } = params;
-  const query: Record<string, string | number | boolean | undefined> = {};
-  if (page !== undefined) query.page = page;
-  if (size !== undefined) query.size = size;
-  if (sort !== undefined) query.sort = sort;
-  if (topicId !== undefined) query.topicId = topicId;
-  if (userId !== undefined) query.userId = userId;
-  return query;
+/** 목록 조회 파라미터: 페이징 + 검색(q) + 필터(CommentFilter). 필터 키는 스키마에만 정의하고 toQuery는 공통 처리 */
+type ListCommentsParams = { page?: number; size?: number; sort?: string; q?: string } & CommentFilter;
+
+function toQuery(params: ListCommentsParams): Record<string, string | number | boolean | undefined> {
+  const { page, size, sort, q, ...filter } = params;
+  const out: Record<string, string | number | boolean | undefined> = {};
+  if (page !== undefined) out.page = page;
+  if (size !== undefined) out.size = size;
+  if (sort !== undefined) out.sort = sort;
+  if (q !== undefined && q !== '') out.q = q;
+  for (const [key, value] of Object.entries(filter)) {
+    if (value !== undefined) out[key] = value as string | number | boolean;
+  }
+  return out;
 }
+
+const listCommentsParamsSchema = paginationSchema
+  .merge(commentFilterSchema)
+  .extend({ q: z.string().optional() })
+  .partial();
 
 export async function getComments(
   options: ApiOptions,
-  params: { page?: number; size?: number; sort?: string } & CommentFilter = {}
+  params: ListCommentsParams = {}
 ): Promise<CommentPageResponse> {
-  const parsed = paginationSchema.merge(commentFilterSchema).partial().parse(params);
+  const parsed = listCommentsParamsSchema.parse(params);
   const data = await apiGet<CommentPageResponse>(options, '/api/comments', toQuery(parsed));
   return commentPageSchema.parse(data) as CommentPageResponse;
 }

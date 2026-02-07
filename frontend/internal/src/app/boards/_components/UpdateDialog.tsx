@@ -13,13 +13,6 @@ export function UpdateDialog({ typeOptions }: UpdateDialogProps) {
   const domain = useBoardContext();
   const { open, board, onClose, onSubmit } = domain.dialogs.update;
   const fields: AutoDialogField[] = [
-    {
-      key: 'typeCategoryCode',
-      label: '타입 분류 코드',
-      type: 'text',
-      hidden: true,
-      defaultValue: 'BOARD_TYPE',
-    },
     { key: 'type', label: '타입', type: 'select', options: typeOptions },
     { key: 'name', label: '이름', type: 'text' },
     { key: 'description', label: '설명', type: 'textarea', optional: true },
@@ -30,7 +23,6 @@ export function UpdateDialog({ typeOptions }: UpdateDialogProps) {
 
   const initialValues = board
     ? {
-        typeCategoryCode: board.typeCategoryCode,
         type: board.type,
         name: board.name,
         description: board.description ?? undefined,

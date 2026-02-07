@@ -23,28 +23,29 @@ type TopicPageResponse = {
 
 const topicPageSchema = pageResponseSchema(topicSchema);
 
-function toQuery(
-  params: { page?: number; size?: number; sort?: string } & TopicFilter
-): Record<string, string | number | boolean | undefined> {
-  const { page, size, sort, boardId, statusCategoryCode, status, q, isNotice, isPinned } = params;
-  const query: Record<string, string | number | boolean | undefined> = {};
-  if (page !== undefined) query.page = page;
-  if (size !== undefined) query.size = size;
-  if (sort !== undefined) query.sort = sort;
-  if (boardId !== undefined) query.boardId = boardId;
-  if (statusCategoryCode !== undefined) query.statusCategoryCode = statusCategoryCode;
-  if (status !== undefined) query.status = status;
-  if (q !== undefined) query.q = q;
-  if (isNotice !== undefined) query.isNotice = isNotice;
-  if (isPinned !== undefined) query.isPinned = isPinned;
-  return query;
+/** 목록 조회 파라미터: 페이징 + 검색(q) + 필터(TopicFilter). 필터 키는 스키마에만 정의하고 toQuery는 공통 처리 */
+type ListTopicsParams = { page?: number; size?: number; sort?: string; q?: string } & TopicFilter;
+
+function toQuery(params: ListTopicsParams): Record<string, string | number | boolean | undefined> {
+  const { page, size, sort, q, ...filter } = params;
+  const out: Record<string, string | number | boolean | undefined> = {};
+  if (page !== undefined) out.page = page;
+  if (size !== undefined) out.size = size;
+  if (sort !== undefined) out.sort = sort;
+  if (q !== undefined && q !== '') out.q = q;
+  for (const [key, value] of Object.entries(filter)) {
+    if (value !== undefined) out[key] = value as string | number | boolean;
+  }
+  return out;
 }
+
+const listTopicsParamsSchema = paginationSchema.merge(topicFilterSchema).partial();
 
 export async function getTopics(
   options: ApiOptions,
-  params: { page?: number; size?: number; sort?: string } & TopicFilter = {}
+  params: ListTopicsParams = {}
 ): Promise<TopicPageResponse> {
-  const parsed = paginationSchema.merge(topicFilterSchema).partial().parse(params);
+  const parsed = listTopicsParamsSchema.parse(params);
   const data = await apiGet<TopicPageResponse>(options, '/api/topics', toQuery(parsed));
   return topicPageSchema.parse(data) as TopicPageResponse;
 }

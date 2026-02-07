@@ -23,11 +23,11 @@ export const boardSchema = z.object({
 
 export type Board = z.infer<typeof boardSchema>;
 
-/** 게시판 생성 요청 */
+/** 게시판 생성 요청 (typeCategoryCode/type 미입력 시 DB DEFAULT) */
 export const boardCreateSchema = z.object({
   menuCode: optionalString,
-  typeCategoryCode: z.string().min(1).max(40),
-  type: z.string().min(1).max(40),
+  typeCategoryCode: optionalString,
+  type: optionalString,
   name: z.string().min(1).max(50),
   description: optionalText,
   note: optionalText,
