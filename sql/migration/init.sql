@@ -106,7 +106,7 @@ CREATE TABLE "user" (
   "id" UUID PRIMARY KEY NOT NULL,
   "role_category_code" VARCHAR(40) NOT NULL DEFAULT 'role',
   "role" VARCHAR(40) NOT NULL DEFAULT 'user',
-  "username" VARCHAR(50) NOT NULL,
+  "username" VARCHAR(50) NOT NULL UNIQUE,
   "password" VARCHAR(256) NOT NULL,
   "salt" VARCHAR(16) NOT NULL,
   "email" VARCHAR(256) UNIQUE NOT NULL,
