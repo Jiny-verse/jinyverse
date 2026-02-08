@@ -3,9 +3,7 @@
 import { useEffect, useState } from 'react';
 import { getCodes } from 'common/services';
 import { useApiOptions } from '@/app/providers/ApiProvider';
-import { Table } from './_components/Table';
-import { CreateDialog } from './_components/CreateDialog';
-import { UpdateDialog } from './_components/UpdateDialog';
+import { Table, CreateDialog, UpdateDialog } from './_components';
 import { BoardProvider, useBoardContext } from './_hooks/useBoardContext';
 
 const BOARD_TYPE_CATEGORY = 'board_type';

@@ -17,7 +17,6 @@ export type {
   CommentUpdateInput,
 } from '../schemas/comment';
 
-/** Spring Page 응답 형태 */
 export interface PageResponse<T> {
   content: T[];
   totalElements: number;
@@ -28,9 +27,10 @@ export interface PageResponse<T> {
   last: boolean;
 }
 
-/** API 요청 옵션 (baseUrl, channel, role) */
 export interface ApiOptions {
   baseUrl: string;
   channel: 'INTERNAL' | 'EXTERNAL';
   role?: 'admin' | 'user' | null;
+  accessToken?: string | null;
+  on401?: () => void;
 }

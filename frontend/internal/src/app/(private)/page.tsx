@@ -1,6 +1,6 @@
 export default function Page() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
+    <div className="flex min-h-screen flex-col items-center justify-center py-2">
       <h1 className="text-6xl font-bold">Jinyverse Frontend</h1>
       <p className="mt-3 text-2xl">Connected to Spring Boot Backend</p>
     </div>

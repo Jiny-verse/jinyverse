@@ -1,4 +1,3 @@
-// Components exports
 export * from './navigation';
 export { ConfirmDialog } from './ConfirmDialog';
 export { AutoDialog } from './AutoDialog';

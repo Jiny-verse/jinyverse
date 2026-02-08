@@ -2,7 +2,13 @@ package com.jinyverse.backend.domain.auth.service;
 
 import com.jinyverse.backend.domain.auth.dto.LoginRequestDto;
 import com.jinyverse.backend.domain.auth.dto.LoginResponseDto;
+import com.jinyverse.backend.domain.auth.dto.RegisterRequestDto;
+import com.jinyverse.backend.domain.auth.dto.ResetPasswordRequestDto;
+import com.jinyverse.backend.domain.auth.dto.VerifyEmailRequestDto;
+import com.jinyverse.backend.domain.user.dto.UserRequestDto;
 import com.jinyverse.backend.domain.user.entity.User;
+import com.jinyverse.backend.domain.user.entity.Verification;
+import com.jinyverse.backend.domain.user.service.VerificationService;
 import com.jinyverse.backend.domain.user.entity.UserAuthCount;
 import com.jinyverse.backend.domain.user.entity.UserSession;
 import com.jinyverse.backend.domain.user.repository.UserAuthCountRepository;
@@ -40,12 +46,16 @@ public class AuthService {
     private static final int LOCKOUT_WINDOW_MINUTES = 15;
     private static final int REFRESH_TOKEN_BYTES = 64;
 
+    private static final String VERIFICATION_TYPE_EMAIL = "email_verify";
+    private static final String VERIFICATION_TYPE_PASSWORD_RESET = "password_reset";
+
     private final UserRepository userRepository;
     private final UserSessionRepository userSessionRepository;
     private final UserAuthCountRepository userAuthCountRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
     private final PlatformTransactionManager transactionManager;
+    private final VerificationService verificationService;
 
     private String dummyBcryptHash;
 
@@ -151,9 +161,6 @@ public class AuthService {
         }
     }
 
-    /**
-     * 잠금 후 15분(실패 윈도우)이 지났으면 잠금 해제하고 true 반환. 아니면 false.
-     */
     private boolean tryUnlockAfterLockoutWindow(User user) {
         return userAuthCountRepository
                 .findByEmailAndTypeCategoryCodeAndTypeAndDeletedAtIsNull(
@@ -205,6 +212,12 @@ public class AuthService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Account locked or disabled");
         }
 
+        String newRefreshToken = generateRefreshToken();
+        LocalDateTime newExpiredAt = LocalDateTime.now().plusDays(7);
+        session.setRefreshToken(newRefreshToken);
+        session.setExpiredAt(newExpiredAt);
+        userSessionRepository.save(session);
+
         Duration accessExpiry = Duration.ofMinutes(30);
         String accessToken = jwtUtil.createAccessToken(user.getId(), user.getRole(), user.getUsername(), accessExpiry);
         Instant expiresAt = Instant.now().plus(accessExpiry);
@@ -214,7 +227,7 @@ public class AuthService {
                 .username(user.getUsername())
                 .role(user.getRole())
                 .accessToken(accessToken)
-                .refreshToken(refreshToken)
+                .refreshToken(newRefreshToken)
                 .expiresAt(expiresAt)
                 .build();
     }
@@ -225,5 +238,57 @@ public class AuthService {
         List<UserSession> sessions = userSessionRepository.findByUserIdAndDeletedAtIsNull(userId);
         sessions.forEach(s -> s.setIsRevoked(true));
         userSessionRepository.saveAll(sessions);
+    }
+
+    @Transactional
+    public void register(RegisterRequestDto request) {
+        if (userRepository.findByUsernameAndDeletedAtIsNull(request.getUsername()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
+        }
+        if (userRepository.findByEmailAndDeletedAtIsNull(request.getEmail()).isPresent()) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already registered");
+        }
+        String encoded = passwordEncoder.encode(request.getPassword());
+        UserRequestDto dto = UserRequestDto.builder()
+                .username(request.getUsername())
+                .email(request.getEmail())
+                .name(request.getName())
+                .nickname(request.getNickname())
+                .isActive(false)
+                .isLocked(false)
+                .roleCategoryCode("role")
+                .role("user")
+                .build();
+        User user = User.fromRequestDto(dto, encoded);
+        userRepository.save(user);
+        verificationService.requestVerification(user.getEmail(), VERIFICATION_TYPE_EMAIL, user.getId());
+    }
+
+    @Transactional
+    public void verifyEmail(VerifyEmailRequestDto request) {
+        Verification v = verificationService.verify(request.getEmail(), request.getCode(), VERIFICATION_TYPE_EMAIL);
+        if (v.getUserId() == null) return;
+        User user = userRepository.findByIdAndDeletedAtIsNull(v.getUserId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        user.setIsActive(true);
+        userRepository.save(user);
+    }
+
+    @Transactional
+    public void requestPasswordReset(String email) {
+        User user = userRepository.findByEmailAndDeletedAtIsNull(email).orElse(null);
+        verificationService.requestVerification(email, VERIFICATION_TYPE_PASSWORD_RESET, user != null ? user.getId() : null);
+    }
+
+    @Transactional
+    public void resetPassword(ResetPasswordRequestDto request) {
+        Verification v = verificationService.verify(request.getEmail(), request.getCode(), VERIFICATION_TYPE_PASSWORD_RESET);
+        if (v.getUserId() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid verification");
+        }
+        User user = userRepository.findByIdAndDeletedAtIsNull(v.getUserId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
     }
 }

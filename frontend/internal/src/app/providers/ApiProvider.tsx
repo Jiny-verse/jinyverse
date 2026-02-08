@@ -11,16 +11,20 @@ export function ApiProvider({
   children,
   baseUrl = defaultBaseUrl,
   channel = 'INTERNAL',
-  role = 'admin',
+  role,
+  accessToken,
+  on401,
 }: {
   children: React.ReactNode;
   baseUrl?: string;
   channel?: ApiOptions['channel'];
   role?: ApiOptions['role'];
+  accessToken?: string | null;
+  on401?: () => void;
 }) {
   const value = useMemo<ApiOptions>(
-    () => ({ baseUrl, channel, role: role ?? undefined }),
-    [baseUrl, channel, role]
+    () => ({ baseUrl, channel, role: role ?? undefined, accessToken: accessToken ?? undefined, on401 }),
+    [baseUrl, channel, role, accessToken, on401]
   );
   return <ApiOptionsContext.Provider value={value}>{children}</ApiOptionsContext.Provider>;
 }

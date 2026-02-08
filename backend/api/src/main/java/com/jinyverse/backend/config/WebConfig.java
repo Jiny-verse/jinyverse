@@ -16,6 +16,15 @@ import java.util.List;
 public class WebConfig {
 
     @Bean
+    public FilterRegistrationBean<CsrfProtectionFilter> csrfProtectionFilter(ObjectMapper objectMapper) {
+        FilterRegistrationBean<CsrfProtectionFilter> registration = new FilterRegistrationBean<>();
+        registration.setFilter(new CsrfProtectionFilter(objectMapper));
+        registration.addUrlPatterns("/api/*", "/api/*/*", "/api/*/*/*", "/api/*/*/*/*");
+        registration.setOrder(Ordered.LOWEST_PRECEDENCE - 1);
+        return registration;
+    }
+
+    @Bean
     public FilterRegistrationBean<JwtAuthenticationFilter> jwtAuthenticationFilter(
             JwtUtil jwtUtil,
             ObjectMapper objectMapper

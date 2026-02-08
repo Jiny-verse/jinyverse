@@ -15,9 +15,7 @@ import {
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import { DetailPreviewPanel, FilterSelect } from 'common/components';
 import type { Topic, TopicCreateInput, TopicUpdateInput, Comment } from 'common/types';
-import { Table } from './_components/Table';
-import { CreateDialog } from './_components/CreateDialog';
-import { UpdateDialog } from './_components/UpdateDialog';
+import { Table, CreateDialog, UpdateDialog } from './_components';
 
 export default function TopicsPage() {
   const params = useParams();
@@ -45,7 +43,6 @@ export default function TopicsPage() {
   const [statusOptions, setStatusOptions] = useState<{ value: string; label: string }[]>([]);
 
   const TOPIC_STATUS_CATEGORY = 'topic_status';
-  /** 공개/비공개는 isPublic 토글로 처리 → 상태 선택지에서 제외 */
   const STATUS_CODES_EXCLUDED = new Set(['published', 'hidden']);
   useEffect(() => {
     getCodes(options, { categoryCode: TOPIC_STATUS_CATEGORY })

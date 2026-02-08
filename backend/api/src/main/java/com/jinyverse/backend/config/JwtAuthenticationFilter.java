@@ -19,8 +19,8 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * /api/** 요청에 대해 Authorization Bearer JWT 검증.
- * 인증 제외 경로: /api/auth/**, POST /api/users
+ * /api/** 요청에 대해 JWT 검증. 토큰은 쿠키(access_token) 우선, 없으면 Authorization Bearer.
+ * 인증 제외: POST /api/auth/login, refresh, logout, register, verify-email, request-password-reset, reset-password / POST /api/users
  * 만료 시 401 TOKEN_EXPIRED, 서명/형식 오류 시 401 INVALID_TOKEN. 유효 시 RequestContext 설정 후 chain 진행, finally에서 clear.
  */
 @RequiredArgsConstructor
@@ -36,14 +36,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
         String method = request.getMethod();
-        // 인증 제외: /api/auth/*, POST /api/users
-        if (path != null && path.startsWith("/api/auth/")) {
+        if (path == null) {
+            return false;
+        }
+        if ("OPTIONS".equalsIgnoreCase(method)) {
             return true;
         }
         if ("POST".equalsIgnoreCase(method) && "/api/users".equals(path)) {
             return true;
         }
-        return false;
+        if (!path.startsWith("/api/auth/")) {
+            return false;
+        }
+        return "POST".equalsIgnoreCase(method)
+                && (path.equals("/api/auth/login") || path.equals("/api/auth/refresh") || path.equals("/api/auth/logout")
+                || path.equals("/api/auth/register") || path.equals("/api/auth/verify-email")
+                || path.equals("/api/auth/request-password-reset") || path.equals("/api/auth/reset-password"));
     }
 
     @Override
@@ -53,9 +61,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
         try {
-            String token = extractBearerToken(request);
+            String token = extractAccessToken(request);
             if (token == null || token.isBlank()) {
-                sendUnauthorized(response, "UNAUTHORIZED", "Missing or invalid Authorization header");
+                sendUnauthorized(response, "UNAUTHORIZED", "Missing or invalid access token (cookie or Authorization header)");
                 return;
             }
             RequestContext context = RequestContext.fromToken(jwtUtil, token);
@@ -68,6 +76,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } finally {
             RequestContextHolder.clear();
         }
+    }
+
+    private String extractAccessToken(HttpServletRequest request) {
+        return CookieUtil.getCookieValue(request, CookieUtil.COOKIE_ACCESS_TOKEN)
+                .orElseGet(() -> extractBearerToken(request));
     }
 
     private String extractBearerToken(HttpServletRequest request) {

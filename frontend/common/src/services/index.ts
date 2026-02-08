@@ -1,5 +1,6 @@
 export * from './api';
+export * from './auth';
 export * from './board';
 export * from './code';
-export * from './topic';
 export * from './comment';
+export * from './topic';

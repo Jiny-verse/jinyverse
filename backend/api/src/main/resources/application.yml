@@ -20,6 +20,23 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
         globally_quoted_identifiers: true
+  # Gmail SMTP (SMTPS, 587 + STARTTLS). MAIL_USERNAME/MAIL_PASSWORD 설정 시 실제 발송.
+  # Gmail: 2단계 인증 후 '앱 비밀번호' 생성 후 MAIL_PASSWORD에 설정.
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
 
 server:
   port: 8080
@@ -30,3 +47,7 @@ app:
     secret: ${JWT_SECRET}
     access-expire-minutes: 30
     refresh-expire-days: 7
+  # Gmail SMTPS 사용 시 true. MAIL_USERNAME, MAIL_PASSWORD(앱 비밀번호) 함께 설정.
+  mail:
+    use-smtp: ${MAIL_USE_SMTP:false}
+

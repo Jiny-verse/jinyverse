@@ -1,12 +1,13 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { SideNavigation } from 'common/components';
-import { ApiProvider } from './providers/ApiProvider';
+import { AuthProvider } from 'common';
 
 export const metadata: Metadata = {
   title: 'Jinyverse',
   description: 'Monorepo Project',
 };
+
+const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? '';
 
 export default function RootLayout({
   children,
@@ -16,16 +17,9 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="m-0 bg-black p-0 text-white">
-        <ApiProvider
-          baseUrl={process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080'}
-          channel="INTERNAL"
-          role="admin"
-        >
-          <div className="flex min-h-screen">
-            <SideNavigation channel="internal" />
-            <main className="ml-64 flex-1 px-[4%] py-6">{children}</main>
-          </div>
-        </ApiProvider>
+        <AuthProvider baseUrl={baseUrl} on401RedirectPath="/login">
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );
