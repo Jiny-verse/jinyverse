@@ -7,9 +7,10 @@ import { useBoardContext } from '../_hooks/useBoardContext';
 
 export interface CreateDialogProps {
   typeOptions: { value: string; label: string }[];
+  menuOptions: { value: string; label: string }[];
 }
 
-export function CreateDialog({ typeOptions }: CreateDialogProps) {
+export function CreateDialog({ typeOptions, menuOptions }: CreateDialogProps) {
   const domain = useBoardContext();
   const { open, onClose, onSubmit } = domain.dialogs.create;
   const fields: AutoDialogField[] = [
@@ -21,6 +22,13 @@ export function CreateDialog({ typeOptions }: CreateDialogProps) {
       defaultValue: 'project',
     },
     { key: 'name', label: '이름', type: 'text' },
+    {
+      key: 'menuCode',
+      label: '연동 메뉴',
+      type: 'select',
+      options: menuOptions,
+      optional: true,
+    },
     { key: 'description', label: '설명', type: 'textarea', optional: true },
     { key: 'note', label: '비고', type: 'textarea', optional: true },
     { key: 'isPublic', label: '공개 여부', type: 'toggle', optional: true },

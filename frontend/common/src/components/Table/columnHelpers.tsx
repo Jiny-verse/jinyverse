@@ -105,7 +105,10 @@ function RowActionButtons<T extends Record<string, unknown>>({
         <Tooltip content="상세보기" position="top">
           <button
             type="button"
-            onClick={() => onDetailView(row)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDetailView(row);
+            }}
             className={`${btnBase} border-gray-300 text-gray-600 hover:bg-gray-100 hover:border-gray-400`}
             aria-label="상세보기"
           >
@@ -117,7 +120,10 @@ function RowActionButtons<T extends Record<string, unknown>>({
         <Tooltip content="수정" position="top">
           <button
             type="button"
-            onClick={() => onEdit(row)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(row);
+            }}
             className={`${btnBase} border-gray-300 text-gray-600 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600`}
             aria-label="수정"
           >
@@ -129,7 +135,10 @@ function RowActionButtons<T extends Record<string, unknown>>({
         <Tooltip content="삭제" position="top">
           <button
             type="button"
-            onClick={() => onDelete(id)}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(id);
+            }}
             className={`${btnBase} border-gray-300 text-gray-600 hover:bg-red-50 hover:border-red-300 hover:text-red-600`}
             aria-label="삭제"
           >

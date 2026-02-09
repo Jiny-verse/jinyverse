@@ -5,21 +5,38 @@ import type { AutoDialogField } from 'common/components';
 import { topicUpdateSchema } from 'common/schemas';
 import type { Topic, TopicUpdateInput } from 'common/types';
 
+const TOPIC_SUBMIT_BUTTONS = [
+  { label: '임시저장', intent: 'temporary' },
+  { label: '확인', intent: 'created' },
+] as const;
+
 export type UpdateDialogProps = {
   open: boolean;
   topic: Topic | null;
-  statusOptions: { value: string; label: string }[];
+  menuOptions: { value: string; label: string }[];
   onClose: () => void;
-  onSubmit: (values: TopicUpdateInput) => void | Promise<void>;
+  onSubmit: (values: TopicUpdateInput, intent?: string) => void | Promise<void>;
 };
 
-export function UpdateDialog({ open, topic, statusOptions, onClose, onSubmit }: UpdateDialogProps) {
+export function UpdateDialog({
+  open,
+  topic,
+  menuOptions,
+  onClose,
+  onSubmit,
+}: UpdateDialogProps) {
   const fields: AutoDialogField[] = [
-    { key: 'authorUserId', label: '작성자 ID', type: 'uuid' },
-    { key: 'status', label: '상태', type: 'select', options: statusOptions },
+    { key: 'status', label: '상태', type: 'text', hidden: true },
     { key: 'boardId', label: '게시판 ID', type: 'uuid', hidden: true },
     { key: 'title', label: '제목', type: 'text' },
     { key: 'content', label: '내용', type: 'textarea' },
+    {
+      key: 'menuCode',
+      label: '연동 메뉴',
+      type: 'select',
+      options: menuOptions,
+      optional: true,
+    },
     { key: 'isNotice', label: '공지', type: 'toggle', optional: true },
     { key: 'isPinned', label: '고정', type: 'toggle', optional: true },
     { key: 'isPublic', label: '공개', type: 'toggle', optional: true },
@@ -27,11 +44,11 @@ export function UpdateDialog({ open, topic, statusOptions, onClose, onSubmit }: 
 
   const initialValues = topic
     ? {
-        authorUserId: topic.authorUserId,
         status: topic.status,
         boardId: topic.boardId,
         title: topic.title,
         content: topic.content,
+        menuCode: topic.menuCode ?? '',
         isNotice: topic.isNotice ?? undefined,
         isPinned: topic.isPinned ?? undefined,
         isPublic: topic.isPublic ?? undefined,
@@ -48,6 +65,7 @@ export function UpdateDialog({ open, topic, statusOptions, onClose, onSubmit }: 
       mode="edit"
       initialValues={initialValues}
       onSubmit={onSubmit}
+      submitButtons={[...TOPIC_SUBMIT_BUTTONS]}
     />
   );
 }

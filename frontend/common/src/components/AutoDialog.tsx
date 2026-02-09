@@ -20,7 +20,10 @@ export type AutoDialogField = {
   defaultValue?: unknown;
   /** select 타입일 때 옵션 목록 */
   options?: { value: string; label: string }[];
+  placeholder?: string;
 };
+
+export type SubmitButtonIntent = { label: string; intent: string };
 
 type AutoDialogProps<S extends z.ZodObject<z.ZodRawShape>> = {
   open: boolean;
@@ -30,7 +33,8 @@ type AutoDialogProps<S extends z.ZodObject<z.ZodRawShape>> = {
   fields: AutoDialogField[];
   mode: 'create' | 'edit';
   initialValues?: Partial<z.infer<S>>;
-  onSubmit: (values: z.infer<S>) => void | Promise<void>;
+  onSubmit: (values: z.infer<S>, intent?: string) => void | Promise<void>;
+  submitButtons?: SubmitButtonIntent[];
 };
 
 export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
@@ -42,6 +46,7 @@ export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
   mode,
   initialValues,
   onSubmit,
+  submitButtons,
 }: AutoDialogProps<S>) {
   const defaultFor = (f: AutoDialogField) => {
     if (f.defaultValue !== undefined) return f.defaultValue;
@@ -65,25 +70,28 @@ export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
     setErrors((prev) => ({ ...prev, [key]: '' }));
   }, []);
 
-  const handleSubmit = useCallback(async () => {
-    const parsed = schema.safeParse(values);
-    if (!parsed.success) {
-      const err: Record<string, string> = {};
-      parsed.error.errors.forEach((e) => {
-        const path = e.path[0]?.toString();
-        if (path) err[path] = e.message;
-      });
-      setErrors(err);
-      return;
-    }
-    setSubmitting(true);
-    try {
-      await onSubmit(parsed.data as z.infer<S>);
-      onClose();
-    } finally {
-      setSubmitting(false);
-    }
-  }, [schema, values, onSubmit, onClose]);
+  const handleSubmit = useCallback(
+    async (intent?: string) => {
+      const parsed = schema.safeParse(values);
+      if (!parsed.success) {
+        const err: Record<string, string> = {};
+        parsed.error.errors.forEach((e) => {
+          const path = e.path[0]?.toString();
+          if (path) err[path] = e.message;
+        });
+        setErrors(err);
+        return;
+      }
+      setSubmitting(true);
+      try {
+        await onSubmit(parsed.data as z.infer<S>, intent);
+        onClose();
+      } finally {
+        setSubmitting(false);
+      }
+    },
+    [schema, values, onSubmit, onClose]
+  );
 
   React.useEffect(() => {
     if (open) {
@@ -107,9 +115,21 @@ export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
           <Button variant="secondary" onClick={onClose}>
             취소
           </Button>
-          <Button onClick={handleSubmit} disabled={submitting}>
-            {submitting ? '저장 중...' : mode === 'create' ? '생성' : '수정'}
-          </Button>
+          {submitButtons?.length
+            ? submitButtons.map((btn) => (
+                <Button
+                  key={btn.intent}
+                  onClick={() => handleSubmit(btn.intent)}
+                  disabled={submitting}
+                >
+                  {submitting ? '저장 중...' : btn.label}
+                </Button>
+              ))
+            : (
+                <Button onClick={() => handleSubmit()} disabled={submitting}>
+                  {submitting ? '저장 중...' : mode === 'create' ? '생성' : '수정'}
+                </Button>
+              )}
         </div>
       }
     >
@@ -169,6 +189,7 @@ export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
                     )
                   }
                   error={errors[f.key]}
+                  placeholder={f.placeholder}
                 />
               )}
             </div>

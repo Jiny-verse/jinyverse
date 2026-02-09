@@ -19,6 +19,8 @@ export const topicSchema = z.object({
   isPinned: z.boolean().nullable(),
   isPublic: z.boolean().nullable(),
   viewCount: z.number().int().nullable(),
+  sourceTopicId: optionalUuid.nullable(),
+  hidden: z.boolean().nullable(),
   publishedAt: z.string().nullable(),
   createdAt: z.string(),
   updatedAt: z.string(),
@@ -52,6 +54,7 @@ export type TopicUpdateInput = z.infer<typeof topicUpdateSchema>;
 /** 게시글 목록 필터 (쿼리 파라미터) */
 export const topicFilterSchema = z.object({
   boardId: optionalUuid,
+  menuCode: optionalString,
   statusCategoryCode: optionalString,
   status: optionalString,
   q: z.string().max(200).optional(),

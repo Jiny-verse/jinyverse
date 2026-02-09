@@ -4,9 +4,11 @@ import com.jinyverse.backend.domain.board.dto.BoardRequestDto;
 import com.jinyverse.backend.domain.board.dto.BoardResponseDto;
 import com.jinyverse.backend.domain.board.service.BoardService;
 import com.jinyverse.backend.domain.common.util.RequestContext;
+import com.jinyverse.backend.domain.menu.dto.CreateGroup;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -25,7 +27,7 @@ public class BoardController {
 
     @PostMapping
     public ResponseEntity<BoardResponseDto> create(
-            @Valid @RequestBody BoardRequestDto requestDto,
+            @Validated(CreateGroup.class) @RequestBody BoardRequestDto requestDto,
             @RequestHeader(value = "X-Channel", required = false) String channel,
             @RequestHeader(value = "X-Role", required = false) String role
     ) {

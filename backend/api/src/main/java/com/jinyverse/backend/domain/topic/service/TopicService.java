@@ -1,11 +1,17 @@
 package com.jinyverse.backend.domain.topic.service;
 
+import com.jinyverse.backend.domain.comment.entity.Comment;
+import com.jinyverse.backend.domain.comment.repository.CommentRepository;
 import com.jinyverse.backend.domain.common.util.Channel;
 import com.jinyverse.backend.domain.common.util.CommonSpecifications;
 import com.jinyverse.backend.domain.common.util.RequestContext;
 import com.jinyverse.backend.domain.topic.dto.TopicRequestDto;
 import com.jinyverse.backend.domain.topic.dto.TopicResponseDto;
+import com.jinyverse.backend.domain.topic.entity.RelTopicFile;
+import com.jinyverse.backend.domain.topic.entity.RelTopicTag;
 import com.jinyverse.backend.domain.topic.entity.Topic;
+import com.jinyverse.backend.domain.topic.repository.RelTopicFileRepository;
+import com.jinyverse.backend.domain.topic.repository.RelTopicTagRepository;
 import com.jinyverse.backend.domain.topic.repository.TopicRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -28,6 +35,9 @@ import static com.jinyverse.backend.domain.common.util.CommonSpecifications.PAGI
 public class TopicService {
 
     private final TopicRepository topicRepository;
+    private final CommentRepository commentRepository;
+    private final RelTopicFileRepository relTopicFileRepository;
+    private final RelTopicTagRepository relTopicTagRepository;
 
     @Transactional
     public TopicResponseDto create(TopicRequestDto requestDto, RequestContext ctx) {
@@ -50,7 +60,7 @@ public class TopicService {
     }
 
     public long count() {
-        return topicRepository.countByDeletedAtIsNull();
+        return topicRepository.count(spec(null, Map.of()));
     }
 
     @Transactional
@@ -61,9 +71,53 @@ public class TopicService {
         Topic topic = topicRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new RuntimeException("Topic not found with id: " + id));
 
+        if (topic.getSourceTopicId() != null && "created".equals(requestDto.getStatus())) {
+            return promoteDraft(topic, requestDto);
+        }
+        if (topic.getSourceTopicId() == null && Boolean.FALSE.equals(topic.getHidden())
+                && "temporary".equals(requestDto.getStatus())) {
+            return createDraftAndHideOriginal(topic, requestDto);
+        }
+
         topic.applyUpdate(requestDto);
         Topic updated = topicRepository.save(topic);
         return updated.toResponseDto();
+    }
+
+    private TopicResponseDto promoteDraft(Topic draft, TopicRequestDto requestDto) {
+        UUID originalId = draft.getSourceTopicId();
+        UUID draftId = draft.getId();
+
+        List<Comment> comments = commentRepository.findByTopicId(originalId);
+        comments.forEach(c -> c.setTopicId(draftId));
+        commentRepository.saveAll(comments);
+
+        List<RelTopicFile> files = relTopicFileRepository.findByTopicId(originalId);
+        files.forEach(f -> f.setTopicId(draftId));
+        relTopicFileRepository.saveAll(files);
+
+        List<RelTopicTag> tags = relTopicTagRepository.findByTopicId(originalId);
+        tags.forEach(t -> t.setTopicId(draftId));
+        relTopicTagRepository.saveAll(tags);
+
+        Topic original = topicRepository.findByIdAndDeletedAtIsNull(originalId)
+                .orElseThrow(() -> new RuntimeException("Original topic not found: " + originalId));
+        original.setDeletedAt(LocalDateTime.now());
+        topicRepository.save(original);
+
+        draft.setSourceTopicId(null);
+        draft.setStatus("created");
+        draft.applyUpdate(requestDto);
+        Topic saved = topicRepository.save(draft);
+        return saved.toResponseDto();
+    }
+
+    private TopicResponseDto createDraftAndHideOriginal(Topic original, TopicRequestDto requestDto) {
+        Topic draft = Topic.draftOf(original, requestDto);
+        Topic savedDraft = topicRepository.save(draft);
+        original.setHidden(true);
+        topicRepository.save(original);
+        return savedDraft.toResponseDto();
     }
 
     @Transactional
@@ -80,7 +134,8 @@ public class TopicService {
 
     private Specification<Topic> spec(RequestContext ctx, Map<String, Object> filter) {
         Specification<Topic> s = CommonSpecifications.notDeleted();
-        
+        s = CommonSpecifications.and(s, (root, q, cb) -> cb.equal(root.get("hidden"), false));
+
         if (ctx != null && ctx.getChannel() != null && "EXTERNAL".equals(ctx.getChannel().name())) {
             s = CommonSpecifications.and(s, CommonSpecifications.eqIfPresent("isPublic", true));
         }

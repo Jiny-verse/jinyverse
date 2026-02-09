@@ -90,13 +90,14 @@ CREATE TABLE "rel__user_file" (
 );
 
 CREATE TABLE "menu" (
-  "code" VARCHAR(40) PRIMARY KEY NOT NULL,
+  "id" UUID PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
+  "code" VARCHAR(40) NOT NULL UNIQUE,
   "name" VARCHAR(50) NOT NULL,
   "description" text,
   "is_active" BOOLEAN NOT NULL DEFAULT true,
   "is_admin" BOOLEAN NOT NULL DEFAULT false,
   "order" INT NOT NULL DEFAULT 0,
-  "upper_code" VARCHAR(40),
+  "upper_id" UUID,
   "created_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
   "updated_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
   "deleted_at" timestamp
@@ -262,7 +263,7 @@ COMMENT ON COLUMN "code"."deleted_at" IS '삭제일시';
 
 COMMENT ON COLUMN "board"."id" IS '게시판 고유 ID';
 
-COMMENT ON COLUMN "board"."menu_code" IS '연결된 메뉴 코드';
+COMMENT ON COLUMN "board"."menu_code" IS '연결된 메뉴 코드 (외래키 없음, 코드 일치 시 매칭)';
 
 COMMENT ON COLUMN "board"."type_category_code" IS '게시판 타입 분류 코드 (board_type)';
 
@@ -288,7 +289,7 @@ COMMENT ON COLUMN "topic"."id" IS '게시글 고유 ID';
 
 COMMENT ON COLUMN "topic"."author_user_id" IS '게시글 작성자 ID';
 
-COMMENT ON COLUMN "topic"."menu_code" IS '연결된 메뉴 코드';
+COMMENT ON COLUMN "topic"."menu_code" IS '연결된 메뉴 코드 (외래키 없음, 코드 일치 시 매칭)';
 
 COMMENT ON COLUMN "topic"."status_category_code" IS '게시글 상태 분류 코드';
 
@@ -358,7 +359,8 @@ COMMENT ON COLUMN "rel__user_file"."is_main" IS '대표 이미지 여부';
 
 COMMENT ON COLUMN "rel__user_file"."created_at" IS '연결 생성일시';
 
-COMMENT ON COLUMN "menu"."code" IS '메뉴 코드';
+COMMENT ON COLUMN "menu"."id" IS '메뉴 고유 ID';
+COMMENT ON COLUMN "menu"."code" IS '메뉴 코드 (수정 가능, UNIQUE)';
 
 COMMENT ON COLUMN "menu"."name" IS '메뉴 명';
 
@@ -370,7 +372,7 @@ COMMENT ON COLUMN "menu"."is_admin" IS '관리자 전용 메뉴 여부';
 
 COMMENT ON COLUMN "menu"."order" IS '메뉴 정렬 순서';
 
-COMMENT ON COLUMN "menu"."upper_code" IS '상위 메뉴 코드';
+COMMENT ON COLUMN "menu"."upper_id" IS '상위 메뉴 ID (자기참조)';
 
 COMMENT ON COLUMN "menu"."created_at" IS '생성일시';
 
@@ -562,8 +564,6 @@ ALTER TABLE "code" ADD FOREIGN KEY ("upper_category_code") REFERENCES "code_cate
 
 ALTER TABLE "code" ADD FOREIGN KEY ("upper_category_code", "upper_code") REFERENCES "code" ("category_code", "code");
 
-ALTER TABLE "board" ADD FOREIGN KEY ("menu_code") REFERENCES "menu" ("code");
-
 ALTER TABLE "board" ADD FOREIGN KEY ("type_category_code") REFERENCES "code_category" ("code");
 
 ALTER TABLE "board" ADD FOREIGN KEY ("type_category_code", "type") REFERENCES "code" ("category_code", "code");
@@ -571,8 +571,6 @@ ALTER TABLE "board" ADD FOREIGN KEY ("type_category_code", "type") REFERENCES "c
 ALTER TABLE "topic" ADD FOREIGN KEY ("author_user_id") REFERENCES "user" ("id");
 
 ALTER TABLE "topic" ADD FOREIGN KEY ("board_id") REFERENCES "board" ("id");
-
-ALTER TABLE "topic" ADD FOREIGN KEY ("menu_code") REFERENCES "menu" ("code");
 
 ALTER TABLE "topic" ADD FOREIGN KEY ("status_category_code") REFERENCES "code_category" ("code");
 
@@ -596,7 +594,7 @@ ALTER TABLE "rel__topic_tag" ADD FOREIGN KEY ("topic_id") REFERENCES "topic" ("i
 
 ALTER TABLE "rel__topic_tag" ADD FOREIGN KEY ("tag_id") REFERENCES "tag" ("id");
 
-ALTER TABLE "menu" ADD FOREIGN KEY ("upper_code") REFERENCES "menu" ("code");
+ALTER TABLE "menu" ADD FOREIGN KEY ("upper_id") REFERENCES "menu" ("id");
 
 ALTER TABLE "user" ADD FOREIGN KEY ("role_category_code") REFERENCES "code_category" ("code");
 
@@ -632,9 +630,9 @@ CREATE UNIQUE INDEX board_order_unique ON "board" ("order")
   WHERE deleted_at IS NULL;
 
 CREATE UNIQUE INDEX menu_order_root_unique ON "menu" ("order")
-  WHERE upper_code IS NULL AND deleted_at IS NULL;
+  WHERE upper_id IS NULL AND deleted_at IS NULL;
 
-CREATE UNIQUE INDEX menu_order_child_unique ON "menu" (upper_code, "order")
-  WHERE upper_code IS NOT NULL AND deleted_at IS NULL;
+CREATE UNIQUE INDEX menu_order_child_unique ON "menu" (upper_id, "order")
+  WHERE upper_id IS NOT NULL AND deleted_at IS NULL;
 
 CREATE UNIQUE INDEX rel_topic_file_topic_order_unique ON "rel__topic_file" (topic_id, "order");

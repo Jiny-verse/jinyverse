@@ -40,6 +40,10 @@ public class TopicResponseDto {
     private Boolean isPublic;
     /** 조회수 */
     private Integer viewCount;
+    /** 원본 게시글 id. 있으면 이 행은 해당 원본의 임시저장(초안). */
+    private UUID sourceTopicId;
+    /** true면 목록에서 제외. */
+    private Boolean hidden;
     /** 게시글 공개 예정 시각 */
     private LocalDateTime publishedAt;
     /** 작성일시 */

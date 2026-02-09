@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -29,11 +30,12 @@ public class AuditLogController {
 
     @GetMapping
     public ResponseEntity<Page<AuditLogResponseDto>> getAll(
+            @RequestParam Map<String, Object> filter,
             Pageable pageable,
             @RequestHeader(value = "X-Channel", required = false) String channel
     ) {
         Page<AuditLogResponseDto> responses =
-                auditLogService.getAll(pageable, RequestContext.fromChannelHeader(channel));
+                auditLogService.getAll(filter, pageable, RequestContext.fromChannelHeader(channel));
         return ResponseEntity.ok(responses);
     }
 

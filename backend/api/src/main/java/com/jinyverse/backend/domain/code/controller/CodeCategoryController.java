@@ -12,6 +12,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/code-categories")
 @RequiredArgsConstructor
@@ -27,11 +29,12 @@ public class CodeCategoryController {
 
     @GetMapping
     public ResponseEntity<Page<CodeCategoryResponseDto>> getAll(
+            @RequestParam Map<String, Object> filter,
             Pageable pageable,
             @RequestHeader(value = "X-Channel", required = false) String channel
     ) {
         Page<CodeCategoryResponseDto> responses =
-                codeCategoryService.getAll(pageable, RequestContext.fromChannelHeader(channel));
+                codeCategoryService.getAll(filter, pageable, RequestContext.fromChannelHeader(channel));
         return ResponseEntity.ok(responses);
     }
 

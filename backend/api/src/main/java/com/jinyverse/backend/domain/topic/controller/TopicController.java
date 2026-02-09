@@ -1,12 +1,14 @@
 package com.jinyverse.backend.domain.topic.controller;
 
 import com.jinyverse.backend.domain.common.util.RequestContext;
+import com.jinyverse.backend.domain.menu.dto.CreateGroup;
 import com.jinyverse.backend.domain.topic.dto.TopicRequestDto;
 import com.jinyverse.backend.domain.topic.dto.TopicResponseDto;
 import com.jinyverse.backend.domain.topic.service.TopicService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -25,7 +27,7 @@ public class TopicController {
 
     @PostMapping
     public ResponseEntity<TopicResponseDto> create(
-            @Valid @RequestBody TopicRequestDto requestDto,
+            @Validated(CreateGroup.class) @RequestBody TopicRequestDto requestDto,
             @RequestHeader(value = "X-Channel", required = false) String channel,
             @RequestHeader(value = "X-Role", required = false) String role
     ) {

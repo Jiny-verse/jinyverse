@@ -1,16 +1,101 @@
 'use client';
 
-import { getNavigationItemsByChannel } from '../../data/navigation';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import { ChevronDown } from 'lucide-react';
+import type { NavigationItem } from '../../types/navigation';
 
 interface Props {
-  channel?: 'external' | 'internal';
+  items: NavigationItem[];
+  isLoading?: boolean;
 }
 
-export function Navigation({ channel = 'external' }: Props) {
-  const items = getNavigationItemsByChannel(channel);
+function NavLinkItem({
+  item,
+  pathname,
+}: {
+  item: NavigationItem;
+  pathname: string;
+}) {
+  const hasChildren = item.children && item.children.length > 0;
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLLIElement>(null);
+
+  useEffect(() => {
+    const close = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    if (open) {
+      document.addEventListener('click', close);
+      return () => document.removeEventListener('click', close);
+    }
+  }, [open]);
+
+  const isActive = pathname === item.href;
+
+  if (hasChildren) {
+    return (
+      <li key={item.id} className="relative list-none" ref={ref}>
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          className={`flex items-center gap-1 text-sm transition-colors duration-[0.4s] py-3 ${
+            isActive
+              ? 'cursor-default font-medium text-white'
+              : 'cursor-pointer font-normal text-[#e5e5e5] hover:text-[#b3b3b3]'
+          }`}
+        >
+          {item.label}
+          <ChevronDown
+            className={`h-4 w-4 shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
+          />
+        </button>
+        {open && (
+          <ul className="absolute left-0 top-full z-50 mt-0.5 min-w-[160px] list-none rounded bg-[#2a2a2a] py-1 shadow-lg">
+            <li className="list-none">
+              <Link
+                href={item.href}
+                className="block px-4 py-2.5 text-sm text-[#e5e5e5] no-underline hover:bg-[#333] hover:text-white"
+                onClick={() => setOpen(false)}
+              >
+                {item.label} (전체)
+              </Link>
+            </li>
+            {item.children!.map((child) => (
+              <li key={child.id} className="list-none">
+                <Link
+                  href={child.href}
+                  className="block px-4 py-2.5 text-sm text-[#e5e5e5] no-underline hover:bg-[#333] hover:text-white"
+                  onClick={() => setOpen(false)}
+                >
+                  {child.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </li>
+    );
+  }
+
+  return (
+    <li key={item.id} className="list-none">
+      <Link
+        href={item.href}
+        className={`flex h-full items-center text-sm no-underline transition-colors duration-[0.4s] ${
+          isActive
+            ? 'cursor-default font-medium text-white'
+            : 'cursor-pointer font-normal text-[#e5e5e5] hover:text-[#b3b3b3]'
+        }`}
+      >
+        {item.label}
+      </Link>
+    </li>
+  );
+}
+
+export function Navigation({ items, isLoading = false }: Props) {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -32,7 +117,6 @@ export function Navigation({ channel = 'external' }: Props) {
       }`}
     >
       <div className="flex h-full items-center justify-between px-[4%] text-xl">
-        {/* Primary Navigation */}
         <div className="flex items-center">
           <Link
             href="/"
@@ -42,25 +126,15 @@ export function Navigation({ channel = 'external' }: Props) {
           </Link>
 
           <nav>
-            <ul className="m-0 flex list-none items-center gap-[18px] p-0">
-              {items.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <li key={item.id} className="block list-none">
-                    <Link
-                      href={item.href}
-                      className={`flex h-full items-center text-sm no-underline transition-colors duration-[0.4s] ${
-                        isActive
-                          ? 'cursor-default font-medium text-white'
-                          : 'cursor-pointer font-normal text-[#e5e5e5] hover:text-[#b3b3b3]'
-                      }`}
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
+            {isLoading ? (
+              <span className="text-sm text-gray-400">로딩 중...</span>
+            ) : (
+              <ul className="m-0 flex list-none items-center gap-[18px] p-0">
+                {items.map((item) => (
+                  <NavLinkItem key={item.id} item={item} pathname={pathname} />
+                ))}
+              </ul>
+            )}
           </nav>
         </div>
 

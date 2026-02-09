@@ -7,15 +7,18 @@ import {
   getTopics,
   getTopic,
   getComments,
-  getCodes,
+  getMenus,
   createTopic,
   updateTopic,
   deleteTopic,
 } from 'common/services';
+import { buildMenuTree, menuTreeToSelectOptionsByCode } from 'common';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import { DetailPreviewPanel, FilterSelect } from 'common/components';
 import type { Topic, TopicCreateInput, TopicUpdateInput, Comment } from 'common/types';
 import { Table, CreateDialog, UpdateDialog } from './_components';
+
+const MENU_NONE = { value: '', label: '(없음)' };
 
 export default function TopicsPage() {
   const params = useParams();
@@ -40,20 +43,15 @@ export default function TopicsPage() {
   const [previewLoading, setPreviewLoading] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Topic | null>(null);
-  const [statusOptions, setStatusOptions] = useState<{ value: string; label: string }[]>([]);
+  const [menuOptions, setMenuOptions] = useState<{ value: string; label: string }[]>([MENU_NONE]);
 
-  const TOPIC_STATUS_CATEGORY = 'topic_status';
-  const STATUS_CODES_EXCLUDED = new Set(['published', 'hidden']);
   useEffect(() => {
-    getCodes(options, { categoryCode: TOPIC_STATUS_CATEGORY })
-      .then((codes) =>
-        setStatusOptions(
-          codes
-            .filter((c) => !STATUS_CODES_EXCLUDED.has(c.code))
-            .map((c) => ({ value: c.code, label: c.name }))
-        )
-      )
-      .catch(() => setStatusOptions([]));
+    getMenus(options, { size: 100 })
+      .then((res) => {
+        const tree = buildMenuTree(res.content);
+        setMenuOptions([MENU_NONE, ...menuTreeToSelectOptionsByCode(tree)]);
+      })
+      .catch(() => setMenuOptions([MENU_NONE]));
   }, [options.baseUrl, options.channel]);
 
   const load = useCallback(() => {
@@ -101,15 +99,22 @@ export default function TopicsPage() {
     };
   }, [options.baseUrl, options.channel, selectedTopicId]);
 
-  const handleCreate = async (values: TopicCreateInput) => {
-    await createTopic(options, { ...values, boardId: values.boardId ?? boardId });
+  const handleCreate = async (values: TopicCreateInput, intent?: string) => {
+    await createTopic(options, {
+      ...values,
+      boardId: values.boardId ?? boardId,
+      status: intent ?? 'created',
+    });
     setCreateDialogOpen(false);
     load();
   };
 
-  const handleUpdate = async (values: TopicUpdateInput) => {
+  const handleUpdate = async (values: TopicUpdateInput, intent?: string) => {
     if (!editing) return;
-    await updateTopic(options, editing.id, values);
+    await updateTopic(options, editing.id, {
+      ...values,
+      status: intent ?? editing.status,
+    });
     setEditing(null);
     load();
   };
@@ -246,14 +251,14 @@ export default function TopicsPage() {
       <CreateDialog
         open={createDialogOpen}
         boardId={boardId}
-        statusOptions={statusOptions}
+        menuOptions={menuOptions}
         onClose={() => setCreateDialogOpen(false)}
         onSubmit={handleCreate}
       />
       <UpdateDialog
         open={!!editing}
         topic={editing}
-        statusOptions={statusOptions}
+        menuOptions={menuOptions}
         onClose={() => setEditing(null)}
         onSubmit={handleUpdate}
       />

@@ -1,5 +1,6 @@
 package com.jinyverse.backend.domain.board.dto;
 
+import com.jinyverse.backend.domain.menu.dto.CreateGroup;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
@@ -27,8 +28,8 @@ public class BoardRequestDto {
     @Size(max = 40, message = "타입은 40자 이하여야 합니다")
     private String type;
 
-    /** 게시판 명 */
-    @NotBlank(message = "이름은 필수입니다")
+    /** 게시판 명 (생성 시 필수, 수정 시 선택) */
+    @NotBlank(message = "이름은 필수입니다", groups = CreateGroup.class)
     @Size(max = 50, message = "이름은 50자 이하여야 합니다")
     private String name;
 

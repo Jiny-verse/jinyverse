@@ -6,8 +6,9 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface MenuRepository extends JpaRepository<Menu, String>, JpaSpecificationExecutor<Menu> {
+public interface MenuRepository extends JpaRepository<Menu, UUID>, JpaSpecificationExecutor<Menu> {
     Optional<Menu> findByCodeAndDeletedAtIsNull(String code);
 }

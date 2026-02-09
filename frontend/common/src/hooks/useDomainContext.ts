@@ -13,6 +13,7 @@ export interface UseDomainContextOptions<T, CreateInput, UpdateInput> {
   apiOptions: ApiOptions;
   services: DomainServices<T, CreateInput, UpdateInput>;
   onReload?: () => void;
+  idKey?: keyof T;
 }
 
 /**
@@ -22,6 +23,7 @@ export function useDomainContext<T, CreateInput = Partial<T>, UpdateInput = Part
   apiOptions,
   services,
   onReload,
+  idKey = 'id' as keyof T,
 }: UseDomainContextOptions<T, CreateInput, UpdateInput>) {
   // 다이얼로그: 생성
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
@@ -105,7 +107,7 @@ export function useDomainContext<T, CreateInput = Partial<T>, UpdateInput = Part
         },
         onSubmit: (input: UpdateInput) => {
           if (!updateTarget) return Promise.resolve();
-          const id = (updateTarget as any).id;
+          const id = String((updateTarget as Record<string, unknown>)[idKey as string]);
           return handleUpdate(id, input);
         },
       },

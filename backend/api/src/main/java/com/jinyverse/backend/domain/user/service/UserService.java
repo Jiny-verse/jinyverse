@@ -15,7 +15,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
+
+import static com.jinyverse.backend.domain.common.util.CommonSpecifications.PAGINATION_KEYS;
 
 @Service
 @RequiredArgsConstructor
@@ -39,8 +42,8 @@ public class UserService {
         return user.toResponseDto();
     }
 
-    public Page<UserResponseDto> getAll(Pageable pageable, RequestContext ctx) {
-        return userRepository.findAll(spec(ctx), pageable).map(User::toResponseDto);
+    public Page<UserResponseDto> getAll(Map<String, Object> filter, Pageable pageable, RequestContext ctx) {
+        return userRepository.findAll(spec(ctx, filter), pageable).map(User::toResponseDto);
     }
 
     @Transactional
@@ -65,8 +68,10 @@ public class UserService {
         userRepository.save(user);
     }
 
-    /** 삭제되지 않은 유저만 조회 */
-    private Specification<User> spec(RequestContext ctx) {
-        return CommonSpecifications.notDeleted();
+    private Specification<User> spec(RequestContext ctx, Map<String, Object> filter) {
+        return CommonSpecifications.and(
+                CommonSpecifications.notDeleted(),
+                CommonSpecifications.filterSpec(filter, PAGINATION_KEYS, "q", new String[]{"username", "email", "name", "nickname"})
+        );
     }
 }

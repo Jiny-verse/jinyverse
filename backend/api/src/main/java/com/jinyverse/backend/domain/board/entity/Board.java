@@ -5,7 +5,6 @@ import com.jinyverse.backend.domain.board.dto.BoardRequestDto;
 import com.jinyverse.backend.domain.board.dto.BoardResponseDto;
 import com.jinyverse.backend.domain.code.entity.Code;
 import com.jinyverse.backend.domain.code.entity.CodeCategory;
-import com.jinyverse.backend.domain.menu.entity.Menu;
 import com.jinyverse.backend.domain.topic.entity.Topic;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -35,7 +34,7 @@ public class Board extends BaseEntity {
     @Column(name = "id", columnDefinition = "UUID", nullable = false)
     private UUID id;
 
-    /** 연결된 메뉴 코드 */
+    /** 연결된 메뉴 코드 (외래키 없음, 코드 일치 시 매칭) */
     @Column(name = "menu_code", length = 40)
     private String menuCode;
 
@@ -68,10 +67,6 @@ public class Board extends BaseEntity {
     /** 게시판 정렬 순서 */
     @Column(name = "order", nullable = false)
     private Integer order;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "menu_code", insertable = false, updatable = false)
-    private Menu menu;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "type_category_code", insertable = false, updatable = false)

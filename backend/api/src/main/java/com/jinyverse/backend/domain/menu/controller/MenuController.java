@@ -1,16 +1,21 @@
 package com.jinyverse.backend.domain.menu.controller;
 
 import com.jinyverse.backend.domain.common.util.RequestContext;
+import com.jinyverse.backend.domain.menu.dto.CreateGroup;
 import com.jinyverse.backend.domain.menu.dto.MenuRequestDto;
+import com.jinyverse.backend.domain.menu.dto.MenuResolveResponseDto;
 import com.jinyverse.backend.domain.menu.dto.MenuResponseDto;
 import com.jinyverse.backend.domain.menu.service.MenuService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/menus")
@@ -20,18 +25,21 @@ public class MenuController {
     private final MenuService menuService;
 
     @PostMapping
-    public ResponseEntity<MenuResponseDto> create(@Valid @RequestBody MenuRequestDto requestDto) {
+    public ResponseEntity<MenuResponseDto> create(
+            @Validated(CreateGroup.class) @RequestBody MenuRequestDto requestDto) {
         MenuResponseDto response = menuService.create(requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping
     public ResponseEntity<Page<MenuResponseDto>> getAll(
+            @RequestParam Map<String, Object> filter,
             Pageable pageable,
-            @RequestHeader(value = "X-Channel", required = false) String channel
+            @RequestHeader(value = "X-Channel", required = false) String channel,
+            @RequestHeader(value = "X-Role", required = false) String role
     ) {
         Page<MenuResponseDto> responses =
-                menuService.getAll(pageable, RequestContext.fromChannelHeader(channel));
+                menuService.getAll(filter, pageable, RequestContext.fromHeaders(channel, role));
         return ResponseEntity.ok(responses);
     }
 
@@ -41,10 +49,20 @@ public class MenuController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{code}")
+    @GetMapping("/{code}/resolve")
+    public ResponseEntity<MenuResolveResponseDto> resolve(@PathVariable String code) {
+        return menuService.resolve(code)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/{code}")
     public ResponseEntity<MenuResponseDto> update(
             @PathVariable String code,
             @Valid @RequestBody MenuRequestDto requestDto) {
+        if (requestDto.getCode() == null || requestDto.getCode().isBlank()) {
+            requestDto.setCode(code);
+        }
         MenuResponseDto response = menuService.update(code, requestDto);
         return ResponseEntity.ok(response);
     }

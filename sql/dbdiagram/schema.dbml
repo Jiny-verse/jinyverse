@@ -33,7 +33,7 @@ Table code {
 
 Table board {
   id uuid [pk, not null, note: "게시판 고유 ID"]
-  menu_code varchar(40) [note: "연결된 메뉴 코드"]
+  menu_code varchar(40) [note: "연결된 메뉴 코드 (외래키 없음, 코드 일치 시 매칭)"]
   type_category_code varchar(40) [not null, default: 'board_type', note: "게시판 타입 분류 코드 (board_type)"]
   type varchar(40) [not null, default: 'project', note: "게시판 타입 코드 값"]
   name varchar(50) [not null, note: "게시판 명"]
@@ -49,7 +49,7 @@ Table board {
 Table topic {
   id uuid [pk, not null, note: "게시글 고유 ID"]
   author_user_id uuid [not null, note: "게시글 작성자 ID"]
-  menu_code varchar(40) [note: "연결된 메뉴 코드"]
+  menu_code varchar(40) [note: "연결된 메뉴 코드 (외래키 없음, 코드 일치 시 매칭)"]
   status_category_code varchar(40) [not null, default: 'topic_status', note: "게시글 상태 분류 코드"]
   status varchar(40) [not null, default: 'created', note: "게시글 상태 코드 값"]
   board_id uuid [not null, note: "소속 게시판 ID"]
@@ -96,13 +96,17 @@ Table rel__user_file {
 }
 
 Table menu {
-  code varchar(40) [pk, not null, note: "메뉴 코드"]
+  id uuid [pk, not null, default: `gen_random_uuid()`, note: "메뉴 고유 ID"]
+  code varchar(40) [not null, unique, note: "메뉴 코드 (수정 가능, UNIQUE)"]
   name varchar(50) [not null, note: "메뉴 명"]
   description text [note: "메뉴 설명"]
   is_active boolean [not null, default: true, note: "메뉴 활성 여부"]
   is_admin boolean [not null, default: false, note: "관리자 전용 메뉴 여부"]
   order int [not null, default: 0, note: "메뉴 정렬 순서"]
-  upper_code varchar(40) [note: "상위 메뉴 코드"]
+  upper_id uuid [note: "상위 메뉴 ID (자기참조)"]
+  channel_category_code varchar(40) [not null, default: 'menu_channel', note: "메뉴 표시 채널 분류 코드"]
+  channel varchar(40) [not null, default: 'INTERNAL', note: "메뉴 표시 채널 코드: INTERNAL, EXTERNAL, PUBLIC"]
+  path varchar(500) [note: "메뉴 기본 링크(경로/URL). 게시판·게시글 연동 없을 때 사용"]
   created_at timestamp [not null, default: `now()`, note: "생성일시"]
   updated_at timestamp [not null, default: `now()`, note: "수정일시"]
   deleted_at timestamp [note: "삭제일시"]
@@ -233,13 +237,11 @@ Ref: code.category_code > code_category.code
 Ref: code.upper_category_code > code_category.code
 Ref: code.(upper_category_code, upper_code) > code.(category_code, code)
 
-Ref: board.menu_code > menu.code
 Ref: board.type_category_code > code_category.code
 Ref: board.(type_category_code, type) > code.(category_code, code)
 
 Ref: topic.author_user_id > user.id
 Ref: topic.board_id > board.id
-Ref: topic.menu_code > menu.code
 Ref: topic.status_category_code > code_category.code
 Ref: topic.(status_category_code, status) > code.(category_code, code)
 
@@ -256,7 +258,9 @@ Ref: rel__user_file.file_id > common_file.id
 Ref: rel__topic_tag.topic_id > topic.id
 Ref: rel__topic_tag.tag_id > tag.id
 
-Ref: menu.upper_code > menu.code
+Ref: menu.upper_id > menu.id [note: "자기참조 (상위 메뉴)"]
+Ref: menu.channel_category_code > code_category.code
+Ref: menu.(channel_category_code, channel) > code.(category_code, code)
 
 Ref: user.role_category_code > code_category.code
 Ref: user.(role_category_code, role) > code.(category_code, code)

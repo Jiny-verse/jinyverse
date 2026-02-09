@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -28,9 +29,12 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<UserResponseDto>> getAll(Pageable pageable) {
+    public ResponseEntity<Page<UserResponseDto>> getAll(
+            @RequestParam Map<String, Object> filter,
+            Pageable pageable
+    ) {
         Page<UserResponseDto> responses =
-                userService.getAll(pageable, RequestContextHolder.get());
+                userService.getAll(filter, pageable, RequestContextHolder.get());
         return ResponseEntity.ok(responses);
     }
 

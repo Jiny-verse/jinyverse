@@ -103,6 +103,9 @@ importers:
       '@jinyverse/common':
         specifier: workspace:*
         version: link:../common
+      lucide-react:
+        specifier: ^0.460.0
+        version: 0.460.0(react@18.3.1)
       next:
         specifier: 15.1.4
         version: 15.1.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)

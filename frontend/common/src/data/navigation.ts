@@ -1,105 +1,38 @@
-import { NavigationData, NavigationItem, Channel } from '../types/navigation';
+import type { NavigationItem } from '../types/navigation';
+import type { Menu } from '../schemas/menu';
+import { buildMenuTree } from './menuTree';
+import type { MenuTreeNode } from './menuTree';
 
-/**
- * 네비게이션 목업 데이터
- * 추후 DB에서 관리할 예정
- */
-export const mockNavigationItems: NavigationItem[] = [
-  {
-    id: 'home',
-    label: '홈',
-    href: '/',
-    icon: 'home',
-  },
-  {
-    id: 'about',
-    label: '소개',
-    href: '/about',
-    icon: 'info',
-  },
-  {
-    id: 'products',
-    label: '제품',
-    href: '/products',
-    icon: 'package',
-  },
-  {
-    id: 'pricing',
-    label: '요금',
-    href: '/pricing',
-    icon: 'dollar',
-  },
-  {
-    id: 'contact',
-    label: '문의',
-    href: '/contact',
-    icon: 'mail',
-  },
-  {
-    id: 'dashboard',
-    label: '대시보드',
-    href: '/dashboard',
-    icon: 'dashboard',
-  },
-  {
-    id: 'users',
-    label: '사용자 관리',
-    href: '/users',
-    icon: 'users',
-  },
-  {
-    id: 'content',
-    label: '콘텐츠 관리',
-    href: '/content',
-    icon: 'folder',
-  },
-  {
-    id: 'analytics',
-    label: '분석',
-    href: '/analytics',
-    icon: 'chart',
-  },
-  {
-    id: 'settings',
-    label: '설정',
-    href: '/settings',
-    icon: 'settings',
-  },
-];
+export function menusToNavigationItems(
+  menus: Menu[],
+  _channel: 'external' | 'internal'
+): NavigationItem[] {
+  const sorted = [...menus].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+  return sorted.map((m) => ({
+    id: m.code,
+    label: m.name ?? m.code,
+    href: `/m/${encodeURIComponent(m.code)}`,
+  }));
+}
 
-/**
- * 채널별 표시 설정
- * 각 아이템이 어떤 채널에 표시될지 정의
- */
-export const mockChannelConfig = [
-  { itemId: 'home', channels: ['both'] as Channel[] },
-  { itemId: 'about', channels: ['external'] as Channel[] },
-  { itemId: 'products', channels: ['external'] as Channel[] },
-  { itemId: 'pricing', channels: ['external'] as Channel[] },
-  { itemId: 'contact', channels: ['external'] as Channel[] },
-  { itemId: 'dashboard', channels: ['internal'] as Channel[] },
-  { itemId: 'users', channels: ['internal'] as Channel[] },
-  { itemId: 'content', channels: ['internal'] as Channel[] },
-  { itemId: 'analytics', channels: ['internal'] as Channel[] },
-  { itemId: 'settings', channels: ['internal'] as Channel[] },
-];
-
-/**
- * 채널에 따라 필터링된 네비게이션 아이템 반환
- */
-export function getNavigationItemsByChannel(channel: 'external' | 'internal'): NavigationItem[] {
-  return mockNavigationItems.filter((item) => {
-    const config = mockChannelConfig.find((c) => c.itemId === item.id);
-    if (!config) return false;
-
-    return config.channels.includes(channel) || config.channels.includes('both');
-  });
+function menuTreeToNavItems(nodes: MenuTreeNode[]): NavigationItem[] {
+  return nodes.map((node) => ({
+    id: node.code,
+    label: node.name ?? node.code,
+    href: `/m/${encodeURIComponent(node.code)}`,
+    children:
+      node.children.length > 0 ? menuTreeToNavItems(node.children) : undefined,
+  }));
 }
 
 /**
- * 전체 네비게이션 데이터
+ * API 메뉴 목록을 계층 구조 네비게이션 아이템으로 변환.
+ * - children으로 하위 메뉴 포함.
  */
-export const mockNavigationData: NavigationData = {
-  items: mockNavigationItems,
-  channelConfig: mockChannelConfig,
-};
+export function menusToNavigationItemsTree(
+  menus: Menu[],
+  _channel: 'external' | 'internal'
+): NavigationItem[] {
+  const tree = buildMenuTree(menus);
+  return menuTreeToNavItems(tree);
+}

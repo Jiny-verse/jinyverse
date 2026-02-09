@@ -4,7 +4,6 @@ import com.jinyverse.backend.domain.board.entity.Board;
 import com.jinyverse.backend.domain.code.entity.Code;
 import com.jinyverse.backend.domain.code.entity.CodeCategory;
 import com.jinyverse.backend.domain.common.BaseEntity;
-import com.jinyverse.backend.domain.menu.entity.Menu;
 import com.jinyverse.backend.domain.topic.dto.TopicRequestDto;
 import com.jinyverse.backend.domain.topic.dto.TopicResponseDto;
 import com.jinyverse.backend.domain.user.entity.User;
@@ -83,9 +82,22 @@ public class Topic extends BaseEntity {
     @Column(name = "view_count", nullable = false)
     private Integer viewCount;
 
+    /** 원본 게시글 id. 있으면 이 행은 해당 원본의 임시저장(초안). null이면 일반/원본 게시글. */
+    @Column(name = "source_topic_id", columnDefinition = "UUID")
+    private UUID sourceTopicId;
+
+    /** true면 목록에서 제외. 원본이 초안이 있을 때 true. */
+    @Column(name = "hidden", nullable = false)
+    @Builder.Default
+    private Boolean hidden = false;
+
     /** 게시글 공개 예정 시각 */
     @Column(name = "published_at")
     private LocalDateTime publishedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "source_topic_id", insertable = false, updatable = false)
+    private Topic sourceTopic;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_user_id", insertable = false, updatable = false)
@@ -94,10 +106,6 @@ public class Topic extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id", insertable = false, updatable = false)
     private Board board;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "menu_code", insertable = false, updatable = false)
-    private Menu menu;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_category_code", insertable = false, updatable = false)
@@ -129,6 +137,28 @@ public class Topic extends BaseEntity {
                 .isNotice(dto.getIsNotice() != null ? dto.getIsNotice() : false)
                 .isPinned(dto.getIsPinned() != null ? dto.getIsPinned() : false)
                 .isPublic(dto.getIsPublic() != null ? dto.getIsPublic() : true)
+                .viewCount(0)
+                .hidden(false)
+                .publishedAt(dto.getPublishedAt())
+                .build();
+    }
+
+    /** 원본 topic + 요청으로 초안 행 생성 (id는 자동 생성, sourceTopicId=원본.id) */
+    public static Topic draftOf(Topic original, TopicRequestDto dto) {
+        return Topic.builder()
+                .authorUserId(dto.getAuthorUserId() != null ? dto.getAuthorUserId() : original.getAuthorUserId())
+                .menuCode(dto.getMenuCode() != null ? dto.getMenuCode() : original.getMenuCode())
+                .statusCategoryCode(blankToNull(dto.getStatusCategoryCode()) != null ? dto.getStatusCategoryCode() : original.getStatusCategoryCode())
+                .status("temporary")
+                .boardId(dto.getBoardId() != null ? dto.getBoardId() : original.getBoardId())
+                .title(dto.getTitle() != null ? dto.getTitle() : original.getTitle())
+                .content(dto.getContent() != null ? dto.getContent() : original.getContent())
+                .isNotice(dto.getIsNotice() != null ? dto.getIsNotice() : original.getIsNotice())
+                .isPinned(dto.getIsPinned() != null ? dto.getIsPinned() : original.getIsPinned())
+                .isPublic(dto.getIsPublic() != null ? dto.getIsPublic() : original.getIsPublic())
+                .viewCount(0)
+                .sourceTopicId(original.getId())
+                .hidden(false)
                 .publishedAt(dto.getPublishedAt())
                 .build();
     }
@@ -180,6 +210,8 @@ public class Topic extends BaseEntity {
                 .isPinned(this.isPinned)
                 .isPublic(this.isPublic)
                 .viewCount(this.viewCount)
+                .sourceTopicId(this.sourceTopicId)
+                .hidden(this.hidden)
                 .publishedAt(this.publishedAt)
                 .createdAt(this.getCreatedAt())
                 .updatedAt(this.getUpdatedAt())

@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -29,12 +30,12 @@ public class NotificationController {
 
     @GetMapping
     public ResponseEntity<Page<NotificationResponseDto>> getAll(
-            @RequestParam(required = false) UUID userId,
+            @RequestParam Map<String, Object> filter,
             Pageable pageable,
             @RequestHeader(value = "X-Channel", required = false) String channel
     ) {
         Page<NotificationResponseDto> responses =
-                notificationService.getAll(userId, pageable, RequestContext.fromChannelHeader(channel));
+                notificationService.getAll(filter, pageable, RequestContext.fromChannelHeader(channel));
         return ResponseEntity.ok(responses);
     }
 

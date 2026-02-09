@@ -14,6 +14,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Map;
+
+import static com.jinyverse.backend.domain.common.util.CommonSpecifications.PAGINATION_KEYS;
 
 @Service
 @RequiredArgsConstructor
@@ -35,13 +38,8 @@ public class CodeService {
         return codeEntity.toResponseDto();
     }
 
-    public Page<CodeResponseDto> getAll(String categoryCode, Pageable pageable, RequestContext ctx) {
-        Specification<Code> spec = spec(ctx);
-        if (categoryCode != null) {
-            spec = spec.and(CommonSpecifications.eqIfPresent("categoryCode", categoryCode));
-        }
-        
-        return codeRepository.findAll(spec, pageable).map(Code::toResponseDto);
+    public Page<CodeResponseDto> getAll(Map<String, Object> filter, Pageable pageable, RequestContext ctx) {
+        return codeRepository.findAll(spec(ctx, filter), pageable).map(Code::toResponseDto);
     }
 
     @Transactional
@@ -64,9 +62,12 @@ public class CodeService {
     }
 
     /**
-     * 권한 및 채널에 따른 강제 조건
+     * 삭제 여부 + 쿼리 파라미터 필터: categoryCode, q(코드·이름·설명 검색)
      */
-    private Specification<Code> spec(RequestContext ctx) {
-        return CommonSpecifications.notDeleted();
+    private Specification<Code> spec(RequestContext ctx, Map<String, Object> filter) {
+        return CommonSpecifications.and(
+                CommonSpecifications.notDeleted(),
+                CommonSpecifications.filterSpec(filter, PAGINATION_KEYS, "q", new String[]{"categoryCode", "code", "name", "description"})
+        );
     }
 }

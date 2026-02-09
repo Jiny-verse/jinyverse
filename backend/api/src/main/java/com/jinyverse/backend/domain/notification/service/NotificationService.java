@@ -14,7 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
+
+import static com.jinyverse.backend.domain.common.util.CommonSpecifications.PAGINATION_KEYS;
 
 @Service
 @RequiredArgsConstructor
@@ -36,13 +39,8 @@ public class NotificationService {
         return notification.toResponseDto();
     }
 
-    public Page<NotificationResponseDto> getAll(UUID userId, Pageable pageable, RequestContext ctx) {
-        Specification<Notification> spec = spec(ctx);
-        if (userId != null) {
-            spec = spec.and(CommonSpecifications.eqIfPresent("userId", userId));
-        }
-        
-        return notificationRepository.findAll(spec, pageable).map(Notification::toResponseDto);
+    public Page<NotificationResponseDto> getAll(Map<String, Object> filter, Pageable pageable, RequestContext ctx) {
+        return notificationRepository.findAll(spec(ctx, filter), pageable).map(Notification::toResponseDto);
     }
 
     @Transactional
@@ -65,9 +63,12 @@ public class NotificationService {
     }
 
     /**
-     * 권한 및 채널에 따른 강제 조건
+     * 삭제 여부 + 쿼리 파라미터 필터 (userId, q 등)
      */
-    private Specification<Notification> spec(RequestContext ctx) {
-        return CommonSpecifications.notDeleted();
+    private Specification<Notification> spec(RequestContext ctx, Map<String, Object> filter) {
+        return CommonSpecifications.and(
+                CommonSpecifications.notDeleted(),
+                CommonSpecifications.filterSpec(filter, PAGINATION_KEYS, "q", new String[]{})
+        );
     }
 }

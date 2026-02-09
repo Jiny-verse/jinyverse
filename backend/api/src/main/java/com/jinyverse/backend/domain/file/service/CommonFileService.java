@@ -1,5 +1,6 @@
 package com.jinyverse.backend.domain.file.service;
 
+import com.jinyverse.backend.domain.common.util.CommonSpecifications;
 import com.jinyverse.backend.domain.common.util.RequestContext;
 import com.jinyverse.backend.domain.file.dto.CommonFileRequestDto;
 import com.jinyverse.backend.domain.file.dto.CommonFileResponseDto;
@@ -12,7 +13,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.UUID;
+
+import static com.jinyverse.backend.domain.common.util.CommonSpecifications.PAGINATION_KEYS;
 
 @Service
 @RequiredArgsConstructor
@@ -34,8 +38,8 @@ public class CommonFileService {
         return commonFile.toResponseDto();
     }
 
-    public Page<CommonFileResponseDto> getAll(Pageable pageable, RequestContext ctx) {
-        return commonFileRepository.findAll(spec(ctx), pageable).map(CommonFile::toResponseDto);
+    public Page<CommonFileResponseDto> getAll(Map<String, Object> filter, Pageable pageable, RequestContext ctx) {
+        return commonFileRepository.findAll(spec(ctx, filter), pageable).map(CommonFile::toResponseDto);
     }
 
     @Transactional
@@ -56,9 +60,12 @@ public class CommonFileService {
     }
 
     /**
-     * 권한 및 채널에 따른 강제 조건
+     * 쿼리 파라미터 필터: q(원본명·저장명 검색)
      */
-    private Specification<CommonFile> spec(RequestContext ctx) {
-        return (root, query, cb) -> cb.conjunction();
+    private Specification<CommonFile> spec(RequestContext ctx, Map<String, Object> filter) {
+        return CommonSpecifications.and(
+                (root, query, cb) -> cb.conjunction(),
+                CommonSpecifications.filterSpec(filter, PAGINATION_KEYS, "q", new String[]{"originalName", "storedName"})
+        );
     }
 }

@@ -1,6 +1,7 @@
 import type { Board, BoardFilter } from '../schemas/board';
 import type { Topic, TopicFilter, TopicJoined } from '../schemas/topic';
 import type { Comment, CommentFilter } from '../schemas/comment';
+import type { Menu, MenuFilter } from '../schemas/menu';
 
 export type { Board, BoardFilter, BoardCreateInput, BoardUpdateInput } from '../schemas/board';
 export type {
@@ -16,6 +17,7 @@ export type {
   CommentCreateInput,
   CommentUpdateInput,
 } from '../schemas/comment';
+export type { Menu, MenuFilter, MenuCreateInput, MenuUpdateInput } from '../schemas/menu';
 
 export interface PageResponse<T> {
   content: T[];

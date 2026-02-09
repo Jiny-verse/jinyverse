@@ -13,7 +13,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
 import java.util.UUID;
+
+import static com.jinyverse.backend.domain.common.util.CommonSpecifications.PAGINATION_KEYS;
 
 @Service
 @RequiredArgsConstructor
@@ -35,8 +38,8 @@ public class TagService {
         return tag.toResponseDto();
     }
 
-    public Page<TagResponseDto> getAll(Pageable pageable, RequestContext ctx) {
-        return tagRepository.findAll(spec(ctx), pageable).map(Tag::toResponseDto);
+    public Page<TagResponseDto> getAll(Map<String, Object> filter, Pageable pageable, RequestContext ctx) {
+        return tagRepository.findAll(spec(ctx, filter), pageable).map(Tag::toResponseDto);
     }
 
     @Transactional
@@ -57,9 +60,12 @@ public class TagService {
     }
 
     /**
-     * 권한 및 채널에 따른 강제 조건
+     * 쿼리 파라미터 필터: q(이름·설명 검색)
      */
-    private Specification<Tag> spec(RequestContext ctx) {
-        return (root, query, cb) -> cb.conjunction();
+    private Specification<Tag> spec(RequestContext ctx, Map<String, Object> filter) {
+        return CommonSpecifications.and(
+                (root, query, cb) -> cb.conjunction(),
+                CommonSpecifications.filterSpec(filter, PAGINATION_KEYS, "q", new String[]{"name", "description"})
+        );
     }
 }

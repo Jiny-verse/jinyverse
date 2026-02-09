@@ -24,8 +24,8 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
           } ${className}`}
           {...props}
         >
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
+          {options.map((option, i) => (
+            <option key={option.value || `opt-${i}`} value={option.value}>
               {option.label}
             </option>
           ))}
