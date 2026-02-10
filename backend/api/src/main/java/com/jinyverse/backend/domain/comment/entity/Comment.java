@@ -76,6 +76,7 @@ public class Comment extends BaseEntity {
                 .userId(dto.getUserId())
                 .upperCommentId(dto.getUpperCommentId())
                 .content(dto.getContent())
+                .isDeleted(false)
                 .build();
     }
 
