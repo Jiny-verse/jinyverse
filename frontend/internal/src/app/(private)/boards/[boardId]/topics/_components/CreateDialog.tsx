@@ -51,6 +51,12 @@ export function CreateDialog({
     authorUserId: user?.userId ?? '',
   };
 
+  const handleSubmit = (values: TopicCreateInput, intent?: string) => {
+    const normalized = { ...values };
+    if (normalized.isNotice) normalized.isPinned = true;
+    return onSubmit(normalized, intent);
+  };
+
   return (
     <AutoDialog
       open={open}
@@ -60,7 +66,7 @@ export function CreateDialog({
       fields={fields}
       mode="create"
       initialValues={initialValues}
-      onSubmit={onSubmit}
+      onSubmit={handleSubmit}
       submitButtons={[...TOPIC_SUBMIT_BUTTONS]}
     />
   );

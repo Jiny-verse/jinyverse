@@ -53,6 +53,12 @@ export function Table({
     previewMode: !!onRowClick,
   });
 
+  const getRowClassName = (row: Topic) => {
+    if (row.isNotice) return 'bg-amber-50';
+    if (row.isPinned) return 'bg-gray-50';
+    return '';
+  };
+
   return (
     <DataTable<Topic>
       data={data}
@@ -68,6 +74,7 @@ export function Table({
       addButtonLabel="게시글 추가"
       onRowClick={onRowClick}
       selectedRowId={selectedRowId}
+      getRowClassName={getRowClassName}
     />
   );
 }

@@ -55,6 +55,12 @@ export function UpdateDialog({
       }
     : undefined;
 
+  const handleSubmit = (values: TopicUpdateInput, intent?: string) => {
+    const normalized = { ...values };
+    if (normalized.isNotice) normalized.isPinned = true;
+    return onSubmit(normalized, intent);
+  };
+
   return (
     <AutoDialog
       open={open}
@@ -64,7 +70,7 @@ export function UpdateDialog({
       fields={fields}
       mode="edit"
       initialValues={initialValues}
-      onSubmit={onSubmit}
+      onSubmit={handleSubmit}
       submitButtons={[...TOPIC_SUBMIT_BUTTONS]}
     />
   );

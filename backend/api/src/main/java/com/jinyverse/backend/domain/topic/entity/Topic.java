@@ -126,17 +126,19 @@ public class Topic extends BaseEntity {
         if (dto == null) {
             throw new IllegalArgumentException("TopicRequestDto is null");
         }
+        String status = blankToNull(dto.getStatus()) != null ? dto.getStatus() : "created";
+        boolean isPublic = !"temporary".equals(status) && (dto.getIsPublic() != null ? dto.getIsPublic() : true);
         return Topic.builder()
                 .authorUserId(dto.getAuthorUserId())
                 .menuCode(dto.getMenuCode())
                 .statusCategoryCode(blankToNull(dto.getStatusCategoryCode()) != null ? dto.getStatusCategoryCode() : "topic_status")
-                .status(blankToNull(dto.getStatus()) != null ? dto.getStatus() : "created")
+                .status(status)
                 .boardId(dto.getBoardId())
                 .title(dto.getTitle())
                 .content(dto.getContent())
                 .isNotice(dto.getIsNotice() != null ? dto.getIsNotice() : false)
                 .isPinned(dto.getIsPinned() != null ? dto.getIsPinned() : false)
-                .isPublic(dto.getIsPublic() != null ? dto.getIsPublic() : true)
+                .isPublic(isPublic)
                 .viewCount(0)
                 .hidden(false)
                 .publishedAt(dto.getPublishedAt())
@@ -155,7 +157,7 @@ public class Topic extends BaseEntity {
                 .content(dto.getContent() != null ? dto.getContent() : original.getContent())
                 .isNotice(dto.getIsNotice() != null ? dto.getIsNotice() : original.getIsNotice())
                 .isPinned(dto.getIsPinned() != null ? dto.getIsPinned() : original.getIsPinned())
-                .isPublic(dto.getIsPublic() != null ? dto.getIsPublic() : original.getIsPublic())
+                .isPublic(false)
                 .viewCount(0)
                 .sourceTopicId(original.getId())
                 .hidden(false)

@@ -25,6 +25,7 @@ export interface DataTableProps<T extends Record<string, unknown>> {
   onRowClick?: (row: T) => void;
   selectedRowId?: string | null;
   getRowId?: (row: T) => string;
+  getRowClassName?: (row: T) => string;
 }
 
 /**
@@ -47,6 +48,7 @@ export function DataTable<T extends Record<string, unknown>>({
   onRowClick,
   selectedRowId,
   getRowId,
+  getRowClassName,
 }: DataTableProps<T>) {
   const paginationWithDefaults = pagination
     ? { ...pagination, sizeOptions: pagination.sizeOptions ?? [10, 20, 50] }
@@ -87,6 +89,7 @@ export function DataTable<T extends Record<string, unknown>>({
       onRowClick={onRowClick}
       selectedRowId={selectedRowId}
       getRowId={getRowId}
+      getRowClassName={getRowClassName}
     />
   );
 }

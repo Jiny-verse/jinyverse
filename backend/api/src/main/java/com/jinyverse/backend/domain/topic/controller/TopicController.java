@@ -8,6 +8,7 @@ import com.jinyverse.backend.domain.topic.service.TopicService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -38,7 +39,7 @@ public class TopicController {
     @GetMapping
     public ResponseEntity<Page<TopicResponseDto>> getAll(
             @RequestParam Map<String, Object> filter,
-            Pageable pageable,
+            @PageableDefault(sort = {"isPinned", "createdAt"}, direction = Sort.Direction.DESC) Pageable pageable,
             @RequestHeader(value = "X-Channel", required = false) String channel,
             @RequestHeader(value = "X-Role", required = false) String role
     ) {
@@ -54,8 +55,12 @@ public class TopicController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TopicResponseDto> getById(@PathVariable UUID id) {
-        TopicResponseDto response = topicService.getById(id);
+    public ResponseEntity<TopicResponseDto> getById(
+            @PathVariable UUID id,
+            @RequestHeader(value = "X-Channel", required = false) String channel,
+            @RequestHeader(value = "X-Role", required = false) String role
+    ) {
+        TopicResponseDto response = topicService.getById(id, RequestContext.fromHeaders(channel, role));
         return ResponseEntity.ok(response);
     }
 

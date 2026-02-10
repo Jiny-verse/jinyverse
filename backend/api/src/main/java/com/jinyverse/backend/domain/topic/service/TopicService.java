@@ -45,13 +45,26 @@ public class TopicService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Topic create requires ADMIN on INTERNAL channel");
         }
         Topic topic = Topic.fromRequestDto(requestDto);
+        if ("temporary".equals(requestDto.getStatus())) {
+            topic.setIsPublic(false);
+        }
         Topic saved = topicRepository.save(topic);
         return saved.toResponseDto();
     }
 
-    public TopicResponseDto getById(UUID id) {
+    public TopicResponseDto getById(UUID id, RequestContext ctx) {
         Topic topic = topicRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new RuntimeException("Topic not found with id: " + id));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found with id: " + id));
+        if (ctx != null && ctx.getChannel() == Channel.EXTERNAL) {
+            boolean privateOrDraft = !Boolean.TRUE.equals(topic.getIsPublic()) || "temporary".equals(topic.getStatus());
+            if (privateOrDraft) {
+                boolean allowed = ctx.getUserId() != null
+                        && (topic.getAuthorUserId().equals(ctx.getUserId()) || ctx.isAdmin());
+                if (!allowed) {
+                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied to this topic");
+                }
+            }
+        }
         return topic.toResponseDto();
     }
 
@@ -80,6 +93,9 @@ public class TopicService {
         }
 
         topic.applyUpdate(requestDto);
+        if ("temporary".equals(topic.getStatus())) {
+            topic.setIsPublic(false);
+        }
         Topic updated = topicRepository.save(topic);
         return updated.toResponseDto();
     }
@@ -138,6 +154,7 @@ public class TopicService {
 
         if (ctx != null && ctx.getChannel() != null && "EXTERNAL".equals(ctx.getChannel().name())) {
             s = CommonSpecifications.and(s, CommonSpecifications.eqIfPresent("isPublic", true));
+            s = CommonSpecifications.and(s, (root, q, cb) -> cb.notEqual(root.get("status"), "temporary"));
         }
         
         for (Map.Entry<String, Object> entry : filter.entrySet()) {

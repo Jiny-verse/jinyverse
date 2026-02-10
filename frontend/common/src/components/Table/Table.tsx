@@ -18,6 +18,8 @@ export interface TableProps<T extends Record<string, unknown>> {
   onRowClick?: (row: T) => void;
   selectedRowId?: string | null;
   getRowId?: (row: T) => string;
+  /** 행별 추가 className (공지/고정 등 스타일) */
+  getRowClassName?: (row: T) => string;
 }
 
 export function Table<T extends Record<string, unknown>>({
@@ -34,6 +36,7 @@ export function Table<T extends Record<string, unknown>>({
   onRowClick,
   selectedRowId,
   getRowId = (row) => String((row as { id?: unknown }).id ?? ''),
+  getRowClassName,
 }: TableProps<T>) {
   const idKey = selection?.idKey as string;
   const selectedSet = new Set(selection?.selectedIds ?? []);
@@ -145,10 +148,12 @@ export function Table<T extends Record<string, unknown>>({
                     if ((e.target as HTMLElement).closest('input[type="checkbox"]')) return;
                     onRowClick?.(row);
                   };
+                  const baseRowClass = isSelected ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-gray-50';
+                  const rowClass = [baseRowClass, getRowClassName?.(row)].filter(Boolean).join(' ');
                   return (
                     <tr
                       key={rowId}
-                      className={isSelected ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-gray-50'}
+                      className={rowClass}
                       onClick={onRowClick ? handleRowClick : undefined}
                       role={onRowClick ? 'button' : undefined}
                       tabIndex={onRowClick ? 0 : undefined}
