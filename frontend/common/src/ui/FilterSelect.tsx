@@ -29,11 +29,11 @@ export function FilterSelect({
     <div className="flex items-center gap-1.5" role="group" aria-label={ariaLabel ?? label}>
       <span className="text-xs text-gray-500 whitespace-nowrap mr-0.5">{label}</span>
       <span className="inline-flex rounded-md border border-gray-300 bg-gray-50/80 p-0.5">
-        {allOptions.map((opt) => {
+        {allOptions.map((opt, i) => {
           const isSelected = value === opt.value;
           return (
             <button
-              key={opt.value || '__all__'}
+              key={opt.value !== '' ? opt.value : `__all__-${i}`}
               type="button"
               onClick={() => onChange(opt.value)}
               className={`h-6 min-w-8 px-2 rounded text-xs font-medium transition-colors ${

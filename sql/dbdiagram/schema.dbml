@@ -214,6 +214,8 @@ Table tag {
   id uuid [pk, not null, note: "태그 ID"]
   name varchar(50) [not null, unique, note: "태그 명"]
   description text [note: "태그 설명"]
+  usage_category_code varchar(40) [not null, default: 'tag_usage', note: "태그 용도 분류 코드"]
+  usage varchar(40) [not null, default: 'topic', note: "태그 용도 코드 (topic, board 등)"]
   created_at timestamp [not null, default: `now()`, note: "생성일시"]
   updated_at timestamp [not null, default: `now()`, note: "수정일시"]
   deleted_at timestamp [note: "삭제일시"]
@@ -254,6 +256,9 @@ Ref: rel__topic_file.file_id > common_file.id
 
 Ref: rel__user_file.user_id > user.id
 Ref: rel__user_file.file_id > common_file.id
+
+Ref: tag.usage_category_code > code_category.code
+Ref: tag.(usage_category_code, usage) > code.(category_code, code)
 
 Ref: rel__topic_tag.topic_id > topic.id
 Ref: rel__topic_tag.tag_id > tag.id

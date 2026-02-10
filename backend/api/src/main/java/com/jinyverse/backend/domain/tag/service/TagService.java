@@ -59,13 +59,11 @@ public class TagService {
         tagRepository.delete(tag);
     }
 
-    /**
-     * 쿼리 파라미터 필터: q(이름·설명 검색)
-     */
     private Specification<Tag> spec(RequestContext ctx, Map<String, Object> filter) {
         return CommonSpecifications.and(
                 (root, query, cb) -> cb.conjunction(),
-                CommonSpecifications.filterSpec(filter, PAGINATION_KEYS, "q", new String[]{"name", "description"})
+                CommonSpecifications.filterSpec(filter, PAGINATION_KEYS, "q",
+                        new String[]{"name", "description", "usageCategoryCode", "usage"})
         );
     }
 }

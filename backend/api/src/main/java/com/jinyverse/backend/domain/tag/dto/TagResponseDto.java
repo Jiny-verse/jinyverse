@@ -22,6 +22,10 @@ public class TagResponseDto {
     private String name;
     /** 태그 설명 */
     private String description;
+    /** 태그 용도 분류 코드 */
+    private String usageCategoryCode;
+    /** 태그 용도 코드 */
+    private String usage;
     /** 생성일시 */
     private LocalDateTime createdAt;
 }

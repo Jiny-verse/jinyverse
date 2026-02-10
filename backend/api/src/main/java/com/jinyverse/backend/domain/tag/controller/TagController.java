@@ -45,7 +45,7 @@ public class TagController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{id}")
+    @PostMapping("/{id}")
     public ResponseEntity<TagResponseDto> update(
             @PathVariable UUID id,
             @Valid @RequestBody TagRequestDto requestDto) {

@@ -22,4 +22,12 @@ public class TagRequestDto {
 
     /** 태그 설명 */
     private String description;
+
+    /** 태그 용도 분류 코드 (기본: tag_usage) */
+    @Size(max = 40)
+    private String usageCategoryCode;
+
+    /** 태그 용도 코드 (예: topic, board) */
+    @Size(max = 40)
+    private String usage;
 }
