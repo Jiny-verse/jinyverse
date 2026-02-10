@@ -14,6 +14,7 @@ export type UpdateDialogProps = {
   open: boolean;
   topic: Topic | null;
   menuOptions: { value: string; label: string }[];
+  tagOptions: { value: string; label: string }[];
   onClose: () => void;
   onSubmit: (values: TopicUpdateInput, intent?: string) => void | Promise<void>;
 };
@@ -22,6 +23,7 @@ export function UpdateDialog({
   open,
   topic,
   menuOptions,
+  tagOptions,
   onClose,
   onSubmit,
 }: UpdateDialogProps) {
@@ -37,6 +39,7 @@ export function UpdateDialog({
       options: menuOptions,
       optional: true,
     },
+    { key: 'tagIds', label: '태그', type: 'chipSelect', options: tagOptions, optional: true },
     { key: 'isNotice', label: '공지', type: 'toggle', optional: true },
     { key: 'isPinned', label: '고정', type: 'toggle', optional: true },
     { key: 'isPublic', label: '공개', type: 'toggle', optional: true },
@@ -49,6 +52,7 @@ export function UpdateDialog({
         title: topic.title,
         content: topic.content,
         menuCode: topic.menuCode ?? '',
+        tagIds: (topic.tags ?? []).map((t) => t.id),
         isNotice: topic.isNotice ?? undefined,
         isPinned: topic.isPinned ?? undefined,
         isPublic: topic.isPublic ?? undefined,

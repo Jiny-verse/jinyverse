@@ -10,6 +10,7 @@ export type CreateDialogProps = {
   open: boolean;
   boardId: string;
   menuOptions: { value: string; label: string }[];
+  tagOptions: { value: string; label: string }[];
   onClose: () => void;
   onSubmit: (values: TopicCreateInput, intent?: string) => void | Promise<void>;
 };
@@ -23,6 +24,7 @@ export function CreateDialog({
   open,
   boardId,
   menuOptions,
+  tagOptions,
   onClose,
   onSubmit,
 }: CreateDialogProps) {
@@ -40,6 +42,7 @@ export function CreateDialog({
       options: menuOptions,
       optional: true,
     },
+    { key: 'tagIds', label: '태그', type: 'chipSelect', options: tagOptions, optional: true },
     { key: 'isNotice', label: '공지', type: 'toggle', optional: true },
     { key: 'isPinned', label: '고정', type: 'toggle', optional: true },
     { key: 'isPublic', label: '공개', type: 'toggle', optional: true },

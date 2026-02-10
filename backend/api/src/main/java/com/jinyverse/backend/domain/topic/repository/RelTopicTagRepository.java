@@ -10,4 +10,6 @@ import java.util.UUID;
 @Repository
 public interface RelTopicTagRepository extends JpaRepository<RelTopicTag, UUID> {
     List<RelTopicTag> findByTopicId(UUID topicId);
+
+    List<RelTopicTag> findByTopicIdIn(List<UUID> topicIds);
 }

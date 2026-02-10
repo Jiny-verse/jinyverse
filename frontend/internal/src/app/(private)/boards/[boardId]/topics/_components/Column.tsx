@@ -27,14 +27,9 @@ export function getColumns(
       </Badge>
     ) : null;
     const titleEl = previewMode ? (
-      <span className="text-blue-600 hover:underline line-clamp-1 cursor-pointer">
-        {row.title}
-      </span>
+      <span className="line-clamp-1 cursor-pointer">{row.title}</span>
     ) : (
-      <Link
-        href={`/boards/${boardId}/topics/${row.id}`}
-        className="text-blue-600 hover:underline line-clamp-1"
-      >
+      <Link href={`/boards/${boardId}/topics/${row.id}`} className="line-clamp-1">
         {row.title}
       </Link>
     );
@@ -51,6 +46,22 @@ export function getColumns(
       key: 'title',
       header: '제목',
       render: titleCell,
+    },
+    {
+      key: 'tags',
+      header: '태그',
+      render: (row) =>
+        row.tags?.length ? (
+          <span className="flex flex-wrap gap-1">
+            {row.tags.map((t) => (
+              <Badge key={t.id} variant="default" className="text-xs">
+                {t.name}
+              </Badge>
+            ))}
+          </span>
+        ) : (
+          '-'
+        ),
     },
     { key: 'author', header: '작성자', render: (row) => row.author?.nickname ?? '-' },
     { key: 'status', header: '상태' },

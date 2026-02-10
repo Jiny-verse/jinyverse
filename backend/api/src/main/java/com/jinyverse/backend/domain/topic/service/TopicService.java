@@ -5,6 +5,9 @@ import com.jinyverse.backend.domain.comment.repository.CommentRepository;
 import com.jinyverse.backend.domain.common.util.Channel;
 import com.jinyverse.backend.domain.common.util.CommonSpecifications;
 import com.jinyverse.backend.domain.common.util.RequestContext;
+import com.jinyverse.backend.domain.tag.dto.TagResponseDto;
+import com.jinyverse.backend.domain.tag.entity.Tag;
+import com.jinyverse.backend.domain.tag.repository.TagRepository;
 import com.jinyverse.backend.domain.topic.dto.TopicRequestDto;
 import com.jinyverse.backend.domain.topic.dto.TopicResponseDto;
 import com.jinyverse.backend.domain.topic.entity.RelTopicFile;
@@ -25,7 +28,9 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static com.jinyverse.backend.domain.common.util.CommonSpecifications.PAGINATION_KEYS;
 
@@ -38,6 +43,7 @@ public class TopicService {
     private final CommentRepository commentRepository;
     private final RelTopicFileRepository relTopicFileRepository;
     private final RelTopicTagRepository relTopicTagRepository;
+    private final TagRepository tagRepository;
 
     @Transactional
     public TopicResponseDto create(TopicRequestDto requestDto, RequestContext ctx) {
@@ -49,7 +55,8 @@ public class TopicService {
             topic.setIsPublic(false);
         }
         Topic saved = topicRepository.save(topic);
-        return saved.toResponseDto();
+        saveTopicTags(saved.getId(), requestDto.getTagIds());
+        return toResponseDtoWithTags(saved.getId(), saved.toResponseDto());
     }
 
     @Transactional(readOnly = false)
@@ -69,11 +76,13 @@ public class TopicService {
             topic.setViewCount((topic.getViewCount() != null ? topic.getViewCount() : 0) + 1);
             topicRepository.save(topic);
         }
-        return topic.toResponseDto();
+        return toResponseDtoWithTags(id, topic.toResponseDto());
     }
 
     public Page<TopicResponseDto> getAll(Map<String, Object> filter, Pageable pageable, RequestContext ctx) {
-        return topicRepository.findAll(spec(ctx, filter), pageable).map(Topic::toResponseDto);
+        Page<TopicResponseDto> page = topicRepository.findAll(spec(ctx, filter), pageable).map(Topic::toResponseDto);
+        fillTagsForPage(page);
+        return page;
     }
 
     public long count() {
@@ -101,7 +110,8 @@ public class TopicService {
             topic.setIsPublic(false);
         }
         Topic updated = topicRepository.save(topic);
-        return updated.toResponseDto();
+        saveTopicTags(updated.getId(), requestDto.getTagIds());
+        return toResponseDtoWithTags(updated.getId(), updated.toResponseDto());
     }
 
     private TopicResponseDto promoteDraft(Topic draft, TopicRequestDto requestDto) {
@@ -129,7 +139,8 @@ public class TopicService {
         draft.setStatus("created");
         draft.applyUpdate(requestDto);
         Topic saved = topicRepository.save(draft);
-        return saved.toResponseDto();
+        saveTopicTags(saved.getId(), requestDto.getTagIds());
+        return toResponseDtoWithTags(saved.getId(), saved.toResponseDto());
     }
 
     private TopicResponseDto createDraftAndHideOriginal(Topic original, TopicRequestDto requestDto) {
@@ -137,7 +148,11 @@ public class TopicService {
         Topic savedDraft = topicRepository.save(draft);
         original.setHidden(true);
         topicRepository.save(original);
-        return savedDraft.toResponseDto();
+        List<RelTopicTag> originalTags = relTopicTagRepository.findByTopicId(original.getId());
+        for (RelTopicTag rel : originalTags) {
+            relTopicTagRepository.save(RelTopicTag.builder().topicId(savedDraft.getId()).tagId(rel.getTagId()).build());
+        }
+        return toResponseDtoWithTags(savedDraft.getId(), savedDraft.toResponseDto());
     }
 
     @Transactional
@@ -175,5 +190,49 @@ public class TopicService {
         }
         
         return s;
+    }
+
+    private void saveTopicTags(UUID topicId, List<UUID> tagIds) {
+        relTopicTagRepository.findByTopicId(topicId).forEach(relTopicTagRepository::delete);
+        if (tagIds != null && !tagIds.isEmpty()) {
+            for (UUID tagId : tagIds) {
+                relTopicTagRepository.save(RelTopicTag.builder().topicId(topicId).tagId(tagId).build());
+            }
+        }
+    }
+
+    private TopicResponseDto toResponseDtoWithTags(UUID topicId, TopicResponseDto dto) {
+        List<RelTopicTag> rels = relTopicTagRepository.findByTopicId(topicId);
+        if (rels.isEmpty()) {
+            dto.setTags(List.of());
+            return dto;
+        }
+        List<UUID> tagIds = rels.stream().map(RelTopicTag::getTagId).distinct().toList();
+        List<Tag> tags = tagRepository.findAllById(tagIds);
+        dto.setTags(tags.stream().map(Tag::toResponseDto).toList());
+        return dto;
+    }
+
+    private void fillTagsForPage(Page<TopicResponseDto> page) {
+        List<TopicResponseDto> content = page.getContent();
+        if (content.isEmpty()) return;
+        List<UUID> topicIds = content.stream().map(TopicResponseDto::getId).filter(Objects::nonNull).toList();
+        if (topicIds.isEmpty()) return;
+        List<RelTopicTag> rels = relTopicTagRepository.findByTopicIdIn(topicIds);
+        Map<UUID, List<UUID>> topicToTagIds = rels.stream()
+                .collect(Collectors.groupingBy(RelTopicTag::getTopicId,
+                        Collectors.mapping(RelTopicTag::getTagId, Collectors.toList())));
+        List<UUID> allTagIds = rels.stream().map(RelTopicTag::getTagId).distinct().toList();
+        if (allTagIds.isEmpty()) {
+            content.forEach(dto -> dto.setTags(List.of()));
+            return;
+        }
+        Map<UUID, TagResponseDto> tagMap = tagRepository.findAllById(allTagIds)
+                .stream()
+                .collect(Collectors.toMap(Tag::getId, Tag::toResponseDto));
+        for (TopicResponseDto dto : content) {
+            List<UUID> ids = topicToTagIds.getOrDefault(dto.getId(), List.of());
+            dto.setTags(ids.stream().map(tagMap::get).filter(Objects::nonNull).toList());
+        }
     }
 }

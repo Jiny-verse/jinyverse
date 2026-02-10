@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -60,4 +61,7 @@ public class TopicRequestDto {
 
     /** 게시글 공개 예정 시각 */
     private LocalDateTime publishedAt;
+
+    /** 연결할 태그 ID 목록 (rel 연결 테이블용, 선택) */
+    private List<UUID> tagIds;
 }

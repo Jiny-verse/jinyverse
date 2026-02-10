@@ -1,5 +1,6 @@
 package com.jinyverse.backend.domain.topic.dto;
 
+import com.jinyverse.backend.domain.tag.dto.TagResponseDto;
 import com.jinyverse.backend.domain.user.dto.UserJoinDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -55,4 +57,6 @@ public class TopicResponseDto {
     private LocalDateTime updatedAt;
     /** 삭제일시 */
     private LocalDateTime deletedAt;
+    /** 연결된 태그 (조인) */
+    private List<TagResponseDto> tags;
 }

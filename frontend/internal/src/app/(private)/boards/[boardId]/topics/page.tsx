@@ -8,6 +8,7 @@ import {
   getTopic,
   getComments,
   getMenus,
+  getTags,
   createTopic,
   updateTopic,
   deleteTopic,
@@ -15,6 +16,7 @@ import {
 import { buildMenuTree, menuTreeToSelectOptionsByCode, formatRelativeOrAbsolute } from 'common';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import { DetailPreviewPanel, FilterSelect } from 'common/components';
+import { Badge } from 'common/ui';
 import type { Topic, TopicCreateInput, TopicUpdateInput, Comment } from 'common/types';
 import { Table, CreateDialog, UpdateDialog } from './_components';
 
@@ -44,6 +46,7 @@ export default function TopicsPage() {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Topic | null>(null);
   const [menuOptions, setMenuOptions] = useState<{ value: string; label: string }[]>([MENU_NONE]);
+  const [tagOptions, setTagOptions] = useState<{ value: string; label: string }[]>([]);
 
   useEffect(() => {
     getMenus(options, { size: 100 })
@@ -52,6 +55,12 @@ export default function TopicsPage() {
         setMenuOptions([MENU_NONE, ...menuTreeToSelectOptionsByCode(tree)]);
       })
       .catch(() => setMenuOptions([MENU_NONE]));
+  }, [options.baseUrl, options.channel]);
+
+  useEffect(() => {
+    getTags(options, { usage: 'topic', size: 100 })
+      .then((res) => setTagOptions(res.content.map((t) => ({ value: t.id, label: t.name }))))
+      .catch(() => setTagOptions([]));
   }, [options.baseUrl, options.channel]);
 
   const load = useCallback(() => {
@@ -104,6 +113,7 @@ export default function TopicsPage() {
       ...values,
       boardId: values.boardId ?? boardId,
       status: intent ?? 'created',
+      tagIds: values.tagIds?.length ? values.tagIds : undefined,
     });
     setCreateDialogOpen(false);
     load();
@@ -114,6 +124,7 @@ export default function TopicsPage() {
     await updateTopic(options, editing.id, {
       ...values,
       status: intent ?? editing.status,
+      tagIds: values.tagIds,
     });
     setEditing(null);
     load();
@@ -220,6 +231,15 @@ export default function TopicsPage() {
                     <p className="text-sm text-gray-500 mb-2">
                       {previewTopic.author?.nickname ?? '-'} · {formatRelativeOrAbsolute(previewTopic.createdAt)} · 조회 {previewTopic.viewCount ?? 0}
                     </p>
+                    {previewTopic.tags?.length ? (
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {previewTopic.tags.map((t) => (
+                          <Badge key={t.id} variant="default" className="text-xs">
+                            {t.name}
+                          </Badge>
+                        ))}
+                      </div>
+                    ) : null}
                     <div className="prose prose-sm max-w-none whitespace-pre-wrap text-gray-900">
                       {previewTopic.content}
                     </div>
@@ -252,6 +272,7 @@ export default function TopicsPage() {
         open={createDialogOpen}
         boardId={boardId}
         menuOptions={menuOptions}
+        tagOptions={tagOptions}
         onClose={() => setCreateDialogOpen(false)}
         onSubmit={handleCreate}
       />
@@ -259,6 +280,7 @@ export default function TopicsPage() {
         open={!!editing}
         topic={editing}
         menuOptions={menuOptions}
+        tagOptions={tagOptions}
         onClose={() => setEditing(null)}
         onSubmit={handleUpdate}
       />

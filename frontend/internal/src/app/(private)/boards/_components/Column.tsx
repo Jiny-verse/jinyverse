@@ -38,12 +38,9 @@ export function getColumns(
       header: BOARD_LABELS.name,
       render: (row) =>
         previewMode ? (
-          <span className="text-blue-600 hover:underline cursor-pointer">{row.name}</span>
+          <span className="line-clamp-1 cursor-pointer">{row.name}</span>
         ) : (
-          <Link
-            href={`${boardIdPrefix}/${row.id}/topics`}
-            className="text-blue-600 hover:underline"
-          >
+          <Link href={`${boardIdPrefix}/${row.id}/topics`} className="line-clamp-1">
             {row.name}
           </Link>
         ),

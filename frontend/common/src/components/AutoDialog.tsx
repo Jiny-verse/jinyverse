@@ -12,13 +12,13 @@ import type { z } from 'zod';
 export type AutoDialogField = {
   key: string;
   label: string;
-  type: 'text' | 'number' | 'textarea' | 'checkbox' | 'toggle' | 'uuid' | 'select';
+  type: 'text' | 'number' | 'textarea' | 'checkbox' | 'toggle' | 'uuid' | 'select' | 'multiselect' | 'chipSelect';
   optional?: boolean;
   /** 숨김 필드: 폼에는 안 보이고 defaultValue 또는 initialValues로만 값 유지 */
   hidden?: boolean;
   /** hidden 필드 또는 생성 시 기본값 */
   defaultValue?: unknown;
-  /** select 타입일 때 옵션 목록 */
+  /** select / multiselect / chipSelect 타입일 때 옵션 목록 */
   options?: { value: string; label: string }[];
   placeholder?: string;
 };
@@ -52,6 +52,7 @@ export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
     if (f.defaultValue !== undefined) return f.defaultValue;
     if (f.type === 'checkbox' || f.type === 'toggle') return false;
     if (f.type === 'select') return '';
+    if (f.type === 'multiselect' || f.type === 'chipSelect') return [];
     return '';
   };
   const [values, setValues] = useState<Record<string, unknown>>(() => {
@@ -176,6 +177,71 @@ export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
                   onChange={(e) => handleChange(f.key, e.target.value)}
                   error={errors[f.key]}
                 />
+              ) : f.type === 'multiselect' ? (
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    {f.label}
+                  </label>
+                  <div className="flex flex-wrap gap-3 rounded border border-gray-300 bg-gray-50/80 p-2">
+                    {(f.options ?? []).map((opt) => {
+                      const selected = (values[f.key] as string[] | undefined) ?? [];
+                      const checked = selected.includes(opt.value);
+                      return (
+                        <label key={opt.value} className="flex cursor-pointer items-center gap-1.5">
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={() => {
+                              const next = checked
+                                ? selected.filter((v) => v !== opt.value)
+                                : [...selected, opt.value];
+                              handleChange(f.key, next);
+                            }}
+                            className="rounded border-gray-300"
+                          />
+                          <span className="text-sm text-gray-800">{opt.label}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                  {errors[f.key] ? (
+                    <p className="mt-1 text-sm text-red-600">{errors[f.key]}</p>
+                  ) : null}
+                </div>
+              ) : f.type === 'chipSelect' ? (
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    {f.label}
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {(f.options ?? []).map((opt) => {
+                      const selected = (values[f.key] as string[] | undefined) ?? [];
+                      const isSelected = selected.includes(opt.value);
+                      return (
+                        <button
+                          key={opt.value}
+                          type="button"
+                          onClick={() => {
+                            const next = isSelected
+                              ? selected.filter((v) => v !== opt.value)
+                              : [...selected, opt.value];
+                            handleChange(f.key, next);
+                          }}
+                          className={`inline-flex items-center rounded-md px-2.5 py-1 text-xs font-medium transition-colors ${
+                            isSelected
+                              ? 'bg-blue-100 text-blue-800 ring-1 ring-blue-200'
+                              : 'bg-gray-100 text-gray-600 ring-1 ring-gray-200 hover:ring-gray-300'
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {errors[f.key] ? (
+                    <p className="mt-1 text-sm text-red-600">{errors[f.key]}</p>
+                  ) : null}
+                </div>
               ) : (
                 <Input
                   id={f.key}

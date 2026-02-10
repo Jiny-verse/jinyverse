@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { userJoinSchema } from './user';
+import { tagSchema } from './tag';
 
 const uuid = z.string().uuid();
 const optionalUuid = uuid.optional();
@@ -27,6 +28,7 @@ export const topicSchema = z.object({
   createdAt: z.string(),
   updatedAt: z.string(),
   deletedAt: z.string().nullable(),
+  tags: z.array(tagSchema).optional(),
 });
 
 export type Topic = z.infer<typeof topicSchema>;
@@ -44,6 +46,7 @@ export const topicCreateSchema = z.object({
   isPinned: z.boolean().optional(),
   isPublic: z.boolean().optional(),
   publishedAt: z.string().optional(),
+  tagIds: z.array(uuid).optional(),
 });
 
 export type TopicCreateInput = z.infer<typeof topicCreateSchema>;
