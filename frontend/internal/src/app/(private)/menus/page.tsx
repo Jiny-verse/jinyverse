@@ -5,7 +5,7 @@ import { getMenusForManagement } from 'common/services';
 import { buildMenuTree, menuTreeToSelectOptions } from 'common';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import type { Menu } from 'common/types';
-import { CreateDialog, UpdateDialog, MenuTreeList, MenuDetailPanel } from './_components';
+import { CreateDialog, UpdateDialog, TreeList, DetailPanel } from './_components';
 import { MenuProvider, useMenuContext } from './_hooks/useMenuContext';
 import type { MenuTreeNode } from 'common';
 
@@ -109,7 +109,7 @@ function MenusContent() {
             </select>
           </div>
           <div className="min-h-[280px] max-h-[400px] overflow-y-auto">
-            <MenuTreeList
+            <TreeList
               tree={menuTree}
               selectedId={selectedMenu?.id ?? null}
               onSelectMenu={handleSelectMenu}
@@ -118,7 +118,7 @@ function MenusContent() {
         </div>
         <div className="min-h-[360px] min-w-0 overflow-hidden">
           {selectedMenu ? (
-            <MenuDetailPanel
+            <DetailPanel
               menu={selectedMenu}
               apiOptions={options}
               onEdit={handleOpenEdit}

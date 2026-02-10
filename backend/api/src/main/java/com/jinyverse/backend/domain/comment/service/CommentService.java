@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 import static com.jinyverse.backend.domain.common.util.CommonSpecifications.PAGINATION_KEYS;
@@ -34,6 +35,9 @@ public class CommentService {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Comment create requires logged-in user (USER or ADMIN)");
         }
         Comment comment = Comment.fromRequestDto(requestDto);
+        if (ctx.isAuthenticated() && ctx.getCurrentUserId() != null) {
+            comment.setUserId(ctx.getCurrentUserId());
+        }
         Comment saved = commentRepository.save(comment);
         return saved.toResponseDto();
     }
@@ -55,7 +59,10 @@ public class CommentService {
         }
         Comment comment = commentRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new RuntimeException("Comment not found with id: " + id));
-
+        boolean isOwner = ctx.isAuthenticated() && Objects.equals(comment.getUserId(), ctx.getCurrentUserId());
+        if (!ctx.isAdmin() && !isOwner) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Comment update allowed only for author or ADMIN");
+        }
         comment.applyUpdate(requestDto);
         Comment updated = commentRepository.save(comment);
         return updated.toResponseDto();
@@ -63,12 +70,15 @@ public class CommentService {
 
     @Transactional
     public void delete(UUID id, RequestContext ctx) {
-        if (ctx == null || !ctx.isAdmin()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Comment delete requires ADMIN");
+        if (ctx == null) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Comment delete requires authentication");
         }
         Comment comment = commentRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new RuntimeException("Comment not found with id: " + id));
-
+        boolean isOwner = ctx.isAuthenticated() && Objects.equals(comment.getUserId(), ctx.getCurrentUserId());
+        if (!ctx.isAdmin() && !isOwner) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Comment delete allowed only for author or ADMIN");
+        }
         comment.setDeletedAt(LocalDateTime.now());
         commentRepository.save(comment);
     }

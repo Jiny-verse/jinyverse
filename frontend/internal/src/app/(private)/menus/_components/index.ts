@@ -1,4 +1,4 @@
 export { CreateDialog } from './CreateDialog';
-export { MenuDetailPanel } from './MenuDetailPanel';
-export { MenuTreeList } from './MenuTreeList';
+export { DetailPanel } from './DetailPanel';
+export { TreeList } from './TreeList';
 export { UpdateDialog } from './UpdateDialog';

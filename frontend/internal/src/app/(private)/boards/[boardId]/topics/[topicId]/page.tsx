@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { getTopic, getComments, deleteComment } from 'common/services';
+import { getTopic, getComments } from 'common/services';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import type { Topic, Comment } from 'common/types';
+import { CommentSection, CommentWriteForm } from './_components';
 
 export default function TopicDetailPage() {
   const params = useParams();
@@ -16,24 +17,18 @@ export default function TopicDetailPage() {
   const [comments, setComments] = useState<Comment[]>([]);
   const [error, setError] = useState<string | null>(null);
 
-  const load = () => {
+  const load = useCallback(() => {
     Promise.all([getTopic(options, topicId), getComments(options, { topicId, size: 50 })])
       .then(([t, res]) => {
         setTopic(t);
         setComments(res.content);
       })
       .catch((e) => setError(e instanceof Error ? e.message : String(e)));
-  };
+  }, [options.baseUrl, options.channel, topicId]);
 
   useEffect(() => {
     load();
-  }, [options.baseUrl, options.channel, topicId]);
-
-  const handleDeleteComment = async (id: string) => {
-    if (!confirm('댓글을 삭제하시겠습니까?')) return;
-    await deleteComment(options, id);
-    load();
-  };
+  }, [load]);
 
   if (error) {
     return (
@@ -72,33 +67,8 @@ export default function TopicDetailPage() {
         </p>
         <div className="prose prose-invert max-w-none whitespace-pre-wrap">{topic.content}</div>
       </article>
-      <section>
-        <h2 className="text-lg font-semibold mb-4">
-          댓글 ({comments.filter((c) => !c.isDeleted).length})
-        </h2>
-        <ul className="space-y-3">
-          {comments
-            .filter((c) => !c.isDeleted)
-            .map((c) => (
-              <li
-                key={c.id}
-                className="flex justify-between items-start rounded border border-gray-700 p-3 bg-gray-800/30"
-              >
-                <div>
-                  <p className="text-sm text-gray-400">작성자 {c.userId}</p>
-                  <p className="mt-1">{c.content}</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => handleDeleteComment(c.id)}
-                  className="text-red-400 text-sm hover:underline"
-                >
-                  삭제
-                </button>
-              </li>
-            ))}
-        </ul>
-      </section>
+      <CommentWriteForm topicId={topicId} apiOptions={options} onSuccess={load} />
+      <CommentSection comments={comments} apiOptions={options} onReload={load} />
     </div>
   );
 }

@@ -13,7 +13,7 @@ const CHANNEL_LABELS: Record<string, string> = {
   PUBLIC: '공개',
 };
 
-export interface MenuDetailPanelProps {
+export interface DetailPanelProps {
   menu: Menu | null;
   apiOptions: ApiOptions;
   onEdit: (menu: Menu) => void;
@@ -21,13 +21,13 @@ export interface MenuDetailPanelProps {
   onLinkChange?: () => void;
 }
 
-export function MenuDetailPanel({
+export function DetailPanel({
   menu,
   apiOptions,
   onEdit,
   onDelete,
   onLinkChange,
-}: MenuDetailPanelProps) {
+}: DetailPanelProps) {
   const [showDetail, setShowDetail] = useState(false);
   const [linkedBoard, setLinkedBoard] = useState<Board | null>(null);
   const [linkedTopic, setLinkedTopic] = useState<Topic | null>(null);

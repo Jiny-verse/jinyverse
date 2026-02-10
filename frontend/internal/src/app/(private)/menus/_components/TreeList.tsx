@@ -4,7 +4,7 @@ import type { Menu } from 'common/types';
 import type { MenuTreeNode } from 'common';
 import { FolderTree } from 'lucide-react';
 
-export interface MenuTreeListProps {
+export interface TreeListProps {
   tree: MenuTreeNode[];
   selectedId?: string | null;
   onSelectMenu: (menu: Menu) => void;
@@ -57,7 +57,7 @@ function TreeLevel({
   );
 }
 
-export function MenuTreeList({ tree, selectedId, onSelectMenu }: MenuTreeListProps) {
+export function TreeList({ tree, selectedId, onSelectMenu }: TreeListProps) {
   if (tree.length === 0) {
     return (
       <div className="flex min-h-[280px] flex-col items-center justify-center py-14 text-center">

@@ -4,6 +4,7 @@ import com.jinyverse.backend.domain.comment.dto.CommentRequestDto;
 import com.jinyverse.backend.domain.comment.dto.CommentResponseDto;
 import com.jinyverse.backend.domain.comment.service.CommentService;
 import com.jinyverse.backend.domain.common.util.RequestContext;
+import com.jinyverse.backend.domain.common.util.RequestContextHolder;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -23,13 +24,18 @@ public class CommentController {
 
     private final CommentService commentService;
 
+    private RequestContext resolveContext(String channel, String role) {
+        RequestContext ctx = RequestContextHolder.get();
+        return ctx != null ? ctx : RequestContext.fromHeaders(channel, role);
+    }
+
     @PostMapping
     public ResponseEntity<CommentResponseDto> create(
             @Valid @RequestBody CommentRequestDto requestDto,
             @RequestHeader(value = "X-Channel", required = false) String channel,
             @RequestHeader(value = "X-Role", required = false) String role
     ) {
-        CommentResponseDto response = commentService.create(requestDto, RequestContext.fromHeaders(channel, role));
+        CommentResponseDto response = commentService.create(requestDto, resolveContext(channel, role));
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -41,7 +47,7 @@ public class CommentController {
             @RequestHeader(value = "X-Role", required = false) String role
     ) {
         Page<CommentResponseDto> responses =
-                commentService.getAll(filter, pageable, RequestContext.fromHeaders(channel, role));
+                commentService.getAll(filter, pageable, resolveContext(channel, role));
         return ResponseEntity.ok(responses);
     }
 
@@ -58,7 +64,7 @@ public class CommentController {
             @RequestHeader(value = "X-Channel", required = false) String channel,
             @RequestHeader(value = "X-Role", required = false) String role
     ) {
-        CommentResponseDto response = commentService.update(id, requestDto, RequestContext.fromHeaders(channel, role));
+        CommentResponseDto response = commentService.update(id, requestDto, resolveContext(channel, role));
         return ResponseEntity.ok(response);
     }
 
@@ -68,7 +74,7 @@ public class CommentController {
             @RequestHeader(value = "X-Channel", required = false) String channel,
             @RequestHeader(value = "X-Role", required = false) String role
     ) {
-        commentService.delete(id, RequestContext.fromHeaders(channel, role));
+        commentService.delete(id, resolveContext(channel, role));
         return ResponseEntity.noContent().build();
     }
 }
