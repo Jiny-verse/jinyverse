@@ -6,3 +6,4 @@ export * from './menu';
 export * from './tag';
 export * from './topic';
 export * from './user';
+export * from './setting';

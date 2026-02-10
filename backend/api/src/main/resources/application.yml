@@ -43,6 +43,9 @@ server:
 
 # JWT (환경변수 필수, 기본값 없음)
 app:
+  file:
+    storage:
+      base-path: ${FILE_STORAGE_BASE_PATH:}
   jwt:
     secret: ${JWT_SECRET}
     access-expire-minutes: 30

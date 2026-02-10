@@ -95,6 +95,12 @@ Table rel__user_file {
   created_at timestamp [not null, default: `now()`, note: "연결 생성일시"]
 }
 
+Table system_setting {
+  key varchar(120) [pk, not null, note: "설정 키 (예: file.storage.basePath)"]
+  value text [note: "설정 값"]
+  updated_at timestamp [not null, default: `now()`, note: "마지막 수정일시"]
+}
+
 Table menu {
   id uuid [pk, not null, default: `gen_random_uuid()`, note: "메뉴 고유 ID"]
   code varchar(40) [not null, unique, note: "메뉴 코드 (수정 가능, UNIQUE)"]

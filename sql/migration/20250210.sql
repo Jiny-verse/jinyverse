@@ -21,3 +21,15 @@ ALTER TABLE "tag" ADD CONSTRAINT "tag_usage_category_code_fk"
   FOREIGN KEY ("usage_category_code") REFERENCES "code_category" ("code");
 ALTER TABLE "tag" ADD CONSTRAINT "tag_usage_fk"
   FOREIGN KEY ("usage_category_code", "usage") REFERENCES "code" ("category_code", "code");
+
+-- 관리단에서 설정하는 키-값 저장소 (파일 저장 경로 등)
+CREATE TABLE IF NOT EXISTS "system_setting" (
+  "key"   VARCHAR(120) PRIMARY KEY NOT NULL,
+  "value" TEXT,
+  "updated_at" TIMESTAMP NOT NULL DEFAULT (NOW())
+);
+
+COMMENT ON TABLE "system_setting" IS '시스템 설정 (관리자 설정용 키-값)';
+COMMENT ON COLUMN "system_setting"."key" IS '설정 키 (예: file.storage.basePath)';
+COMMENT ON COLUMN "system_setting"."value" IS '설정 값';
+COMMENT ON COLUMN "system_setting"."updated_at" IS '마지막 수정일시';
