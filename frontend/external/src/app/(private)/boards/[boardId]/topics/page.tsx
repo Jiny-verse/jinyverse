@@ -127,7 +127,7 @@ export default function TopicsPage() {
                 <>
                   <article className="rounded-lg border border-gray-200 bg-white p-4 mb-4">
                     <p className="text-sm text-gray-500 mb-2">
-                      작성일 {previewTopic.createdAt} · 조회 {previewTopic.viewCount ?? 0}
+                      {previewTopic.author?.nickname ?? '-'} · {formatRelativeOrAbsolute(previewTopic.createdAt)} · 조회 {previewTopic.viewCount ?? 0}
                     </p>
                     <div className="prose prose-sm max-w-none whitespace-pre-wrap text-gray-900">
                       {previewTopic.content}

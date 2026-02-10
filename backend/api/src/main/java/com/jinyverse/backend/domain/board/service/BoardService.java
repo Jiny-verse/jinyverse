@@ -78,11 +78,12 @@ public class BoardService {
         boardRepository.save(board);
     }
 
-    /** 접근 제어 전용: 삭제 여부, 채널별 노출 */
     private Specification<Board> accessControlSpec(RequestContext ctx) {
         Specification<Board> s = CommonSpecifications.notDeleted();
         if (ctx != null && ctx.getChannel() != null && "EXTERNAL".equals(ctx.getChannel().name())) {
-            s = CommonSpecifications.and(s, CommonSpecifications.eqIfPresent("isPublic", true));
+            if (!ctx.hasRole()) {
+                s = CommonSpecifications.and(s, CommonSpecifications.eqIfPresent("isPublic", true));
+            }
         }
         return s;
     }

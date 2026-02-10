@@ -202,6 +202,7 @@ public class Topic extends BaseEntity {
         return TopicResponseDto.builder()
                 .id(this.id)
                 .authorUserId(this.authorUserId)
+                .author(this.author != null ? this.author.toJoinDto() : null)
                 .menuCode(this.menuCode)
                 .statusCategoryCode(this.statusCategoryCode)
                 .status(this.status)

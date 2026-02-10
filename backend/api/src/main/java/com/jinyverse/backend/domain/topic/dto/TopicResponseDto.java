@@ -1,5 +1,6 @@
 package com.jinyverse.backend.domain.topic.dto;
 
+import com.jinyverse.backend.domain.user.dto.UserJoinDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,6 +21,8 @@ public class TopicResponseDto {
     private UUID id;
     /** 게시글 작성자 ID */
     private UUID authorUserId;
+    /** 작성자 */
+    private UserJoinDto author;
     /** 연결된 메뉴 코드 */
     private String menuCode;
     /** 게시글 상태 분류 코드 */

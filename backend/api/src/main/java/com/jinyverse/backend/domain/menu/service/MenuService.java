@@ -187,9 +187,11 @@ public class MenuService {
     private Specification<Menu> spec(RequestContext ctx, Map<String, Object> filter) {
         Specification<Menu> result = CommonSpecifications.notDeleted();
 
-        // INTERNAL 채널일 때만 비활성 메뉴 조회 가능
         if (ctx != null && ctx.getChannel() != null && Channel.EXTERNAL.equals(ctx.getChannel())) {
             result = result.and(CommonSpecifications.eqIfPresent("isActive", true));
+            if (!ctx.isAdmin()) {
+                result = result.and(CommonSpecifications.eqIfPresent("isAdmin", false));
+            }
         }
 
         // 채널 필터: 요청 채널·PUBLIC만 (메뉴바 노출용. 전체 조회는 GET /api/admin/menus 사용)

@@ -62,13 +62,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         try {
             String token = extractAccessToken(request);
-            if (token == null || token.isBlank()) {
-                sendUnauthorized(response, "UNAUTHORIZED", "Missing or invalid access token (cookie or Authorization header)");
-                return;
+            if (token != null && !token.isBlank()) {
+                RequestContext context = RequestContext.fromToken(jwtUtil, token);
+                RequestContextHolder.set(context);
+                filterChain.doFilter(request, response);
+            } else {
+                if (isPublicGetRequest(request)) {
+                    filterChain.doFilter(request, response);
+                } else {
+                    sendUnauthorized(response, "UNAUTHORIZED", "Missing or invalid access token (cookie or Authorization header)");
+                }
             }
-            RequestContext context = RequestContext.fromToken(jwtUtil, token);
-            RequestContextHolder.set(context);
-            filterChain.doFilter(request, response);
         } catch (ExpiredJwtException e) {
             sendUnauthorized(response, "TOKEN_EXPIRED", "Access token has expired");
         } catch (JwtException e) {
@@ -76,6 +80,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } finally {
             RequestContextHolder.clear();
         }
+    }
+
+    private boolean isPublicGetRequest(HttpServletRequest request) {
+        if (!"GET".equalsIgnoreCase(request.getMethod())) {
+            return false;
+        }
+        String path = request.getRequestURI();
+        if (path == null) return false;
+        if (path.equals("/api/menus") || path.startsWith("/api/menus/")) return true;
+        if (path.equals("/api/boards")) return true;
+        if (path.equals("/api/topics")) return true;
+        if (path.startsWith("/api/topics/") && path.indexOf('/', 12) < 0) return true; // /api/topics/{id} 단건만
+        if (path.equals("/api/comments")) return true;
+        return false;
     }
 
     private String extractAccessToken(HttpServletRequest request) {

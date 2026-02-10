@@ -32,7 +32,7 @@ export interface PageResponse<T> {
 export interface ApiOptions {
   baseUrl: string;
   channel: 'INTERNAL' | 'EXTERNAL';
-  role?: 'admin' | 'user' | null;
+  role?: string | null;
   accessToken?: string | null;
   on401?: () => void;
 }

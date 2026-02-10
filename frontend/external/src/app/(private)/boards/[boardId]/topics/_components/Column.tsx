@@ -2,6 +2,7 @@
 
 import type { ColumnDef } from 'common/components';
 import { createActionColumn } from 'common/components';
+import { formatRelativeOrAbsolute } from 'common';
 import type { Topic } from 'common/types';
 import Link from 'next/link';
 
@@ -33,13 +34,14 @@ export function getTopicColumns(boardId: string, options?: TopicColumnOptions): 
           </Link>
         ),
     },
+    { key: 'author', header: '작성자', render: (row) => row.author?.nickname ?? '-' },
     { key: 'status', header: '상태' },
     { key: 'viewCount', header: '조회', render: (row) => row.viewCount ?? 0 },
     { key: 'isNotice', header: '공지', render: (row) => (row.isNotice ? 'Y' : 'N') },
     {
       key: 'createdAt',
       header: '작성일',
-      render: (row) => (row.createdAt ? String(row.createdAt).slice(0, 10) : '-'),
+      render: (row) => (row.createdAt ? formatRelativeOrAbsolute(row.createdAt) : '-'),
     },
   ];
   if (options?.onDetailView) {

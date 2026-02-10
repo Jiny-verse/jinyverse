@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
-import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { getTopic, getComments } from 'common/services';
 import { formatRelativeOrAbsolute } from 'common';
@@ -55,12 +54,6 @@ export default function TopicDetailPage() {
     return (
       <div className="min-h-screen pt-[90px]">
         <p className="text-red-400">{error}</p>
-        <Link
-          href={`/boards/${boardId}/topics`}
-          className="mt-4 inline-block text-gray-400 hover:text-white"
-        >
-          게시글 목록
-        </Link>
       </div>
     );
   }
@@ -75,16 +68,10 @@ export default function TopicDetailPage() {
 
   return (
     <div className="min-h-screen pt-[90px]">
-      <Link
-        href={`/boards/${boardId}/topics`}
-        className="text-gray-400 hover:text-white mb-4 inline-block"
-      >
-        ← 게시글 목록
-      </Link>
       <article className="rounded-lg border border-gray-700 bg-gray-800/50 p-6 mb-8">
         <h1 className="text-2xl font-bold mb-2">{topic.title}</h1>
         <p className="text-sm text-gray-400 mb-4">
-          작성일 {topic.createdAt} · 조회 {topic.viewCount ?? 0}
+          {topic.author?.nickname ?? '-'} · {formatRelativeOrAbsolute(topic.createdAt)} · 조회 {topic.viewCount ?? 0}
         </p>
         <div className="prose prose-invert max-w-none whitespace-pre-wrap">{topic.content}</div>
       </article>

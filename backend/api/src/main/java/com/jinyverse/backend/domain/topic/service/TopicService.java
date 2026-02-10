@@ -52,6 +52,7 @@ public class TopicService {
         return saved.toResponseDto();
     }
 
+    @Transactional(readOnly = false)
     public TopicResponseDto getById(UUID id, RequestContext ctx) {
         Topic topic = topicRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found with id: " + id));
@@ -64,6 +65,9 @@ public class TopicService {
                     throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied to this topic");
                 }
             }
+            // 외부 채널에서 상세 조회 시 조회수 증가
+            topic.setViewCount((topic.getViewCount() != null ? topic.getViewCount() : 0) + 1);
+            topicRepository.save(topic);
         }
         return topic.toResponseDto();
     }
@@ -153,7 +157,9 @@ public class TopicService {
         s = CommonSpecifications.and(s, (root, q, cb) -> cb.equal(root.get("hidden"), false));
 
         if (ctx != null && ctx.getChannel() != null && "EXTERNAL".equals(ctx.getChannel().name())) {
-            s = CommonSpecifications.and(s, CommonSpecifications.eqIfPresent("isPublic", true));
+            if (!ctx.hasRole()) {
+                s = CommonSpecifications.and(s, CommonSpecifications.eqIfPresent("isPublic", true));
+            }
             s = CommonSpecifications.and(s, (root, q, cb) -> cb.notEqual(root.get("status"), "temporary"));
         }
         

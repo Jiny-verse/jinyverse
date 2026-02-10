@@ -1,7 +1,7 @@
 'use client';
 
 import { HorizontalNavigation } from 'common/components';
-import { useNavigationItems } from 'common';
+import { useAuth, useNavigationItems } from 'common';
 import { ApiProvider, useApiOptions } from '@/app/providers/ApiProvider';
 
 const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
@@ -22,8 +22,9 @@ export default function PrivateLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { user } = useAuth();
   return (
-    <ApiProvider baseUrl={baseUrl} channel="EXTERNAL" role={null}>
+    <ApiProvider baseUrl={baseUrl} channel="EXTERNAL" role={user?.role ?? null}>
       <ExternalPrivateContent>{children}</ExternalPrivateContent>
     </ApiProvider>
   );

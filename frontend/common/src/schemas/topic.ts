@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { userJoinSchema } from './user';
 
 const uuid = z.string().uuid();
 const optionalUuid = uuid.optional();
@@ -9,6 +10,7 @@ const optionalText = z.string().optional();
 export const topicSchema = z.object({
   id: uuid,
   authorUserId: uuid,
+  author: userJoinSchema.nullable().optional(),
   menuCode: optionalString.nullable(),
   statusCategoryCode: z.string().max(40),
   status: z.string().max(40),

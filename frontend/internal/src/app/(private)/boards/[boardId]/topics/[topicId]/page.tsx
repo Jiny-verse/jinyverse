@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { getTopic, getComments } from 'common/services';
+import { formatRelativeOrAbsolute } from 'common';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import type { Topic, Comment } from 'common/types';
 import { CommentSection, CommentWriteForm } from './_components';
@@ -63,7 +64,7 @@ export default function TopicDetailPage() {
       <article className="rounded-lg border border-gray-700 bg-gray-800/50 p-6 mb-8">
         <h1 className="text-2xl font-bold mb-2">{topic.title}</h1>
         <p className="text-sm text-gray-400 mb-4">
-          작성일 {topic.createdAt} · 조회 {topic.viewCount ?? 0}
+          {topic.author?.nickname ?? '-'} · {formatRelativeOrAbsolute(topic.createdAt)} · 조회 {topic.viewCount ?? 0}
         </p>
         <div className="prose prose-invert max-w-none whitespace-pre-wrap">{topic.content}</div>
       </article>
