@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
@@ -79,8 +80,16 @@ public class CommentService {
         if (!ctx.isAdmin() && !isOwner) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Comment delete allowed only for author or ADMIN");
         }
+        cascadeSoftDelete(comment);
+    }
+
+    private void cascadeSoftDelete(Comment comment) {
         comment.setDeletedAt(LocalDateTime.now());
         commentRepository.save(comment);
+        List<Comment> children = commentRepository.findByUpperCommentIdAndDeletedAtIsNull(comment.getId());
+        for (Comment child : children) {
+            cascadeSoftDelete(child);
+        }
     }
 
     private Specification<Comment> spec(RequestContext ctx, Map<String, Object> filter) {

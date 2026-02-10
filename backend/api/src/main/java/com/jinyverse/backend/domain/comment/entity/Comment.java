@@ -98,7 +98,7 @@ public class Comment extends BaseEntity {
         return CommentResponseDto.builder()
                 .id(this.id)
                 .topicId(this.topicId)
-                .userId(this.userId)
+                .author(this.user != null ? this.user.toJoinDto() : null)
                 .upperCommentId(this.upperCommentId)
                 .content(this.content)
                 .isDeleted(this.isDeleted)

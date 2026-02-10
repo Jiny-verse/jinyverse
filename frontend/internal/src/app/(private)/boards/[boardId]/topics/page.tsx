@@ -12,7 +12,7 @@ import {
   updateTopic,
   deleteTopic,
 } from 'common/services';
-import { buildMenuTree, menuTreeToSelectOptionsByCode } from 'common';
+import { buildMenuTree, menuTreeToSelectOptionsByCode, formatRelativeOrAbsolute } from 'common';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import { DetailPreviewPanel, FilterSelect } from 'common/components';
 import type { Topic, TopicCreateInput, TopicUpdateInput, Comment } from 'common/types';
@@ -236,7 +236,7 @@ export default function TopicsPage() {
                             key={c.id}
                             className="rounded border border-gray-200 p-2 bg-white text-sm"
                           >
-                            <p className="text-gray-500 text-xs">작성자 {c.userId}</p>
+                            <p className="text-gray-500 text-xs">{c.author?.nickname ?? '-'} · {formatRelativeOrAbsolute(c.createdAt)}</p>
                             <p className="mt-0.5 text-gray-900">{c.content}</p>
                           </li>
                         ))}

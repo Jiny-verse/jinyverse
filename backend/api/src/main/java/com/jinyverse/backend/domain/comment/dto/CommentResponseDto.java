@@ -1,5 +1,6 @@
 package com.jinyverse.backend.domain.comment.dto;
 
+import com.jinyverse.backend.domain.user.dto.UserJoinDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,8 +21,8 @@ public class CommentResponseDto {
     private UUID id;
     /** 게시글 ID */
     private UUID topicId;
-    /** 작성자 사용자 ID */
-    private UUID userId;
+    /** 작성자 */
+    private UserJoinDto author;
     /** 상위 댓글 ID */
     private UUID upperCommentId;
     /** 댓글 내용 */

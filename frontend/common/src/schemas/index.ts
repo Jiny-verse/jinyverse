@@ -4,3 +4,4 @@ export * from './board';
 export * from './comment';
 export * from './menu';
 export * from './topic';
+export * from './user';

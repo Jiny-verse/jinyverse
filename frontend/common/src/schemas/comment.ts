@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { userJoinSchema } from './user';
 
 const uuid = z.string().uuid();
 const optionalUuid = uuid.optional();
@@ -7,7 +8,7 @@ const optionalUuid = uuid.optional();
 export const commentSchema = z.object({
   id: uuid,
   topicId: uuid,
-  userId: uuid,
+  author: userJoinSchema.nullable(),
   upperCommentId: optionalUuid.nullable(),
   content: z.string(),
   isDeleted: z.boolean().nullable(),

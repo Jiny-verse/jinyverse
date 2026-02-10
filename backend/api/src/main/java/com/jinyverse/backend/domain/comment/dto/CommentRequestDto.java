@@ -1,5 +1,6 @@
 package com.jinyverse.backend.domain.comment.dto;
 
+import com.jinyverse.backend.domain.menu.dto.CreateGroup;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -18,11 +19,11 @@ import java.util.UUID;
 public class CommentRequestDto {
 
     /** 게시글 ID */
-    @NotNull(message = "게시글 ID는 필수입니다")
+    @NotNull(message = "게시글 ID는 필수입니다", groups = CreateGroup.class)
     private UUID topicId;
 
     /** 작성자 사용자 ID */
-    @NotNull(message = "사용자 ID는 필수입니다")
+    @NotNull(message = "사용자 ID는 필수입니다", groups = CreateGroup.class)
     private UUID userId;
 
     /** 상위 댓글 ID */

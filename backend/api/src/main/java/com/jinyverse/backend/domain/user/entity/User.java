@@ -3,6 +3,7 @@ package com.jinyverse.backend.domain.user.entity;
 import com.jinyverse.backend.domain.code.entity.Code;
 import com.jinyverse.backend.domain.code.entity.CodeCategory;
 import com.jinyverse.backend.domain.common.BaseEntity;
+import com.jinyverse.backend.domain.user.dto.UserJoinDto;
 import com.jinyverse.backend.domain.user.dto.UserRequestDto;
 import com.jinyverse.backend.domain.user.dto.UserResponseDto;
 import jakarta.persistence.*;
@@ -156,6 +157,13 @@ public class User extends BaseEntity {
                 .createdAt(this.getCreatedAt())
                 .updatedAt(this.getUpdatedAt())
                 .deletedAt(this.getDeletedAt())
+                .build();
+    }
+
+    public UserJoinDto toJoinDto() {
+        return UserJoinDto.builder()
+                .id(this.id)
+                .nickname(this.nickname)
                 .build();
     }
 }

@@ -17,6 +17,7 @@ export {
 export type { MenuTreeNode, TreeNode } from './data/menuTree';
 export * from './ui';
 export * from './hooks';
+export { formatRelativeOrAbsolute } from './utils/formatDateTime';
 export { t, i18n, useLanguage, I18nProvider } from './utils/i18n';
 export type { Locale } from './utils/i18n';
 export * from './schemas';

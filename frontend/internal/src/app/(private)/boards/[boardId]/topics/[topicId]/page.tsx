@@ -68,7 +68,7 @@ export default function TopicDetailPage() {
         <div className="prose prose-invert max-w-none whitespace-pre-wrap">{topic.content}</div>
       </article>
       <CommentWriteForm topicId={topicId} apiOptions={options} onSuccess={load} />
-      <CommentSection comments={comments} apiOptions={options} onReload={load} />
+      <CommentSection topicId={topicId} comments={comments} apiOptions={options} onReload={load} />
     </div>
   );
 }
