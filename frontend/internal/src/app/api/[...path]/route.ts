@@ -33,7 +33,15 @@ async function proxy(request: NextRequest, { path }: { path: string[] }) {
     headers.set(k, v);
   });
 
-  const body = ['GET', 'HEAD'].includes(request.method) ? undefined : await request.text();
+  let body: BodyInit | undefined;
+  if (!['GET', 'HEAD'].includes(request.method)) {
+    const contentType = request.headers.get('content-type')?.toLowerCase() ?? '';
+    if (contentType.includes('multipart/form-data')) {
+      body = await request.arrayBuffer();
+    } else {
+      body = await request.text();
+    }
+  }
   const res = await fetch(url.toString(), {
     method: request.method,
     headers,

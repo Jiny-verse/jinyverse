@@ -14,12 +14,20 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+    defer-datasource-initialization: true
     show-sql: true
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
         globally_quoted_identifiers: true
+  batch:
+    jdbc:
+      initialize-schema: always
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
   # Gmail SMTP (SMTPS, 587 + STARTTLS). MAIL_USERNAME/MAIL_PASSWORD 설정 시 실제 발송.
   # Gmail: 2단계 인증 후 '앱 비밀번호' 생성 후 MAIL_PASSWORD에 설정.
   mail:
@@ -46,6 +54,11 @@ app:
   file:
     storage:
       base-path: ${FILE_STORAGE_BASE_PATH:}
+  batch:
+    orphan-files:
+      age-hours: 24
+  upload-session:
+    ttl-minutes: 60
   jwt:
     secret: ${JWT_SECRET}
     access-expire-minutes: 30
@@ -53,4 +66,3 @@ app:
   # Gmail SMTPS 사용 시 true. MAIL_USERNAME, MAIL_PASSWORD(앱 비밀번호) 함께 설정.
   mail:
     use-smtp: ${MAIL_USE_SMTP:false}
-

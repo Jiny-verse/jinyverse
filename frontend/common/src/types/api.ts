@@ -4,6 +4,7 @@ import type { Comment, CommentFilter } from '../schemas/comment';
 import type { Menu, MenuFilter } from '../schemas/menu';
 
 export type { Board, BoardFilter, BoardCreateInput, BoardUpdateInput } from '../schemas/board';
+export type { User } from '../schemas/user';
 export type { Tag, TagFilter, TagCreateInput, TagUpdateInput } from '../schemas/tag';
 export type {
   Topic,

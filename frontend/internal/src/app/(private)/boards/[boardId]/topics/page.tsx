@@ -114,6 +114,7 @@ export default function TopicsPage() {
       boardId: values.boardId ?? boardId,
       status: intent ?? 'created',
       tagIds: values.tagIds?.length ? values.tagIds : undefined,
+      files: values.files?.length ? values.files : undefined,
     });
     setCreateDialogOpen(false);
     load();
@@ -125,6 +126,7 @@ export default function TopicsPage() {
       ...values,
       status: intent ?? editing.status,
       tagIds: values.tagIds,
+      files: values.files,
     });
     setEditing(null);
     load();
@@ -271,6 +273,7 @@ export default function TopicsPage() {
       <CreateDialog
         open={createDialogOpen}
         boardId={boardId}
+        apiOptions={options}
         menuOptions={menuOptions}
         tagOptions={tagOptions}
         onClose={() => setCreateDialogOpen(false)}
@@ -279,6 +282,7 @@ export default function TopicsPage() {
       <UpdateDialog
         open={!!editing}
         topic={editing}
+        apiOptions={options}
         menuOptions={menuOptions}
         tagOptions={tagOptions}
         onClose={() => setEditing(null)}

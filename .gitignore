@@ -22,6 +22,10 @@ Thumbs.db
 *.swp
 *.swo
 
+# Project specific
+docs/
+.claude/
+
 # Environment variables & Secrets
 .env
 .env.*

@@ -5,3 +5,4 @@ export type { AutoDialogField } from './AutoDialog';
 export { DetailPreviewPanel } from './DetailPreviewPanel';
 export type { DetailPreviewPanelProps } from './DetailPreviewPanel';
 export * from './Table';
+export * from './File';

@@ -35,6 +35,7 @@ type AutoDialogProps<S extends z.ZodObject<z.ZodRawShape>> = {
   initialValues?: Partial<z.infer<S>>;
   onSubmit: (values: z.infer<S>, intent?: string) => void | Promise<void>;
   submitButtons?: SubmitButtonIntent[];
+  children?: React.ReactNode;
 };
 
 export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
@@ -47,6 +48,7 @@ export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
   initialValues,
   onSubmit,
   submitButtons,
+  children,
 }: AutoDialogProps<S>) {
   const defaultFor = (f: AutoDialogField) => {
     if (f.defaultValue !== undefined) return f.defaultValue;
@@ -261,6 +263,7 @@ export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
             </div>
           );
         })}
+        {children}
       </div>
     </Modal>
   );

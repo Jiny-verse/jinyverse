@@ -1,8 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getFileStorageSetting, updateFileStorageSetting } from 'common/services';
+import {
+  getFileStorageSetting,
+  updateFileStorageSetting,
+  getMe,
+  setProfileImage,
+  clearProfileImage,
+} from 'common/services';
+import { SingleImageField } from 'common/components';
 import { useApiOptions } from '@/app/providers/ApiProvider';
+import type { User } from 'common/types';
 
 export default function SettingsPage() {
   const options = useApiOptions();
@@ -10,12 +18,32 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'ok' | 'error'; text: string } | null>(null);
+  const [me, setMe] = useState<User | null>(null);
+
+  const loadMe = () => {
+    getMe(options)
+      .then(setMe)
+      .catch(() => setMe(null));
+  };
 
   useEffect(() => {
-    getFileStorageSetting(options)
-      .then((res) => setBasePath(res.basePath ?? ''))
-      .catch(() => setMessage({ type: 'error', text: '설정을 불러오지 못했습니다.' }))
-      .finally(() => setLoading(false));
+    let done = false;
+    Promise.all([getFileStorageSetting(options), getMe(options).catch(() => null)])
+      .then(([res, user]) => {
+        if (!done) {
+          setBasePath(res.basePath ?? '');
+          setMe(user ?? null);
+        }
+      })
+      .catch(() => {
+        if (!done) setMessage({ type: 'error', text: '설정을 불러오지 못했습니다.' });
+      })
+      .finally(() => {
+        if (!done) setLoading(false);
+      });
+    return () => {
+      done = true;
+    };
   }, [options.baseUrl, options.channel]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -71,6 +99,33 @@ export default function SettingsPage() {
               {saving ? '저장 중...' : '저장'}
             </button>
           </form>
+        )}
+      </section>
+
+      <section className="mt-8 max-w-xl rounded-lg border border-[#333] bg-[#1f1f1f] p-6">
+        <h2 className="mb-4 text-lg font-semibold text-white">프로필 이미지</h2>
+        <p className="mb-4 text-sm text-neutral-400">
+          프로필 이미지를 업로드하면 내 계정에 연결됩니다. (로그인한 사용자만 사용 가능)
+        </p>
+        {loading ? (
+          <p className="text-sm text-neutral-400">로딩 중...</p>
+        ) : (
+          <SingleImageField
+            apiOptions={options}
+            value={me?.profileImageFileId ?? null}
+            onChange={async (fileId) => {
+              if (fileId) {
+                await setProfileImage(options, fileId);
+                loadMe();
+              } else {
+                await clearProfileImage(options);
+                loadMe();
+              }
+            }}
+            uploadLabel="업로드"
+            showRemove={true}
+            onError={(e) => setMessage({ type: 'error', text: `프로필 이미지 설정 실패: ${e.message}` })}
+          />
         )}
       </section>
     </div>

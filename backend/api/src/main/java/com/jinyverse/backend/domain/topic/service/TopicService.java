@@ -5,9 +5,12 @@ import com.jinyverse.backend.domain.comment.repository.CommentRepository;
 import com.jinyverse.backend.domain.common.util.Channel;
 import com.jinyverse.backend.domain.common.util.CommonSpecifications;
 import com.jinyverse.backend.domain.common.util.RequestContext;
+import com.jinyverse.backend.domain.file.repository.CommonFileRepository;
 import com.jinyverse.backend.domain.tag.dto.TagResponseDto;
 import com.jinyverse.backend.domain.tag.entity.Tag;
 import com.jinyverse.backend.domain.tag.repository.TagRepository;
+import com.jinyverse.backend.domain.topic.dto.RelTopicFileDto;
+import com.jinyverse.backend.domain.topic.dto.TopicFileItemDto;
 import com.jinyverse.backend.domain.topic.dto.TopicRequestDto;
 import com.jinyverse.backend.domain.topic.dto.TopicResponseDto;
 import com.jinyverse.backend.domain.topic.entity.RelTopicFile;
@@ -42,6 +45,7 @@ public class TopicService {
     private final TopicRepository topicRepository;
     private final CommentRepository commentRepository;
     private final RelTopicFileRepository relTopicFileRepository;
+    private final CommonFileRepository commonFileRepository;
     private final RelTopicTagRepository relTopicTagRepository;
     private final TagRepository tagRepository;
 
@@ -56,6 +60,7 @@ public class TopicService {
         }
         Topic saved = topicRepository.save(topic);
         saveTopicTags(saved.getId(), requestDto.getTagIds());
+        saveTopicFiles(saved.getId(), requestDto.getFiles());
         return toResponseDtoWithTags(saved.getId(), saved.toResponseDto());
     }
 
@@ -82,6 +87,7 @@ public class TopicService {
     public Page<TopicResponseDto> getAll(Map<String, Object> filter, Pageable pageable, RequestContext ctx) {
         Page<TopicResponseDto> page = topicRepository.findAll(spec(ctx, filter), pageable).map(Topic::toResponseDto);
         fillTagsForPage(page);
+        fillFilesForPage(page);
         return page;
     }
 
@@ -111,6 +117,7 @@ public class TopicService {
         }
         Topic updated = topicRepository.save(topic);
         saveTopicTags(updated.getId(), requestDto.getTagIds());
+        saveTopicFiles(updated.getId(), requestDto.getFiles());
         return toResponseDtoWithTags(updated.getId(), updated.toResponseDto());
     }
 
@@ -140,6 +147,7 @@ public class TopicService {
         draft.applyUpdate(requestDto);
         Topic saved = topicRepository.save(draft);
         saveTopicTags(saved.getId(), requestDto.getTagIds());
+        saveTopicFiles(saved.getId(), requestDto.getFiles());
         return toResponseDtoWithTags(saved.getId(), saved.toResponseDto());
     }
 
@@ -163,6 +171,7 @@ public class TopicService {
         Topic topic = topicRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new RuntimeException("Topic not found with id: " + id));
 
+        relTopicFileRepository.deleteByTopicId(id);
         topic.setDeletedAt(LocalDateTime.now());
         topicRepository.save(topic);
     }
@@ -177,18 +186,20 @@ public class TopicService {
             }
             s = CommonSpecifications.and(s, (root, q, cb) -> cb.notEqual(root.get("status"), "temporary"));
         }
-        
+
         for (Map.Entry<String, Object> entry : filter.entrySet()) {
             String key = entry.getKey();
-            if (PAGINATION_KEYS.contains(key)) continue;
+            if (PAGINATION_KEYS.contains(key))
+                continue;
             Object value = entry.getValue();
             if ("q".equals(key)) {
-                s = CommonSpecifications.and(s, CommonSpecifications.keywordLikeAny((String) value, "title", "content"));
+                s = CommonSpecifications.and(s,
+                        CommonSpecifications.keywordLikeAny((String) value, "title", "content"));
             } else {
                 s = CommonSpecifications.and(s, CommonSpecifications.eqIfPresent(key, value));
             }
         }
-        
+
         return s;
     }
 
@@ -205,19 +216,23 @@ public class TopicService {
         List<RelTopicTag> rels = relTopicTagRepository.findByTopicId(topicId);
         if (rels.isEmpty()) {
             dto.setTags(List.of());
-            return dto;
+        } else {
+            List<UUID> tagIds = rels.stream().map(RelTopicTag::getTagId).distinct().toList();
+            List<Tag> tags = tagRepository.findAllById(tagIds);
+            dto.setTags(tags.stream().map(Tag::toResponseDto).toList());
         }
-        List<UUID> tagIds = rels.stream().map(RelTopicTag::getTagId).distinct().toList();
-        List<Tag> tags = tagRepository.findAllById(tagIds);
-        dto.setTags(tags.stream().map(Tag::toResponseDto).toList());
+        List<RelTopicFile> fileRels = relTopicFileRepository.findByTopicId(topicId);
+        dto.setFiles(fileRels.stream().map(RelTopicFile::toDto).toList());
         return dto;
     }
 
     private void fillTagsForPage(Page<TopicResponseDto> page) {
         List<TopicResponseDto> content = page.getContent();
-        if (content.isEmpty()) return;
+        if (content.isEmpty())
+            return;
         List<UUID> topicIds = content.stream().map(TopicResponseDto::getId).filter(Objects::nonNull).toList();
-        if (topicIds.isEmpty()) return;
+        if (topicIds.isEmpty())
+            return;
         List<RelTopicTag> rels = relTopicTagRepository.findByTopicIdIn(topicIds);
         Map<UUID, List<UUID>> topicToTagIds = rels.stream()
                 .collect(Collectors.groupingBy(RelTopicTag::getTopicId,
@@ -233,6 +248,46 @@ public class TopicService {
         for (TopicResponseDto dto : content) {
             List<UUID> ids = topicToTagIds.getOrDefault(dto.getId(), List.of());
             dto.setTags(ids.stream().map(tagMap::get).filter(Objects::nonNull).toList());
+        }
+    }
+
+    private void saveTopicFiles(UUID topicId, List<TopicFileItemDto> files) {
+        relTopicFileRepository.findByTopicId(topicId).forEach(relTopicFileRepository::delete);
+        if (files == null || files.isEmpty())
+            return;
+        for (int i = 0; i < files.size(); i++) {
+            TopicFileItemDto item = files.get(i);
+            int order = item.getOrder() != null ? item.getOrder() : i;
+            boolean isMain = Boolean.TRUE.equals(item.getIsMain()) || (i == 0 && files.size() == 1);
+            relTopicFileRepository.save(RelTopicFile.builder()
+                    .topicId(topicId)
+                    .fileId(item.getFileId())
+                    .order(order)
+                    .isMain(isMain)
+                    .build());
+
+            commonFileRepository.findById(item.getFileId()).ifPresent(file -> {
+                if (file.getSessionId() != null) {
+                    file.setSessionId(null);
+                    commonFileRepository.save(file);
+                }
+            });
+        }
+    }
+
+    private void fillFilesForPage(Page<TopicResponseDto> page) {
+        List<TopicResponseDto> content = page.getContent();
+        if (content.isEmpty())
+            return;
+        List<UUID> topicIds = content.stream().map(TopicResponseDto::getId).filter(Objects::nonNull).toList();
+        if (topicIds.isEmpty())
+            return;
+        List<RelTopicFile> rels = relTopicFileRepository.findByTopicIdIn(topicIds);
+        Map<UUID, List<RelTopicFileDto>> topicToFiles = rels.stream()
+                .collect(Collectors.groupingBy(RelTopicFile::getTopicId,
+                        Collectors.mapping(RelTopicFile::toDto, Collectors.toList())));
+        for (TopicResponseDto dto : content) {
+            dto.setFiles(topicToFiles.getOrDefault(dto.getId(), List.of()));
         }
     }
 }

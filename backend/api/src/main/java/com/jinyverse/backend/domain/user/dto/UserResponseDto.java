@@ -40,4 +40,6 @@ public class UserResponseDto {
     private LocalDateTime updatedAt;
     /** 삭제일시 */
     private LocalDateTime deletedAt;
+    /** 프로필 이미지 파일 */
+    private UUID profileImageFileId;
 }

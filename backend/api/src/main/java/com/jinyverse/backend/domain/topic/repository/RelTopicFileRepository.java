@@ -10,4 +10,7 @@ import java.util.UUID;
 @Repository
 public interface RelTopicFileRepository extends JpaRepository<RelTopicFile, UUID> {
     List<RelTopicFile> findByTopicId(UUID topicId);
+    List<RelTopicFile> findByTopicIdIn(List<UUID> topicIds);
+    List<RelTopicFile> findByFileId(UUID fileId);
+    void deleteByTopicId(UUID topicId);
 }

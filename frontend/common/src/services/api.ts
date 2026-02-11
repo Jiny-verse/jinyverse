@@ -2,12 +2,14 @@ import type { ApiOptions } from '../types/api';
 
 const CREDENTIALS: RequestCredentials = 'include';
 
-const headers = (options: ApiOptions): HeadersInit => {
+const headers = (options: ApiOptions, omitContentType = false): HeadersInit => {
   const h: Record<string, string> = {
-    'Content-Type': 'application/json',
     'X-Channel': options.channel,
     'X-Requested-With': 'XMLHttpRequest',
   };
+  if (!omitContentType) {
+    h['Content-Type'] = 'application/json';
+  }
   if (options.role) {
     h['X-Role'] = options.role;
   }
@@ -46,7 +48,7 @@ export async function apiGet<T>(
   params?: Record<string, string | number | boolean | undefined>
 ): Promise<T> {
   const url = buildUrl(options.baseUrl, path, params);
-  const res = await fetch(url, { method: 'GET', headers: headers(options), credentials: CREDENTIALS });
+  const res = await fetch(url, { method: 'GET', headers: headers(options, false), credentials: CREDENTIALS });
   if (res.status === 401) {
     options.on401?.();
   }
@@ -61,7 +63,7 @@ export async function apiPost<T>(options: ApiOptions, path: string, body: unknow
   const url = buildUrl(options.baseUrl, path);
   const res = await fetch(url, {
     method: 'POST',
-    headers: headers(options),
+    headers: headers(options, false),
     body: JSON.stringify(body),
     credentials: CREDENTIALS,
   });
@@ -82,8 +84,33 @@ export async function apiPut<T>(options: ApiOptions, path: string, body: unknown
   const url = buildUrl(options.baseUrl, path);
   const res = await fetch(url, {
     method: 'PUT',
-    headers: headers(options),
+    headers: headers(options, false),
     body: JSON.stringify(body),
+    credentials: CREDENTIALS,
+  });
+  if (res.status === 401) {
+    options.on401?.();
+  }
+  if (!res.ok) {
+    const body = await res.text().catch(() => res.statusText);
+    throw new Error(`API ${res.status} ${res.statusText}: ${body || res.url}`);
+  }
+  if (res.status === 204) {
+    return undefined as T;
+  }
+  return res.json() as Promise<T>;
+}
+
+export async function apiPostFormData<T>(
+  options: ApiOptions,
+  path: string,
+  formData: FormData
+): Promise<T> {
+  const url = buildUrl(options.baseUrl, path);
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: headers(options, true),
+    body: formData,
     credentials: CREDENTIALS,
   });
   if (res.status === 401) {
@@ -101,7 +128,7 @@ export async function apiPut<T>(options: ApiOptions, path: string, body: unknown
 
 export async function apiDelete(options: ApiOptions, path: string): Promise<void> {
   const url = buildUrl(options.baseUrl, path);
-  const res = await fetch(url, { method: 'DELETE', headers: headers(options), credentials: CREDENTIALS });
+  const res = await fetch(url, { method: 'DELETE', headers: headers(options, false), credentials: CREDENTIALS });
   if (res.status === 401) {
     options.on401?.();
   }
@@ -109,4 +136,17 @@ export async function apiDelete(options: ApiOptions, path: string): Promise<void
     const body = await res.text().catch(() => res.statusText);
     throw new Error(`API ${res.status} ${res.statusText}: ${body || res.url}`);
   }
+}
+
+export async function apiGetBlob(options: ApiOptions, path: string): Promise<Blob> {
+  const url = buildUrl(options.baseUrl, path);
+  const res = await fetch(url, { method: 'GET', headers: headers(options, false), credentials: CREDENTIALS });
+  if (res.status === 401) {
+    options.on401?.();
+  }
+  if (!res.ok) {
+    const body = await res.text().catch(() => res.statusText);
+    throw new Error(`API ${res.status} ${res.statusText}: ${body || res.url}`);
+  }
+  return res.blob();
 }

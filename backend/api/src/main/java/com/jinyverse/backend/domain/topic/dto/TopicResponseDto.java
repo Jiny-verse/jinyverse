@@ -59,4 +59,6 @@ public class TopicResponseDto {
     private LocalDateTime deletedAt;
     /** 연결된 태그 (조인) */
     private List<TagResponseDto> tags;
+    /** 파일 목록 */
+    private List<RelTopicFileDto> files;
 }

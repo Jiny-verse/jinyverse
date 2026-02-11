@@ -64,4 +64,7 @@ public class TopicRequestDto {
 
     /** 연결할 태그 ID 목록 (rel 연결 테이블용, 선택) */
     private List<UUID> tagIds;
+
+    /** 파일 목록 */
+    private List<TopicFileItemDto> files;
 }
