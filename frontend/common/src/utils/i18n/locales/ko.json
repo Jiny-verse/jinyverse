@@ -70,5 +70,49 @@
     "close": "닫기",
     "confirm": "확인",
     "cancel": "취소"
+  },
+  "editor": {
+    "toolbar": {
+      "bold": "굵게",
+      "italic": "기울임",
+      "underline": "밑줄",
+      "strike": "취소선",
+      "code": "인라인 코드",
+      "codeBlock": "코드 블록",
+      "h1": "제목 1",
+      "h2": "제목 2",
+      "h3": "제목 3",
+      "ul": "글머리 기호 목록",
+      "ol": "번호 매기기 목록",
+      "link": "링크",
+      "image": "이미지",
+      "undo": "실행 취소",
+      "redo": "다시 실행",
+      "switchMode": "모드 전환"
+    },
+    "mode": {
+      "text": "리치 텍스트",
+      "markdown": "마크다운"
+    },
+    "status": {
+      "cursor": "{{line}}:{{col}}",
+      "chars": "{{count}}자"
+    },
+    "placeholder": "내용을 입력하세요",
+    "dialog": {
+      "link": {
+        "title": "링크 삽입",
+        "text": "표시 텍스트",
+        "textPlaceholder": "링크 텍스트 (선택)"
+      },
+      "image": {
+        "title": "이미지 삽입",
+        "upload": "파일 업로드",
+        "selectFile": "파일 선택",
+        "uploadError": "업로드에 실패했습니다.",
+        "alt": "대체 텍스트 (alt)",
+        "altPlaceholder": "이미지 설명 (선택)"
+      }
+    }
   }
 }

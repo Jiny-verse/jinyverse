@@ -15,7 +15,7 @@ import {
 } from 'common/services';
 import { buildMenuTree, menuTreeToSelectOptionsByCode, formatRelativeOrAbsolute } from 'common';
 import { useApiOptions } from '@/app/providers/ApiProvider';
-import { DetailPreviewPanel, FilterSelect } from 'common/components';
+import { DetailPreviewPanel, FilterSelect, ContentViewer } from 'common/components';
 import { Badge } from 'common/ui';
 import type { Topic, TopicCreateInput, TopicUpdateInput, Comment } from 'common/types';
 import { Table, CreateDialog, UpdateDialog } from './_components';
@@ -242,9 +242,7 @@ export default function TopicsPage() {
                         ))}
                       </div>
                     ) : null}
-                    <div className="prose prose-sm max-w-none whitespace-pre-wrap text-gray-900">
-                      {previewTopic.content}
-                    </div>
+                    <ContentViewer content={previewTopic.content} className="prose-sm max-w-none" />
                   </article>
                   <section>
                     <h2 className="text-sm font-semibold text-gray-700 mb-2">

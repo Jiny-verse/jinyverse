@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { getTopic, getComments } from 'common/services';
 import { formatRelativeOrAbsolute } from 'common';
+import { ContentViewer } from 'common/components';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import type { Topic, Comment } from 'common/types';
 
@@ -73,7 +74,7 @@ export default function TopicDetailPage() {
         <p className="text-sm text-gray-400 mb-4">
           {topic.author?.nickname ?? '-'} · {formatRelativeOrAbsolute(topic.createdAt)} · 조회 {topic.viewCount ?? 0}
         </p>
-        <div className="prose prose-invert max-w-none whitespace-pre-wrap">{topic.content}</div>
+        <ContentViewer content={topic.content} className="prose-invert max-w-none" />
       </article>
       <section>
         <h2 className="text-lg font-semibold mb-4">댓글 ({comments.filter((c) => !c.isDeleted).length})</h2>

@@ -7,20 +7,19 @@ import { Textarea } from '../ui/Textarea';
 import { Button } from '../ui/Button';
 import { Switch } from '../ui/Switch';
 import { Select } from '../ui/Select';
+import { Editor } from './Editor/Editor';
 import type { z } from 'zod';
 
 export type AutoDialogField = {
   key: string;
   label: string;
-  type: 'text' | 'number' | 'textarea' | 'checkbox' | 'toggle' | 'uuid' | 'select' | 'multiselect' | 'chipSelect';
+  type: 'text' | 'number' | 'textarea' | 'editor' | 'checkbox' | 'toggle' | 'uuid' | 'select' | 'multiselect' | 'chipSelect';
   optional?: boolean;
-  /** 숨김 필드: 폼에는 안 보이고 defaultValue 또는 initialValues로만 값 유지 */
   hidden?: boolean;
-  /** hidden 필드 또는 생성 시 기본값 */
   defaultValue?: unknown;
-  /** select / multiselect / chipSelect 타입일 때 옵션 목록 */
   options?: { value: string; label: string }[];
   placeholder?: string;
+  onUploadImage?: (file: File) => Promise<string>;
 };
 
 export type SubmitButtonIntent = { label: string; intent: string };
@@ -97,14 +96,12 @@ export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
   );
 
   React.useEffect(() => {
-    if (open) {
-      const o: Record<string, unknown> = {};
-      fields.forEach((f) => {
-        const v = initialValues?.[f.key as keyof z.infer<S>];
-        o[f.key] = v ?? defaultFor(f);
-      });
-      setValues(o);
-    }
+    const o: Record<string, unknown> = {};
+    fields.forEach((f) => {
+      const v = initialValues?.[f.key as keyof z.infer<S>];
+      o[f.key] = v ?? defaultFor(f);
+    });
+    setValues(o);
   }, [open, initialValues, fields]);
 
   return (
@@ -139,9 +136,28 @@ export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
       <div className="space-y-4">
         {fields.map((f) => {
           if (f.hidden) return null;
+          // editor 타입은 open 변경 시 리마운트해서 defaultValue 갱신
+          const divKey = f.type === 'editor' ? `${f.key}-${String(open)}` : f.key;
           return (
-            <div key={f.key}>
-              {f.type === 'textarea' ? (
+            <div key={divKey}>
+              {f.type === 'editor' ? (
+                <div>
+                  <label className="mb-1 block text-sm font-medium text-gray-700">
+                    {f.label}
+                    {!f.optional && <span className="ml-1 text-red-500">*</span>}
+                  </label>
+                  <Editor
+                    defaultValue={String(values[f.key] ?? '')}
+                    onChange={(content) => handleChange(f.key, content)}
+                    onUploadImage={f.onUploadImage}
+                    minHeight="180px"
+                    className="border-gray-300"
+                  />
+                  {errors[f.key] && (
+                    <p className="mt-1 text-sm text-red-600">{errors[f.key]}</p>
+                  )}
+                </div>
+              ) : f.type === 'textarea' ? (
                 <Textarea
                   id={f.key}
                   label={f.label}

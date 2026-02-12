@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { AutoDialog, FileAttachmentField } from 'common/components';
 import type { AutoDialogField } from 'common/components';
 import { topicCreateSchema } from 'common/schemas';
 import type { TopicCreateInput, ApiOptions } from 'common/types';
 import type { FileAttachmentItem } from 'common/schemas';
-import { createUploadSession } from 'common/services';
+import { createUploadSession, uploadFile, getDownloadUrl } from 'common/services';
 import { useAuth } from 'common';
 
 export type CreateDialogProps = {
@@ -48,13 +48,21 @@ export function CreateDialog({
     }
   }, [open, apiOptions.baseUrl, apiOptions.channel]);
 
+  const handleUploadImage = useCallback(
+    async (file: File): Promise<string> => {
+      const result = await uploadFile(apiOptions, file, uploadSessionId ?? undefined);
+      return getDownloadUrl(apiOptions, result.id);
+    },
+    [apiOptions, uploadSessionId],
+  );
+
   const fields = useMemo<AutoDialogField[]>(
     () => [
       { key: 'authorUserId', label: '작성자', type: 'uuid', hidden: true },
       { key: 'status', label: '상태', type: 'text', hidden: true, defaultValue: 'created' },
       { key: 'boardId', label: '게시판 ID', type: 'uuid', hidden: true },
       { key: 'title', label: '제목', type: 'text' },
-      { key: 'content', label: '내용', type: 'textarea' },
+      { key: 'content', label: '내용', type: 'editor', onUploadImage: handleUploadImage },
       {
         key: 'menuCode',
         label: '연동 메뉴',
@@ -67,7 +75,7 @@ export function CreateDialog({
       { key: 'isPinned', label: '고정', type: 'toggle', optional: true },
       { key: 'isPublic', label: '공개', type: 'toggle', optional: true },
     ],
-    [menuOptions, tagOptions]
+    [menuOptions, tagOptions, handleUploadImage]
   );
 
   const initialValues = useMemo<Partial<TopicCreateInput>>(

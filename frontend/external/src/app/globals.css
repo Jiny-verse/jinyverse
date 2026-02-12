@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@plugin "@tailwindcss/typography";
 
 /* common 패키지 스캔 (모노레포) */
 @source "../../../common/src/**/*.{js,ts,jsx,tsx,mdx}";

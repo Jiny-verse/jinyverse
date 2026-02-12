@@ -1,0 +1,98 @@
+// AST Node Types
+export type MarkType = 'bold' | 'italic' | 'underline' | 'strikethrough' | 'code';
+
+export interface Mark {
+  type: MarkType;
+}
+
+export interface ASTNode {
+  type: 'doc' | 'paragraph' | 'heading' | 'blockquote' | 'code_block' | 'list' | 'list_item' | 'text' | 'hard_break' | 'image' | 'link';
+  content?: ASTNode[];
+  marks?: Mark[];
+  text?: string;
+  attrs?: Record<string, string | number | null>;
+}
+
+// Editor Selection / Range
+export interface EditorSelection {
+  anchor: number;
+  head: number;
+}
+
+export interface EditorRange {
+  from: number;
+  to: number;
+}
+
+// Command Pattern
+export interface ICommand {
+  execute(): void;
+  undo(): void;
+  readonly description: string;
+}
+
+// Editor Mode Interface (Strategy Pattern)
+export interface IEditorMode {
+  readonly name: 'text' | 'markdown';
+  render(container: HTMLElement, core: IEditorCore): void;
+  destroy(): void;
+  getContent(): string;
+  setContent(content: string): void;
+  getToolbarItems(): ToolbarItem[];
+  transformData(input: string): string;
+}
+
+// Core Interface
+export interface IEditorCore {
+  on<K extends keyof EditorEventMap>(event: K, handler: (data: EditorEventMap[K]) => void): void;
+  off<K extends keyof EditorEventMap>(event: K, handler: (data: EditorEventMap[K]) => void): void;
+  emit<K extends keyof EditorEventMap>(event: K, data: EditorEventMap[K]): void;
+  executeCommand(command: ICommand): void;
+  undo(): void;
+  redo(): void;
+  canUndo(): boolean;
+  canRedo(): boolean;
+  initMode(mode: IEditorMode): void;
+  /** Destroys old mode, transforms content, registers new mode. Returns transformed content to apply after rendering. */
+  setMode(mode: IEditorMode): string;
+  getCurrentMode(): IEditorMode | null;
+  getContent(): string;
+  setContent(content: string): void;
+  destroy(): void;
+}
+
+// Toolbar Item
+export type ToolbarItemType = 'button' | 'separator' | 'mode-toggle';
+
+export interface ToolbarItem {
+  id: string;
+  type: ToolbarItemType;
+  icon?: string;
+  labelKey: string;
+  action?: (core: IEditorCore) => void;
+  isActive?: (core: IEditorCore) => boolean;
+}
+
+// Event Map (type-safe event bus)
+export interface EditorEventMap {
+  'content:change': { content: string };
+  'mode:change': { mode: 'text' | 'markdown' };
+  'selection:change': { selection: EditorSelection };
+  'history:change': { canUndo: boolean; canRedo: boolean };
+  'cursor:change': { line: number; column: number; charCount: number };
+  'format:active': { bold: boolean; italic: boolean; underline: boolean; strikethrough: boolean };
+  'dialog:link': { mode: 'text' | 'markdown'; selectedText?: string };
+  'dialog:image': { mode: 'text' | 'markdown' };
+}
+
+// Editor Props
+export interface EditorProps {
+  defaultValue?: string;
+  defaultMode?: 'text' | 'markdown';
+  onChange?: (content: string) => void;
+  placeholder?: string;
+  className?: string;
+  minHeight?: string;
+  /** Called when user selects an image file. Should return the uploaded image URL. */
+  onUploadImage?: (file: File) => Promise<string>;
+}

@@ -6,3 +6,4 @@ export { DetailPreviewPanel } from './DetailPreviewPanel';
 export type { DetailPreviewPanelProps } from './DetailPreviewPanel';
 export * from './Table';
 export * from './File';
+export * from './Editor';

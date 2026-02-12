@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { AutoDialog, FileAttachmentField } from 'common/components';
 import type { AutoDialogField } from 'common/components';
 import { topicUpdateSchema } from 'common/schemas';
 import type { Topic, TopicUpdateInput, ApiOptions } from 'common/types';
 import type { FileAttachmentItem } from 'common/schemas';
+import { uploadFile, getDownloadUrl } from 'common/services';
 
 const TOPIC_SUBMIT_BUTTONS = [
   { label: '임시저장', intent: 'temporary' },
@@ -33,6 +34,14 @@ export function UpdateDialog({
 }: UpdateDialogProps) {
   const [files, setFiles] = useState<FileAttachmentItem[]>([]);
 
+  const handleUploadImage = useCallback(
+    async (file: File): Promise<string> => {
+      const result = await uploadFile(apiOptions, file);
+      return getDownloadUrl(apiOptions, result.id);
+    },
+    [apiOptions],
+  );
+
   useEffect(() => {
     if (topic?.files?.length) {
       setFiles(
@@ -52,7 +61,7 @@ export function UpdateDialog({
       { key: 'status', label: '상태', type: 'text', hidden: true },
       { key: 'boardId', label: '게시판 ID', type: 'uuid', hidden: true },
       { key: 'title', label: '제목', type: 'text' },
-      { key: 'content', label: '내용', type: 'textarea' },
+      { key: 'content', label: '내용', type: 'editor', onUploadImage: handleUploadImage },
       {
         key: 'menuCode',
         label: '연동 메뉴',
@@ -65,7 +74,7 @@ export function UpdateDialog({
       { key: 'isPinned', label: '고정', type: 'toggle', optional: true },
       { key: 'isPublic', label: '공개', type: 'toggle', optional: true },
     ],
-    [menuOptions, tagOptions]
+    [menuOptions, tagOptions, handleUploadImage]
   );
 
   const initialValues = useMemo(
