@@ -147,7 +147,7 @@ export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
                     {!f.optional && <span className="ml-1 text-red-500">*</span>}
                   </label>
                   <Editor
-                    defaultValue={String(values[f.key] ?? '')}
+                    defaultValue={String(initialValues?.[f.key as keyof z.infer<S>] ?? '')}
                     onChange={(content) => handleChange(f.key, content)}
                     onUploadImage={f.onUploadImage}
                     minHeight="180px"

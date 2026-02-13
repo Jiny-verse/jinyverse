@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Bold,
   Italic,
@@ -16,6 +16,19 @@ import {
   Link,
   Image,
   AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify,
+  Quote,
+  Minus,
+  Palette,
+  Highlighter,
+  Hash,
+  Type,
+  AArrowUp,
+  MessageSquare,
+  Youtube,
+  Table,
   LucideIcon,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -38,6 +51,19 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Link,
   Image,
   AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify,
+  Quote,
+  Minus,
+  Palette,
+  Highlighter,
+  Hash,
+  Type,
+  AArrowUp,
+  MessageSquare,
+  Youtube,
+  Table,
 };
 
 type FormatActive = {
@@ -61,6 +87,102 @@ interface ToolbarProps {
   onModeToggle: () => void;
   canUndo: boolean;
   canRedo: boolean;
+}
+
+function ColorPickerButton({ item, core, label }: { item: ToolbarItem; core: IEditorCore | null; label: string }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const IconComponent = item.icon ? ICON_MAP[item.icon] : null;
+
+  useEffect(() => {
+    if (!open) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <Tooltip content={label} position="bottom">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setOpen((v) => !v)}
+          className="p-1.5 h-8 w-8"
+          aria-label={label}
+          disabled={!core}
+        >
+          {IconComponent ? <IconComponent size={16} /> : label.slice(0, 2)}
+        </Button>
+      </Tooltip>
+      {open && (
+        <div className="absolute top-full left-0 mt-1 z-50 bg-white border border-gray-200 rounded shadow-md p-2 flex flex-wrap gap-1 w-[148px]">
+          {item.colorOptions?.map((color) => (
+            <button
+              key={color}
+              title={color}
+              onClick={() => {
+                if (core) item.onColorSelect?.(color, core);
+                setOpen(false);
+              }}
+              className="w-6 h-6 rounded border border-gray-300 hover:scale-110 transition-transform"
+              style={{ backgroundColor: color === 'transparent' ? '#fff' : color, backgroundImage: color === 'transparent' ? 'repeating-conic-gradient(#ccc 0% 25%, transparent 0% 50%) 0 0 / 8px 8px' : undefined }}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function SelectButton({ item, core, label }: { item: ToolbarItem; core: IEditorCore | null; label: string }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const IconComponent = item.icon ? ICON_MAP[item.icon] : null;
+
+  useEffect(() => {
+    if (!open) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [open]);
+
+  return (
+    <div ref={ref} className="relative">
+      <Tooltip content={label} position="bottom">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setOpen((v) => !v)}
+          className="p-1.5 h-8 w-8"
+          aria-label={label}
+          disabled={!core}
+        >
+          {IconComponent ? <IconComponent size={16} /> : label.slice(0, 2)}
+        </Button>
+      </Tooltip>
+      {open && (
+        <div className="absolute top-full left-0 mt-1 z-50 bg-white border border-gray-200 rounded shadow-md py-1 min-w-[100px]">
+          {item.selectOptions?.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => {
+                if (core) item.onSelect?.(opt.value, core);
+                setOpen(false);
+              }}
+              className="w-full text-left px-3 py-1.5 text-sm hover:bg-gray-100"
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function Toolbar({
@@ -87,7 +209,10 @@ export function Toolbar({
   }, [core]);
 
   return (
-    <div className="flex items-center gap-1 px-2 py-1 border-b border-gray-200 bg-gray-50 flex-wrap">
+    <div
+      className="flex items-center gap-1 px-2 py-1 border-b border-gray-200 bg-gray-50 flex-wrap"
+      onMouseDown={(e) => e.preventDefault()}
+    >
       {/* Undo */}
       <Tooltip content={t('editor.toolbar.undo', '실행 취소')} position="bottom">
         <Button
@@ -130,8 +255,17 @@ export function Toolbar({
           return <div key={item.id} className="w-px h-5 bg-gray-300 mx-1" />;
         }
 
-        const IconComponent = item.icon ? ICON_MAP[item.icon] : null;
         const label = t(item.labelKey, item.labelKey);
+
+        if (item.type === 'color-picker') {
+          return <ColorPickerButton key={item.id} item={item} core={core} label={label} />;
+        }
+
+        if (item.type === 'select') {
+          return <SelectButton key={item.id} item={item} core={core} label={label} />;
+        }
+
+        const IconComponent = item.icon ? ICON_MAP[item.icon] : null;
         const activeKey = FORMAT_ACTIVE_IDS[item.id];
         const isActive = activeKey ? formatActive[activeKey] : false;
 

@@ -1,12 +1,14 @@
 // AST Node Types
 export type MarkType = 'bold' | 'italic' | 'underline' | 'strikethrough' | 'code';
 
+export type CalloutType = string; // background color hex (e.g. '#e8f4fd')
+
 export interface Mark {
   type: MarkType;
 }
 
 export interface ASTNode {
-  type: 'doc' | 'paragraph' | 'heading' | 'blockquote' | 'code_block' | 'list' | 'list_item' | 'text' | 'hard_break' | 'image' | 'link';
+  type: 'doc' | 'paragraph' | 'heading' | 'blockquote' | 'code_block' | 'list' | 'list_item' | 'text' | 'hard_break' | 'image' | 'link' | 'horizontal_rule' | 'callout' | 'embed' | 'table' | 'table_row' | 'table_cell';
   content?: ASTNode[];
   marks?: Mark[];
   text?: string;
@@ -62,7 +64,12 @@ export interface IEditorCore {
 }
 
 // Toolbar Item
-export type ToolbarItemType = 'button' | 'separator' | 'mode-toggle';
+export type ToolbarItemType = 'button' | 'separator' | 'mode-toggle' | 'color-picker' | 'select';
+
+export interface ToolbarSelectOption {
+  value: string;
+  label: string;
+}
 
 export interface ToolbarItem {
   id: string;
@@ -71,6 +78,14 @@ export interface ToolbarItem {
   labelKey: string;
   action?: (core: IEditorCore) => void;
   isActive?: (core: IEditorCore) => boolean;
+  /** For 'color-picker' type: list of preset color hex strings */
+  colorOptions?: string[];
+  /** For 'color-picker' type: callback with chosen color */
+  onColorSelect?: (color: string, core: IEditorCore) => void;
+  /** For 'select' type: list of options */
+  selectOptions?: ToolbarSelectOption[];
+  /** For 'select' type: callback with chosen value */
+  onSelect?: (value: string, core: IEditorCore) => void;
 }
 
 // Event Map (type-safe event bus)
@@ -83,6 +98,10 @@ export interface EditorEventMap {
   'format:active': { bold: boolean; italic: boolean; underline: boolean; strikethrough: boolean };
   'dialog:link': { mode: 'text' | 'markdown'; selectedText?: string };
   'dialog:image': { mode: 'text' | 'markdown' };
+  'dialog:specialChar': { mode: 'text' | 'markdown' };
+  'dialog:embed': { mode: 'text' | 'markdown' };
+  'dialog:table': { mode: 'text' | 'markdown' };
+  'table:active': { active: boolean };
 }
 
 // Editor Props

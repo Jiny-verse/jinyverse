@@ -215,6 +215,27 @@ export class MarkdownMode implements IEditorMode {
     const insertLine = (prefix: string, desc: string) => (core: IEditorCore) => {
       if (this.textarea) core.executeCommand(new LineInsertCommand(this.textarea, prefix, desc));
     };
+    const insertSnippet = (snippet: string, desc: string) => (core: IEditorCore) => {
+      if (!this.textarea) return;
+      const ta = this.textarea;
+      const pos = ta.selectionStart;
+      const prev = ta.value;
+      core.executeCommand({
+        description: desc,
+        execute: () => {
+          ta.value = ta.value.slice(0, pos) + snippet + ta.value.slice(pos);
+          ta.selectionStart = pos + snippet.length;
+          ta.selectionEnd = pos + snippet.length;
+          ta.dispatchEvent(new Event('input', { bubbles: true }));
+        },
+        undo: () => {
+          ta.value = prev;
+          ta.selectionStart = pos;
+          ta.selectionEnd = pos;
+          ta.dispatchEvent(new Event('input', { bubbles: true }));
+        },
+      });
+    };
 
     return [
       { id: 'bold', type: 'button', icon: 'Bold', labelKey: 'editor.toolbar.bold', action: insert('**', 'Bold') },
@@ -228,11 +249,25 @@ export class MarkdownMode implements IEditorMode {
       { id: 'sep2', type: 'separator', labelKey: '' },
       { id: 'ul', type: 'button', icon: 'List', labelKey: 'editor.toolbar.ul', action: insertLine('- ', 'Bullet List') },
       { id: 'ol', type: 'button', icon: 'ListOrdered', labelKey: 'editor.toolbar.ol', action: insertLine('1. ', 'Ordered List') },
+      { id: 'blockquote', type: 'button', icon: 'Quote', labelKey: 'editor.toolbar.blockquote', action: insertLine('> ', 'Blockquote') },
       { id: 'sep3', type: 'separator', labelKey: '' },
       { id: 'codeblock', type: 'button', icon: 'Code2', labelKey: 'editor.toolbar.codeBlock', action: insert('```\n', 'Code Block') },
+      { id: 'hr', type: 'button', icon: 'Minus', labelKey: 'editor.toolbar.hr', action: insertSnippet('\n---\n', 'Horizontal Rule') },
+      {
+        id: 'callout', type: 'color-picker', icon: 'MessageSquare', labelKey: 'editor.toolbar.callout',
+        colorOptions: ['#e8f4fd', '#fef9e7', '#f0fdf4', '#fef2f2', '#f5f0ff', '#fff7ed', '#f3f4f6'],
+        onColorSelect: (color, core) => {
+          if (!this.textarea) return;
+          const snippet = `\n> [!${color}]\n> `;
+          insertSnippet(snippet, 'Callout')(core);
+        },
+      },
+      { id: 'table', type: 'button', icon: 'Table', labelKey: 'editor.toolbar.table', action: (core) => { core.emit('dialog:table', { mode: 'markdown' }); } },
       { id: 'sep4', type: 'separator', labelKey: '' },
       { id: 'link', type: 'button', icon: 'Link', labelKey: 'editor.toolbar.link', action: (core) => { core.emit('dialog:link', { mode: 'markdown' }); } },
       { id: 'image', type: 'button', icon: 'Image', labelKey: 'editor.toolbar.image', action: (core) => { core.emit('dialog:image', { mode: 'markdown' }); } },
+      { id: 'embed', type: 'button', icon: 'Youtube', labelKey: 'editor.toolbar.embed', action: (core) => { core.emit('dialog:embed', { mode: 'markdown' }); } },
+      { id: 'specialChar', type: 'button', icon: 'Hash', labelKey: 'editor.toolbar.specialChar', action: (core) => { core.emit('dialog:specialChar', { mode: 'markdown' }); } },
     ];
   }
 
@@ -256,6 +291,81 @@ export class MarkdownMode implements IEditorMode {
         ta.value = prev;
         ta.selectionStart = selStart;
         ta.selectionEnd = selEnd;
+        ta.dispatchEvent(new Event('input', { bubbles: true }));
+      },
+    });
+  }
+
+  insertTable(rows: number, cols: number, hasHeader: boolean): void {
+    if (!this.textarea || !this.core) return;
+    const headers = Array.from({ length: cols }, (_, i) => `헤더 ${i + 1}`);
+    let md = `\n| ${headers.join(' | ')} |\n`;
+    md += `| ${headers.map(() => '---').join(' | ')} |\n`;
+    const bodyRows = hasHeader ? rows - 1 : rows;
+    for (let r = 0; r < Math.max(1, bodyRows); r++) {
+      md += `| ${Array(cols).fill('   ').join(' | ')} |\n`;
+    }
+    md += '\n';
+    const ta = this.textarea;
+    const pos = ta.selectionStart;
+    const prev = ta.value;
+    this.core.executeCommand({
+      description: 'Insert Table',
+      execute: () => {
+        ta.value = ta.value.slice(0, pos) + md + ta.value.slice(pos);
+        ta.selectionStart = pos + md.length;
+        ta.selectionEnd = pos + md.length;
+        ta.dispatchEvent(new Event('input', { bubbles: true }));
+      },
+      undo: () => {
+        ta.value = prev;
+        ta.selectionStart = pos;
+        ta.selectionEnd = pos;
+        ta.dispatchEvent(new Event('input', { bubbles: true }));
+      },
+    });
+  }
+
+  insertEmbed(url: string): void {
+    if (!this.textarea || !this.core) return;
+    const snippet = `\n{% embed ${url} %}\n`;
+    const ta = this.textarea;
+    const pos = ta.selectionStart;
+    const prev = ta.value;
+    this.core.executeCommand({
+      description: 'Insert Embed',
+      execute: () => {
+        ta.value = ta.value.slice(0, pos) + snippet + ta.value.slice(pos);
+        ta.selectionStart = pos + snippet.length;
+        ta.selectionEnd = pos + snippet.length;
+        ta.dispatchEvent(new Event('input', { bubbles: true }));
+      },
+      undo: () => {
+        ta.value = prev;
+        ta.selectionStart = pos;
+        ta.selectionEnd = pos;
+        ta.dispatchEvent(new Event('input', { bubbles: true }));
+      },
+    });
+  }
+
+  insertSpecialChar(char: string): void {
+    if (!this.textarea || !this.core) return;
+    const ta = this.textarea;
+    const pos = ta.selectionStart;
+    const prev = ta.value;
+    this.core.executeCommand({
+      description: 'Insert Special Character',
+      execute: () => {
+        ta.value = ta.value.slice(0, pos) + char + ta.value.slice(pos);
+        ta.selectionStart = pos + char.length;
+        ta.selectionEnd = pos + char.length;
+        ta.dispatchEvent(new Event('input', { bubbles: true }));
+      },
+      undo: () => {
+        ta.value = prev;
+        ta.selectionStart = pos;
+        ta.selectionEnd = pos;
         ta.dispatchEvent(new Event('input', { bubbles: true }));
       },
     });

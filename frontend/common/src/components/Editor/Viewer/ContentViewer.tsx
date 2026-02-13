@@ -22,8 +22,24 @@ export function ContentViewer({ content, format = 'html', className = '' }: Cont
           node.setAttribute('href', `https://${href}`);
         }
       }
+      const style = node.getAttribute('style');
+      if (style) {
+        const allowed = style
+          .split(';')
+          .map((s) => s.trim())
+          .filter((s) => /^(color|background-color|text-align|line-height|font-family|font-size)\s*:/i.test(s))
+          .join('; ');
+        if (allowed) {
+          node.setAttribute('style', allowed);
+        } else {
+          node.removeAttribute('style');
+        }
+      }
     });
-    const result = DOMPurify.sanitize(raw);
+    const result = DOMPurify.sanitize(raw, {
+      ADD_ATTR: ['style', 'frameborder', 'allowfullscreen', 'sandbox'],
+      ADD_TAGS: ['iframe'],
+    });
     DOMPurify.removeHooks('afterSanitizeAttributes');
     return result;
   }, [content, format]);

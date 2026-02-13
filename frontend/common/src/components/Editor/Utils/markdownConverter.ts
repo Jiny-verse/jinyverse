@@ -1,4 +1,4 @@
-import type { ASTNode, Mark } from '../Types';
+import type { ASTNode, Mark, CalloutType } from '../Types';
 import {
   createDoc,
   createParagraph,
@@ -7,6 +7,12 @@ import {
   createCodeBlock,
   createList,
   createListItem,
+  createHorizontalRule,
+  createCallout,
+  createEmbed,
+  createTable,
+  createTableRow,
+  createTableCell,
   marksToMarkdown,
 } from './astUtils';
 
@@ -55,6 +61,44 @@ function nodeToMarkdown(node: ASTNode): string {
     }
     case 'hard_break':
       return '  \n';
+    case 'horizontal_rule':
+      return '---';
+    case 'embed': {
+      const url = String(node.attrs?.url ?? '');
+      return `{% embed ${url} %}`;
+    }
+    case 'table': {
+      const rows = node.content ?? [];
+      if (rows.length === 0) return '';
+      const headerRow = rows.find((r) => r.attrs?.isHeader === 1);
+      const bodyRows = rows.filter((r) => !r.attrs?.isHeader);
+      const getCells = (row: ASTNode) => (row.content ?? []).map((cell) => inlineToMarkdown(cell.content ?? []));
+      let md = '';
+      if (headerRow) {
+        const cells = getCells(headerRow);
+        md += `| ${cells.join(' | ')} |\n`;
+        md += `| ${cells.map(() => '---').join(' | ')} |\n`;
+      } else if (bodyRows.length > 0) {
+        const cells = getCells(bodyRows[0]);
+        md += `| ${cells.join(' | ')} |\n`;
+        md += `| ${cells.map(() => '---').join(' | ')} |\n`;
+      }
+      const dataRows = headerRow ? bodyRows : bodyRows.slice(1);
+      dataRows.forEach((row) => {
+        const cells = getCells(row);
+        md += `| ${cells.join(' | ')} |\n`;
+      });
+      return md;
+    }
+    case 'table_row':
+      return (node.content ?? []).map(nodeToMarkdown).join(' | ');
+    case 'table_cell':
+      return inlineToMarkdown(node.content ?? []);
+    case 'callout': {
+      const color = String(node.attrs?.calloutType ?? '#e8f4fd');
+      const inner = astToMarkdown(node.content ?? []);
+      return `> [!${color}]\n${inner.split('\n').map((l) => `> ${l}`).join('\n')}`;
+    }
     case 'image': {
       const src = node.attrs?.src ?? '';
       const alt = node.attrs?.alt ?? '';
@@ -84,6 +128,47 @@ export function markdownToAST(md: string): ASTNode[] {
   while (i < lines.length) {
     const line = lines[i];
 
+    // Embed shortcode: {% embed URL %}
+    const embedMatch = line.match(/^\{%\s*embed\s+(\S+)\s*%\}$/);
+    if (embedMatch) {
+      blocks.push(createEmbed(embedMatch[1]));
+      i++;
+      continue;
+    }
+
+    // Pipe table: | Col1 | Col2 | ...
+    if (line.trim().startsWith('|') && line.trim().endsWith('|')) {
+      const parsePipeRow = (l: string): string[] =>
+        l.trim().split('|').slice(1, -1).map((c) => c.trim());
+      const headerCells = parsePipeRow(line);
+      i++;
+      if (i < lines.length && /^\|[-:| ]+\|$/.test(lines[i].trim())) {
+        i++; // skip separator
+        const bodyRows: string[][] = [];
+        while (i < lines.length && lines[i].trim().startsWith('|') && lines[i].trim().endsWith('|')) {
+          bodyRows.push(parsePipeRow(lines[i]));
+          i++;
+        }
+        const headerRow = createTableRow(
+          headerCells.map((c) => createTableCell(parseInline(c), true)),
+          true,
+        );
+        const dataRows = bodyRows.map((cells) =>
+          createTableRow(cells.map((c) => createTableCell(parseInline(c), false)), false),
+        );
+        blocks.push(createTable([headerRow, ...dataRows]));
+        continue;
+      }
+      // Not a table — treat as paragraph
+    }
+
+    // Horizontal rule
+    if (/^[-*_]{3,}\s*$/.test(line)) {
+      blocks.push(createHorizontalRule());
+      i++;
+      continue;
+    }
+
     // Fenced code block
     if (line.startsWith('```')) {
       const codeLines: string[] = [];
@@ -104,6 +189,21 @@ export function markdownToAST(md: string): ASTNode[] {
       const content = parseInline(headingMatch[2]);
       blocks.push(createHeading(level, content));
       i++;
+      continue;
+    }
+
+    // Callout (extended blockquote: > [!#color])
+    const calloutMatch = line.match(/^> \[!(#[0-9a-fA-F]{3,8})\]\s*$/);
+    if (calloutMatch) {
+      const calloutType = calloutMatch[1] as CalloutType;
+      const quoteLines: string[] = [];
+      i++;
+      while (i < lines.length && lines[i].startsWith('> ')) {
+        quoteLines.push(lines[i].slice(2));
+        i++;
+      }
+      const innerAST = markdownToAST(quoteLines.join('\n'));
+      blocks.push(createCallout(calloutType, innerAST));
       continue;
     }
 
@@ -249,6 +349,40 @@ export function htmlToMarkdown(html: string): string {
     .replace(/<code[^>]*>(.*?)<\/code>/gi, '`$1`')
     // Code blocks
     .replace(/<pre[^>]*><code[^>]*>([\s\S]*?)<\/code><\/pre>/gi, '```\n$1\n```\n')
+    // Tables → pipe table
+    .replace(/<table[^>]*>([\s\S]*?)<\/table>/gi, (_: string, content: string) => {
+      const rows: string[][] = [];
+      let hasHeader = false;
+      const theadMatch = content.match(/<thead[^>]*>([\s\S]*?)<\/thead>/i);
+      if (theadMatch) {
+        hasHeader = true;
+        const cells = (theadMatch[1].match(/<t[hd][^>]*>([\s\S]*?)<\/t[hd]>/gi) || []).map((c: string) => c.replace(/<[^>]+>/g, '').trim());
+        rows.push(cells);
+      }
+      const tbodyContent = (content.match(/<tbody[^>]*>([\s\S]*?)<\/tbody>/i)?.[1]) ?? content;
+      (tbodyContent.match(/<tr[^>]*>([\s\S]*?)<\/tr>/gi) || []).forEach((row: string) => {
+        const cells = (row.match(/<t[hd][^>]*>([\s\S]*?)<\/t[hd]>/gi) || []).map((c: string) => c.replace(/<[^>]+>/g, '').trim());
+        rows.push(cells);
+      });
+      if (rows.length === 0) return '';
+      const colCount = Math.max(...rows.map((r) => r.length));
+      const padded = rows.map((r) => [...r, ...Array(colCount - r.length).fill('')]);
+      let md = '\n';
+      md += `| ${padded[0].join(' | ')} |\n`;
+      md += `| ${padded[0].map(() => '---').join(' | ')} |\n`;
+      padded.slice(hasHeader ? 1 : 0).forEach((row) => { md += `| ${row.join(' | ')} |\n`; });
+      return md + '\n';
+    })
+    // Embed wrapper
+    .replace(/<div[^>]*class="embed-wrapper(?:[^"]*)"[^>]*>[\s\S]*?<iframe[^>]*src="([^"]*)"[\s\S]*?<\/iframe>[\s\S]*?<\/div>/gi, (_: string, src: string) => `{% embed ${src} %}\n`)
+    .replace(/<div[^>]*class="embed-wrapper(?:[^"]*)"[^>]*>[\s\S]*?<a[^>]*href="([^"]*)"[\s\S]*?<\/a>[\s\S]*?<\/div>/gi, (_: string, href: string) => `{% embed ${href} %}\n`)
+    // Callout boxes
+    .replace(/<div[^>]*class="callout"[^>]*style="[^"]*background-color:\s*(#[0-9a-fA-F]{3,8})[^"]*"[^>]*>[\s\S]*?<div[^>]*class="callout-body"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/gi, (_, color: string, body: string) => {
+      const stripped = body.replace(/<[^>]+>/g, '').trim();
+      return `> [!${color}]\n> ${stripped}\n`;
+    })
+    // Horizontal rule
+    .replace(/<hr\s*\/?>/gi, '\n---\n')
     // Images
     .replace(/<img[^>]*>/gi, (match) => {
       const src = match.match(/src="([^"]*)"/i)?.[1] ?? '';

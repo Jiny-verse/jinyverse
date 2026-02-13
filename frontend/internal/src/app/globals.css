@@ -54,3 +54,61 @@ body {
   color: var(--foreground);
   background: var(--background);
 }
+
+/* Callout Box Styles */
+@layer components {
+  .callout {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin: 8px 0;
+  }
+
+}
+
+/* Editor ContentEditable overrides */
+.editor-text-mode .callout { display: block; }
+
+/* Embed Wrapper Styles */
+.embed-wrapper {
+  position: relative;
+  width: 100%;
+  margin: 8px 0;
+}
+.embed-wrapper iframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 6px;
+}
+.embed-wrapper.embed-link {
+  padding: 10px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #f9fafb;
+}
+.embed-wrapper.embed-link a {
+  color: #2563eb;
+  word-break: break-all;
+}
+
+/* Editor Table Styles */
+.editor-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 8px 0;
+  font-size: 14px;
+}
+.editor-table th,
+.editor-table td {
+  border: 1px solid #d1d5db;
+  padding: 6px 10px;
+  min-width: 80px;
+  vertical-align: top;
+}
+.editor-table th {
+  background-color: #f3f4f6;
+  font-weight: 600;
+  text-align: left;
+}
+.editor-table tr:hover td {
+  background-color: rgba(0,0,0,0.02);
+}

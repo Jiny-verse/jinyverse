@@ -86,6 +86,20 @@
       "ol": "번호 매기기 목록",
       "link": "링크",
       "image": "이미지",
+      "blockquote": "인용문",
+      "hr": "구분선",
+      "alignLeft": "왼쪽 정렬",
+      "alignCenter": "가운데 정렬",
+      "alignRight": "오른쪽 정렬",
+      "textColor": "글자 색상",
+      "highlight": "글자 배경색",
+      "lineHeight": "행간",
+      "specialChar": "특수문자",
+      "fontFamily": "폰트",
+      "fontSize": "크기",
+      "callout": "콜아웃",
+      "embed": "임베드",
+      "table": "표",
       "undo": "실행 취소",
       "redo": "다시 실행",
       "switchMode": "모드 전환"
@@ -105,6 +119,19 @@
         "text": "표시 텍스트",
         "textPlaceholder": "링크 텍스트 (선택)"
       },
+      "table": {
+        "title": "표 삽입",
+        "rows": "행 수",
+        "cols": "열 수",
+        "hasHeader": "첫 행을 헤더로",
+        "preview": "미리보기"
+      },
+      "embed": {
+        "title": "임베드 삽입",
+        "placeholder": "YouTube, Vimeo URL을 입력하세요",
+        "supported": "✅ 지원되는 형식입니다 (YouTube / Vimeo)",
+        "unsupported": "⚠️ YouTube/Vimeo URL이 아닙니다. 링크 카드로 삽입됩니다."
+      },
       "image": {
         "title": "이미지 삽입",
         "upload": "파일 업로드",
@@ -113,6 +140,17 @@
         "alt": "대체 텍스트 (alt)",
         "altPlaceholder": "이미지 설명 (선택)"
       }
+    },
+    "table": {
+      "addRowAbove": "위에 행 추가",
+      "addRowBelow": "아래에 행 추가",
+      "deleteRow": "행 삭제",
+      "addColLeft": "왼쪽에 열 추가",
+      "addColRight": "오른쪽에 열 추가",
+      "deleteCol": "열 삭제",
+      "cellBgColor": "셀 배경색",
+      "cellTextColor": "셀 글자색",
+      "deleteTable": "표 삭제"
     }
   }
 }
