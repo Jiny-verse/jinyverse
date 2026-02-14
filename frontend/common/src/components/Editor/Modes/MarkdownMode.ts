@@ -84,6 +84,7 @@ export class MarkdownMode implements IEditorMode {
   private isComposing = false;
   private keydownHandler: ((e: KeyboardEvent) => void) | null = null;
   private inputHandler: (() => void) | null = null;
+  private selectionHandler: (() => void) | null = null;
   private compositionStartHandler: (() => void) | null = null;
   private compositionEndHandler: (() => void) | null = null;
 
@@ -126,6 +127,12 @@ export class MarkdownMode implements IEditorMode {
       core.emit('cursor:change', { line: lineNum, column: col, charCount: ta.value.length });
     };
     ta.addEventListener('input', this.inputHandler);
+
+    this.selectionHandler = () => {
+      if (document.activeElement !== ta) return;
+      core.emit('format:active', this.detectFormatActive(ta));
+    };
+    document.addEventListener('selectionchange', this.selectionHandler);
 
     container.appendChild(ta);
   }
@@ -186,6 +193,9 @@ export class MarkdownMode implements IEditorMode {
       if (this.compositionStartHandler) this.textarea.removeEventListener('compositionstart', this.compositionStartHandler);
       if (this.compositionEndHandler) this.textarea.removeEventListener('compositionend', this.compositionEndHandler);
     }
+    if (this.selectionHandler) {
+      document.removeEventListener('selectionchange', this.selectionHandler);
+    }
     if (this.container && this.textarea) {
       this.container.removeChild(this.textarea);
     }
@@ -194,8 +204,33 @@ export class MarkdownMode implements IEditorMode {
     this.core = null;
     this.keydownHandler = null;
     this.inputHandler = null;
+    this.selectionHandler = null;
     this.compositionStartHandler = null;
     this.compositionEndHandler = null;
+  }
+
+  private detectFormatActive(ta: HTMLTextAreaElement): {
+    bold: boolean;
+    italic: boolean;
+    underline: boolean;
+    strikethrough: boolean;
+  } {
+    const text = ta.value;
+    const pos = ta.selectionStart;
+    const isInside = (pattern: RegExp, markerLen: number): boolean => {
+      pattern.lastIndex = 0;
+      let m;
+      while ((m = pattern.exec(text)) !== null) {
+        if (pos > m.index + markerLen && pos <= m.index + m[0].length - markerLen) return true;
+      }
+      return false;
+    };
+    return {
+      bold: isInside(/\*\*[\s\S]+?\*\*/g, 2),
+      italic: isInside(/(?<!\*)\*(?!\*)[\s\S]+?(?<!\*)\*(?!\*)/g, 1),
+      underline: false,
+      strikethrough: isInside(/~~[\s\S]+?~~/g, 2),
+    };
   }
 
   getContent(): string {

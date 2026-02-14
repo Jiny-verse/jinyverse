@@ -167,6 +167,51 @@ export class TextMode implements IEditorMode {
       }
     }
 
+    // Enter inside inline <code>: 커서를 code 밖으로 이동 후 브라우저가 plain 단락 생성
+    if (e.key === 'Enter' && !e.shiftKey) {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0) {
+        const range = sel.getRangeAt(0);
+        const anchorEl = range.startContainer instanceof Element
+          ? range.startContainer as Element
+          : (range.startContainer as Node).parentElement;
+        const insideCode = anchorEl?.closest<HTMLElement>('code') ?? null;
+        if (insideCode && !anchorEl?.closest('pre') && this.editorDiv.contains(insideCode)) {
+          const codeParent = insideCode.parentElement;
+          if (codeParent) {
+            const codeNext = insideCode.nextSibling; // DOM 수정 전 저장
+
+            // 1) code 내부 커서 이후 내용 추출 (code 내부 범위만 → 단순하고 신뢰성 높음)
+            const tailRange = document.createRange();
+            tailRange.setStart(range.startContainer, range.startOffset);
+            tailRange.setEnd(insideCode, insideCode.childNodes.length);
+            const tailFrag = tailRange.extractContents();
+
+            // 2) 추출 내용을 code 바깥(plain)으로 삽입
+            const firstInserted = tailFrag.firstChild;
+            while (tailFrag.firstChild) codeParent.insertBefore(tailFrag.firstChild, codeNext);
+
+            // 3) 빈 code 요소 제거
+            if (insideCode.childNodes.length === 0) insideCode.remove();
+
+            // 4) 커서를 삽입된 첫 노드 앞(또는 블록 끝)으로 이동
+            const newRange = document.createRange();
+            if (firstInserted && (firstInserted as Node).isConnected) {
+              newRange.setStartBefore(firstInserted as Node);
+            } else if (codeNext?.isConnected) {
+              newRange.setStartBefore(codeNext);
+            } else {
+              newRange.setStart(codeParent, codeParent.childNodes.length);
+            }
+            newRange.collapse(true);
+            sel.removeAllRanges();
+            sel.addRange(newRange);
+            // preventDefault 없음 — 브라우저가 현재 위치(code 밖)에서 단락 분리
+          }
+        }
+      }
+    }
+
     if (ctrl) {
       switch (e.key.toLowerCase()) {
         case 'b': {
@@ -261,10 +306,54 @@ export class TextMode implements IEditorMode {
     const insertHR = (core: IEditorCore) => {
       if (!this.editorDiv) return;
       const prev = this.editorDiv.innerHTML;
+      const editorDiv = this.editorDiv;
+
+      const range = this.savedSelection?.cloneRange() ?? (() => {
+        const sel = window.getSelection();
+        return (sel && sel.rangeCount > 0) ? sel.getRangeAt(0).cloneRange() : null;
+      })();
+
+      const doInsert = () => {
+        const hr = document.createElement('hr');
+        const nextP = document.createElement('p');
+        nextP.innerHTML = '<br>';
+
+        let insertAfter: Node | null = null;
+        if (range) {
+          let block: Node | null = range.commonAncestorContainer;
+          while (block && block !== editorDiv) {
+            if (block.parentNode === editorDiv) { insertAfter = block; break; }
+            block = block.parentNode;
+          }
+        }
+
+        if (insertAfter && insertAfter.parentNode === editorDiv) {
+          editorDiv.insertBefore(hr, insertAfter.nextSibling);
+          editorDiv.insertBefore(nextP, hr.nextSibling);
+        } else {
+          editorDiv.appendChild(hr);
+          editorDiv.appendChild(nextP);
+        }
+
+        const sel = window.getSelection();
+        if (sel) {
+          const r = document.createRange();
+          r.setStart(nextP, 0);
+          r.collapse(true);
+          sel.removeAllRanges();
+          sel.addRange(r);
+        }
+
+        core.emit('content:change', { content: editorDiv.innerHTML });
+      };
+
       core.executeCommand({
         description: 'Horizontal Rule',
-        execute: () => { document.execCommand('insertHTML', false, '<hr>'); },
-        undo: () => { if (this.editorDiv) this.editorDiv.innerHTML = DOMPurify.sanitize(prev); },
+        execute: doInsert,
+        undo: () => {
+          editorDiv.innerHTML = DOMPurify.sanitize(prev, { ADD_ATTR: ['style'] });
+          core.emit('content:change', { content: editorDiv.innerHTML });
+        },
       });
     };
 
