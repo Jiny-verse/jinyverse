@@ -42,4 +42,7 @@ public class AuditLogRequestDto {
     /** 요청 IP */
     @Size(max = 45, message = "IP 주소는 45자 이하여야 합니다")
     private String ipAddress;
+
+    /** 추가 식별 메타데이터 (예: {"codeKey":"..."}, {"key":"..."}) */
+    private String metadata;
 }

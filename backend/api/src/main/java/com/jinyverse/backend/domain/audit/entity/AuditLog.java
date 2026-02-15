@@ -62,6 +62,11 @@ public class AuditLog extends BaseEntity {
     @Column(name = "ip_address", length = 45)
     private String ipAddress;
 
+    /** 추가 식별 메타데이터 */
+    @Column(name = "metadata", columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private String metadata;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "actor_user_id", insertable = false, updatable = false)
     private User actor;
@@ -76,6 +81,7 @@ public class AuditLog extends BaseEntity {
                 .afterData(dto.getAfterData())
                 .actorUserId(dto.getActorUserId())
                 .ipAddress(dto.getIpAddress())
+                .metadata(dto.getMetadata())
                 .build();
     }
 
@@ -88,6 +94,7 @@ public class AuditLog extends BaseEntity {
                 .afterData(this.afterData)
                 .actorUserId(this.actorUserId)
                 .ipAddress(this.ipAddress)
+                .metadata(this.metadata)
                 .build();
     }
 
@@ -101,6 +108,7 @@ public class AuditLog extends BaseEntity {
                 .afterData(this.afterData)
                 .actorUserId(this.actorUserId)
                 .ipAddress(this.ipAddress)
+                .metadata(this.metadata)
                 .createdAt(this.getCreatedAt())
                 .build();
     }

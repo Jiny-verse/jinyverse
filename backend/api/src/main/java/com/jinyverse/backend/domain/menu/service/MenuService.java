@@ -1,5 +1,6 @@
 package com.jinyverse.backend.domain.menu.service;
 
+import com.jinyverse.backend.domain.audit.util.AuditLogHelper;
 import com.jinyverse.backend.domain.common.util.Channel;
 import com.jinyverse.backend.domain.common.util.CommonSpecifications;
 import com.jinyverse.backend.domain.common.util.RequestContext;
@@ -13,6 +14,7 @@ import com.jinyverse.backend.domain.menu.repository.MenuRepository;
 import com.jinyverse.backend.domain.topic.entity.Topic;
 import com.jinyverse.backend.domain.topic.repository.TopicRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -40,6 +42,7 @@ public class MenuService {
     private final MenuRepository menuRepository;
     private final BoardRepository boardRepository;
     private final TopicRepository topicRepository;
+    private final AuditLogHelper auditLogHelper;
 
     @Transactional
     public MenuResponseDto create(MenuRequestDto requestDto) {
@@ -47,7 +50,10 @@ public class MenuService {
             throw new IllegalArgumentException("상위 메뉴를 찾을 수 없습니다.");
         }
         Menu menu = Menu.fromRequestDto(requestDto);
-        return menuRepository.save(menu).toResponseDto();
+        Menu saved = menuRepository.save(menu);
+        MenuResponseDto dto = saved.toResponseDto();
+        auditLogHelper.log("MENU", saved.getId(), "CREATE", null, dto);
+        return dto;
     }
 
     public MenuResponseDto getByCode(String code) {
@@ -122,8 +128,12 @@ public class MenuService {
         }
 
         validateUpperIdNotCircular(menu.getId(), requestDto.getUpperId());
+        MenuResponseDto before = menu.toResponseDto();
         menu.applyUpdate(requestDto);
-        return menuRepository.save(menu).toResponseDto();
+        Menu updated = menuRepository.save(menu);
+        MenuResponseDto after = updated.toResponseDto();
+        auditLogHelper.log("MENU", updated.getId(), "UPDATE", before, after);
+        return after;
     }
 
     private void updateBoardMenuCode(String oldCode, String newCode) {
@@ -132,7 +142,8 @@ public class MenuService {
                 CommonSpecifications.eqIfPresent("menuCode", oldCode));
         List<Board> boards = boardRepository.findAll(spec);
         boards.forEach(b -> b.setMenuCode(newCode));
-        if (!boards.isEmpty()) boardRepository.saveAll(boards);
+        if (!boards.isEmpty())
+            boardRepository.saveAll(boards);
     }
 
     private void updateTopicMenuCode(String oldCode, String newCode) {
@@ -141,7 +152,8 @@ public class MenuService {
                 CommonSpecifications.eqIfPresent("menuCode", oldCode));
         List<Topic> topics = topicRepository.findAll(spec);
         topics.forEach(t -> t.setMenuCode(newCode));
-        if (!topics.isEmpty()) topicRepository.saveAll(topics);
+        if (!topics.isEmpty())
+            topicRepository.saveAll(topics);
     }
 
     @Transactional
@@ -149,15 +161,18 @@ public class MenuService {
         Menu menu = menuRepository.findByCodeAndDeletedAtIsNull(code)
                 .orElseThrow(() -> new RuntimeException("Menu not found with code: " + code));
 
+        MenuResponseDto before = menu.toResponseDto();
         menu.setDeletedAt(LocalDateTime.now());
         menuRepository.save(menu);
+        auditLogHelper.log("MENU", menu.getId(), "DELETE", before, null);
     }
 
     /**
      * 상위 메뉴 설정 시 순환 참조 방지: upperId로 타고 올라갔을 때 selfId가 나오면 안 됨.
      */
     private void validateUpperIdNotCircular(UUID selfId, UUID upperId) {
-        if (upperId == null) return;
+        if (upperId == null)
+            return;
         if (upperId.equals(selfId)) {
             throw new IllegalArgumentException("상위 메뉴로 자신을 선택할 수 없습니다.");
         }
@@ -173,9 +188,11 @@ public class MenuService {
         queue.add(id);
         while (!queue.isEmpty()) {
             UUID current = queue.remove(0);
-            if (!visited.add(current)) continue;
+            if (!visited.add(current))
+                continue;
             Optional<Menu> menu = menuRepository.findById(current);
-            if (menu.isEmpty() || menu.get().getUpperId() == null) continue;
+            if (menu.isEmpty() || menu.get().getUpperId() == null)
+                continue;
             queue.add(menu.get().getUpperId());
         }
         return visited;
@@ -207,8 +224,8 @@ public class MenuService {
         // 쿼리 파라미터 필터: q(코드·이름·설명 검색), isActive, channel, upperId
         result = CommonSpecifications.and(
                 result,
-                CommonSpecifications.filterSpec(filter, PAGINATION_KEYS, "q", new String[]{"code", "name", "description", "upperId"})
-        );
+                CommonSpecifications.filterSpec(filter, PAGINATION_KEYS, "q",
+                        new String[] { "code", "name", "description", "upperId" }));
 
         return result;
     }
@@ -218,8 +235,8 @@ public class MenuService {
         Specification<Menu> result = CommonSpecifications.notDeleted();
         result = CommonSpecifications.and(
                 result,
-                CommonSpecifications.filterSpec(filter, PAGINATION_KEYS, "q", new String[]{"code", "name", "description", "upperId"})
-        );
+                CommonSpecifications.filterSpec(filter, PAGINATION_KEYS, "q",
+                        new String[] { "code", "name", "description", "upperId" }));
         return result;
     }
 }

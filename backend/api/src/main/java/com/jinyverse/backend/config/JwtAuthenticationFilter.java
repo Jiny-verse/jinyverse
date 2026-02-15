@@ -1,9 +1,12 @@
 package com.jinyverse.backend.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jinyverse.backend.domain.common.util.Channel;
+import com.jinyverse.backend.domain.common.util.ClientIpUtil;
 import com.jinyverse.backend.domain.common.util.JwtUtil;
 import com.jinyverse.backend.domain.common.util.RequestContext;
 import com.jinyverse.backend.domain.common.util.RequestContextHolder;
+import com.jinyverse.backend.domain.common.util.Role;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -17,6 +20,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.UUID;
 
 /**
  * /api/** 요청에 대해 JWT 검증. 토큰은 쿠키(access_token) 우선, 없으면 Authorization Bearer.
@@ -63,8 +67,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String token = extractAccessToken(request);
             if (token != null && !token.isBlank()) {
-                RequestContext context = RequestContext.fromToken(jwtUtil, token);
-                RequestContextHolder.set(context);
+                RequestContext existing = RequestContextHolder.get();
+                UUID userId = jwtUtil.getUserIdFromToken(token);
+                String roleStr = jwtUtil.getRoleFromToken(token);
+                String username = jwtUtil.getUsernameFromToken(token);
+                RequestContext auth = existing != null
+                        ? existing.withAuth(userId, username, Role.fromHeader(roleStr))
+                        : RequestContext.anonymous(Channel.INTERNAL, ClientIpUtil.extractIp(request))
+                                        .withAuth(userId, username, Role.fromHeader(roleStr));
+                RequestContextHolder.set(auth);
                 filterChain.doFilter(request, response);
             } else {
                 if (isPublicGetRequest(request)) {
@@ -77,8 +88,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             sendUnauthorized(response, "TOKEN_EXPIRED", "Access token has expired");
         } catch (JwtException e) {
             sendUnauthorized(response, "INVALID_TOKEN", "Invalid or malformed token");
-        } finally {
-            RequestContextHolder.clear();
         }
     }
 

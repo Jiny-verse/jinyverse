@@ -1,5 +1,6 @@
 package com.jinyverse.backend.domain.topic.service;
 
+import com.jinyverse.backend.domain.audit.util.AuditLogHelper;
 import com.jinyverse.backend.domain.comment.entity.Comment;
 import com.jinyverse.backend.domain.comment.repository.CommentRepository;
 import com.jinyverse.backend.domain.common.util.Channel;
@@ -20,6 +21,7 @@ import com.jinyverse.backend.domain.topic.repository.RelTopicFileRepository;
 import com.jinyverse.backend.domain.topic.repository.RelTopicTagRepository;
 import com.jinyverse.backend.domain.topic.repository.TopicRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -37,6 +39,7 @@ import java.util.stream.Collectors;
 
 import static com.jinyverse.backend.domain.common.util.CommonSpecifications.PAGINATION_KEYS;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -48,6 +51,7 @@ public class TopicService {
     private final CommonFileRepository commonFileRepository;
     private final RelTopicTagRepository relTopicTagRepository;
     private final TagRepository tagRepository;
+    private final AuditLogHelper auditLogHelper;
 
     @Transactional
     public TopicResponseDto create(TopicRequestDto requestDto, RequestContext ctx) {
@@ -61,7 +65,9 @@ public class TopicService {
         Topic saved = topicRepository.save(topic);
         saveTopicTags(saved.getId(), requestDto.getTagIds());
         saveTopicFiles(saved.getId(), requestDto.getFiles());
-        return toResponseDtoWithTags(saved.getId(), saved.toResponseDto());
+        TopicResponseDto dto = toResponseDtoWithTags(saved.getId(), saved.toResponseDto());
+        auditLogHelper.log("TOPIC", saved.getId(), "CREATE", null, dto);
+        return dto;
     }
 
     @Transactional(readOnly = false)
@@ -103,12 +109,18 @@ public class TopicService {
         Topic topic = topicRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new RuntimeException("Topic not found with id: " + id));
 
+        TopicResponseDto before = toResponseDtoWithTags(id, topic.toResponseDto());
+
         if (topic.getSourceTopicId() != null && "created".equals(requestDto.getStatus())) {
-            return promoteDraft(topic, requestDto);
+            TopicResponseDto after = promoteDraft(topic, requestDto);
+            auditLogHelper.log("TOPIC", after.getId(), "UPDATE", before, after);
+            return after;
         }
         if (topic.getSourceTopicId() == null && Boolean.FALSE.equals(topic.getHidden())
                 && "temporary".equals(requestDto.getStatus())) {
-            return createDraftAndHideOriginal(topic, requestDto);
+            TopicResponseDto after = createDraftAndHideOriginal(topic, requestDto);
+            auditLogHelper.log("TOPIC", id, "UPDATE", before, after);
+            return after;
         }
 
         topic.applyUpdate(requestDto);
@@ -118,7 +130,9 @@ public class TopicService {
         Topic updated = topicRepository.save(topic);
         saveTopicTags(updated.getId(), requestDto.getTagIds());
         saveTopicFiles(updated.getId(), requestDto.getFiles());
-        return toResponseDtoWithTags(updated.getId(), updated.toResponseDto());
+        TopicResponseDto after = toResponseDtoWithTags(updated.getId(), updated.toResponseDto());
+        auditLogHelper.log("TOPIC", id, "UPDATE", before, after);
+        return after;
     }
 
     private TopicResponseDto promoteDraft(Topic draft, TopicRequestDto requestDto) {
@@ -171,9 +185,11 @@ public class TopicService {
         Topic topic = topicRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new RuntimeException("Topic not found with id: " + id));
 
+        TopicResponseDto before = toResponseDtoWithTags(id, topic.toResponseDto());
         relTopicFileRepository.deleteByTopicId(id);
         topic.setDeletedAt(LocalDateTime.now());
         topicRepository.save(topic);
+        auditLogHelper.log("TOPIC", id, "DELETE", before, null);
     }
 
     private Specification<Topic> spec(RequestContext ctx, Map<String, Object> filter) {

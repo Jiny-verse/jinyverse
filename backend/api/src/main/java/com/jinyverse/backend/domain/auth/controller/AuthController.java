@@ -12,6 +12,7 @@ import com.jinyverse.backend.domain.common.util.RequestContextHolder;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -38,8 +39,7 @@ public class AuthController {
             HttpServletRequest httpRequest,
             HttpServletResponse httpResponse
     ) {
-        String ipAddress = httpRequest.getRemoteAddr();
-        LoginResponseDto response = authService.login(request, userAgent, ipAddress);
+        LoginResponseDto response = authService.login(request, userAgent);
         CookieUtil.addCookie(httpResponse, CookieUtil.COOKIE_ACCESS_TOKEN, response.getAccessToken(), ACCESS_COOKIE_MAX_AGE_SECONDS, httpRequest);
         CookieUtil.addCookie(httpResponse, CookieUtil.COOKIE_REFRESH_TOKEN, response.getRefreshToken(), REFRESH_COOKIE_MAX_AGE_SECONDS, httpRequest);
         return ResponseEntity.ok(responseWithoutTokens(response));

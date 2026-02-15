@@ -32,6 +32,8 @@ public class AuditLogResponseDto {
     private UUID actorUserId;
     /** 요청 IP */
     private String ipAddress;
+    /** 추가 식별 메타데이터 */
+    private String metadata;
     /** 행위 시점 */
     private LocalDateTime createdAt;
 }

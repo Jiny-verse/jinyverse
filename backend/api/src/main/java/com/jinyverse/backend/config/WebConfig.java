@@ -16,6 +16,14 @@ import java.util.List;
 public class WebConfig {
 
     @Bean
+    public FilterRegistrationBean<AppRequestContextFilter> appRequestContextFilter() {
+        FilterRegistrationBean<AppRequestContextFilter> reg = new FilterRegistrationBean<>(new AppRequestContextFilter());
+        reg.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        reg.addUrlPatterns("/api/*", "/api/*/*", "/api/*/*/*", "/api/*/*/*/*");
+        return reg;
+    }
+
+    @Bean
     public FilterRegistrationBean<CsrfProtectionFilter> csrfProtectionFilter(ObjectMapper objectMapper) {
         FilterRegistrationBean<CsrfProtectionFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(new CsrfProtectionFilter(objectMapper));

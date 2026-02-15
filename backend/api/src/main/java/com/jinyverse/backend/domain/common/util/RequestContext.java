@@ -14,11 +14,13 @@ public class RequestContext {
     private final Role role;
     private final UUID userId;
     private final String username;
+    private final String ipAddress;
 
     public static RequestContext of(Channel channel, Role role) {
         return new RequestContext(
                 channel == null ? Channel.INTERNAL : channel,
                 role,
+                null,
                 null,
                 null
         );
@@ -36,7 +38,7 @@ public class RequestContext {
      * JWT 액세스 토큰에서 현재 유저 정보로 RequestContext 생성.
      * 채널은 INTERNAL, role은 토큰 claim에서 파싱.
      */
-    public static RequestContext fromToken(JwtUtil jwtUtil, String token) {
+    public static RequestContext fromToken(JwtUtil jwtUtil, String token, String ipAddress) {
         UUID userId = jwtUtil.getUserIdFromToken(token);
         String roleStr = jwtUtil.getRoleFromToken(token);
         String username = jwtUtil.getUsernameFromToken(token);
@@ -44,8 +46,19 @@ public class RequestContext {
                 Channel.INTERNAL,
                 Role.fromHeader(roleStr),
                 userId,
-                username
+                username,
+                ipAddress
         );
+    }
+
+    /** 비인증 요청용 익명 컨텍스트 (IP·Channel만 설정) */
+    public static RequestContext anonymous(Channel channel, String ipAddress) {
+        return new RequestContext(channel, null, null, null, ipAddress);
+    }
+
+    /** 기존 IP·Channel 유지하면서 인증 정보 추가 */
+    public RequestContext withAuth(UUID userId, String username, Role role) {
+        return new RequestContext(this.channel, role, userId, username, this.ipAddress);
     }
 
     public boolean isAdmin() {

@@ -1,9 +1,11 @@
 package com.jinyverse.backend.domain.setting.service;
 
+import com.jinyverse.backend.domain.audit.util.AuditLogHelper;
 import com.jinyverse.backend.domain.setting.dto.FileStorageSettingDto;
 import com.jinyverse.backend.domain.setting.entity.SystemSetting;
 import com.jinyverse.backend.domain.setting.repository.SystemSettingRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SystemSettingService {
@@ -18,6 +21,7 @@ public class SystemSettingService {
     public static final String KEY_FILE_STORAGE_BASE_PATH = "file.storage.basePath";
 
     private final SystemSettingRepository systemSettingRepository;
+    private final AuditLogHelper auditLogHelper;
 
     @Value("${app.file.storage.base-path:}")
     private String defaultBasePath;
@@ -30,11 +34,16 @@ public class SystemSettingService {
 
     @Transactional
     public void setValue(String key, String value) {
-        SystemSetting setting = systemSettingRepository.findById(key).orElse(new SystemSetting());
+        Optional<SystemSetting> existing = systemSettingRepository.findById(key);
+        String beforeValue = existing.map(SystemSetting::getValue).orElse(null);
+
+        SystemSetting setting = existing.orElse(new SystemSetting());
         setting.setKey(key);
         setting.setValue(value);
         setting.setUpdatedAt(LocalDateTime.now());
         systemSettingRepository.save(setting);
+
+        auditLogHelper.log("SYSTEM_SETTING", "UPDATE", beforeValue, value, "{\"key\":\"" + key + "\"}");
     }
 
     /** 파일 저장 경로: DB에 있으면 그 값, 없으면 application.yml 기본값. */
@@ -62,4 +71,5 @@ public class SystemSettingService {
         }
         return getFileStorageSetting();
     }
+
 }

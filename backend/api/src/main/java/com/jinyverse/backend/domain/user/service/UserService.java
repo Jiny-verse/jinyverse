@@ -1,5 +1,6 @@
 package com.jinyverse.backend.domain.user.service;
 
+import com.jinyverse.backend.domain.audit.util.AuditLogHelper;
 import com.jinyverse.backend.domain.common.util.CommonSpecifications;
 import com.jinyverse.backend.domain.common.util.RequestContext;
 import com.jinyverse.backend.domain.file.entity.CommonFile;
@@ -13,6 +14,7 @@ import com.jinyverse.backend.domain.user.entity.User;
 import com.jinyverse.backend.domain.user.repository.RelUserFileRepository;
 import com.jinyverse.backend.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -27,6 +29,7 @@ import java.util.UUID;
 
 import static com.jinyverse.backend.domain.common.util.CommonSpecifications.PAGINATION_KEYS;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -38,13 +41,16 @@ public class UserService {
     private final RelUserFileRepository relUserFileRepository;
     private final CommonFileRepository commonFileRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuditLogHelper auditLogHelper;
 
     @Transactional
     public UserResponseDto create(UserRequestDto requestDto) {
         String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
         User user = User.fromRequestDto(requestDto, encodedPassword);
         User saved = userRepository.save(user);
-        return saved.toResponseDto();
+        UserResponseDto dto = saved.toResponseDto();
+        auditLogHelper.log("USER", saved.getId(), "CREATE", null, dto);
+        return dto;
     }
 
     public UserResponseDto getById(UUID id) {
@@ -110,17 +116,22 @@ public class UserService {
         User user = userRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", id));
 
+        UserResponseDto before = user.toResponseDto();
         if (requestDto.getPassword() != null && !requestDto.getPassword().isBlank()) {
             user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         }
         user.applyUpdate(requestDto);
-        return user.toResponseDto();
+        UserResponseDto after = user.toResponseDto();
+        auditLogHelper.log("USER", id, "UPDATE", before, after);
+        return after;
     }
 
     @Transactional
     public UserResponseDto update(UUID id, com.jinyverse.backend.domain.user.dto.UserUpdateDto updateDto) {
         User user = userRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", id));
+
+        UserResponseDto before = user.toResponseDto();
 
         if (updateDto.getPassword() != null && !updateDto.getPassword().isBlank()) {
             if (updateDto.getCurrentPassword() == null
@@ -143,7 +154,9 @@ public class UserService {
         if (updateDto.getRole() != null)
             user.setRole(updateDto.getRole());
 
-        return user.toResponseDto();
+        UserResponseDto after = user.toResponseDto();
+        auditLogHelper.log("USER", id, "UPDATE", before, after);
+        return after;
     }
 
     @Transactional
@@ -151,9 +164,11 @@ public class UserService {
         User user = userRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", id));
 
+        UserResponseDto before = user.toResponseDto();
         relUserFileRepository.deleteByUserId(id);
         user.setDeletedAt(LocalDateTime.now());
         userRepository.save(user);
+        auditLogHelper.log("USER", id, "DELETE", before, null);
     }
 
     private Specification<User> spec(RequestContext ctx, Map<String, Object> filter) {

@@ -1,5 +1,6 @@
 package com.jinyverse.backend.domain.board.service;
 
+import com.jinyverse.backend.domain.audit.util.AuditLogHelper;
 import com.jinyverse.backend.domain.board.dto.BoardRequestDto;
 import com.jinyverse.backend.domain.board.dto.BoardResponseDto;
 import com.jinyverse.backend.domain.board.entity.Board;
@@ -8,6 +9,7 @@ import com.jinyverse.backend.domain.common.util.Channel;
 import com.jinyverse.backend.domain.common.util.CommonSpecifications;
 import com.jinyverse.backend.domain.common.util.RequestContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -22,12 +24,14 @@ import java.util.UUID;
 
 import static com.jinyverse.backend.domain.common.util.CommonSpecifications.PAGINATION_KEYS;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class BoardService {
 
     private final BoardRepository boardRepository;
+    private final AuditLogHelper auditLogHelper;
 
     @Transactional
     public BoardResponseDto create(BoardRequestDto requestDto, RequestContext ctx) {
@@ -36,7 +40,9 @@ public class BoardService {
         }
         Board board = Board.fromRequestDto(requestDto);
         Board saved = boardRepository.save(board);
-        return saved.toResponseDto();
+        BoardResponseDto dto = saved.toResponseDto();
+        auditLogHelper.log("BOARD", saved.getId(), "CREATE", null, dto);
+        return dto;
     }
 
     public BoardResponseDto getById(UUID id) {
@@ -61,9 +67,12 @@ public class BoardService {
         Board board = boardRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new RuntimeException("Board not found with id: " + id));
 
+        BoardResponseDto before = board.toResponseDto();
         board.applyUpdate(requestDto);
         Board updated = boardRepository.save(board);
-        return updated.toResponseDto();
+        BoardResponseDto after = updated.toResponseDto();
+        auditLogHelper.log("BOARD", id, "UPDATE", before, after);
+        return after;
     }
 
     @Transactional
@@ -74,8 +83,10 @@ public class BoardService {
         Board board = boardRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new RuntimeException("Board not found with id: " + id));
 
+        BoardResponseDto before = board.toResponseDto();
         board.setDeletedAt(LocalDateTime.now());
         boardRepository.save(board);
+        auditLogHelper.log("BOARD", id, "DELETE", before, null);
     }
 
     private Specification<Board> accessControlSpec(RequestContext ctx) {
