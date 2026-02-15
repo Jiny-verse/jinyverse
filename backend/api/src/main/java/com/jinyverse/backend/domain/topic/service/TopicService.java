@@ -187,6 +187,7 @@ public class TopicService {
 
         TopicResponseDto before = toResponseDtoWithTags(id, topic.toResponseDto());
         relTopicFileRepository.deleteByTopicId(id);
+        relTopicTagRepository.deleteByTopicId(id);
         topic.setDeletedAt(LocalDateTime.now());
         topicRepository.save(topic);
         auditLogHelper.log("TOPIC", id, "DELETE", before, null);

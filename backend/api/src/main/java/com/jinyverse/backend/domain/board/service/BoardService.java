@@ -8,6 +8,10 @@ import com.jinyverse.backend.domain.board.repository.BoardRepository;
 import com.jinyverse.backend.domain.common.util.Channel;
 import com.jinyverse.backend.domain.common.util.CommonSpecifications;
 import com.jinyverse.backend.domain.common.util.RequestContext;
+import com.jinyverse.backend.domain.topic.entity.Topic;
+import com.jinyverse.backend.domain.topic.repository.RelTopicFileRepository;
+import com.jinyverse.backend.domain.topic.repository.RelTopicTagRepository;
+import com.jinyverse.backend.domain.topic.repository.TopicRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -19,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,6 +37,9 @@ public class BoardService {
 
     private final BoardRepository boardRepository;
     private final AuditLogHelper auditLogHelper;
+    private final TopicRepository topicRepository;
+    private final RelTopicFileRepository relTopicFileRepository;
+    private final RelTopicTagRepository relTopicTagRepository;
 
     @Transactional
     public BoardResponseDto create(BoardRequestDto requestDto, RequestContext ctx) {
@@ -84,7 +92,15 @@ public class BoardService {
                 .orElseThrow(() -> new RuntimeException("Board not found with id: " + id));
 
         BoardResponseDto before = board.toResponseDto();
-        board.setDeletedAt(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        List<Topic> topics = topicRepository.findByBoardIdAndDeletedAtIsNull(id);
+        for (Topic topic : topics) {
+            relTopicFileRepository.deleteByTopicId(topic.getId());
+            relTopicTagRepository.deleteByTopicId(topic.getId());
+            topic.setDeletedAt(now);
+        }
+        topicRepository.saveAll(topics);
+        board.setDeletedAt(now);
         boardRepository.save(board);
         auditLogHelper.log("BOARD", id, "DELETE", before, null);
     }

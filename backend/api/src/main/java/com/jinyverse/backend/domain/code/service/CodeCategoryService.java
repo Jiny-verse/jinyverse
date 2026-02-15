@@ -2,8 +2,10 @@ package com.jinyverse.backend.domain.code.service;
 
 import com.jinyverse.backend.domain.code.dto.CodeCategoryRequestDto;
 import com.jinyverse.backend.domain.code.dto.CodeCategoryResponseDto;
+import com.jinyverse.backend.domain.code.entity.Code;
 import com.jinyverse.backend.domain.code.entity.CodeCategory;
 import com.jinyverse.backend.domain.code.repository.CodeCategoryRepository;
+import com.jinyverse.backend.domain.code.repository.CodeRepository;
 import com.jinyverse.backend.domain.common.util.CommonSpecifications;
 import com.jinyverse.backend.domain.common.util.RequestContext;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 import static com.jinyverse.backend.domain.common.util.CommonSpecifications.PAGINATION_KEYS;
@@ -24,6 +27,7 @@ import static com.jinyverse.backend.domain.common.util.CommonSpecifications.PAGI
 public class CodeCategoryService {
 
     private final CodeCategoryRepository codeCategoryRepository;
+    private final CodeRepository codeRepository;
 
     @Transactional
     public CodeCategoryResponseDto create(CodeCategoryRequestDto requestDto) {
@@ -57,7 +61,11 @@ public class CodeCategoryService {
         CodeCategory codeCategory = codeCategoryRepository.findByCodeAndDeletedAtIsNull(code)
                 .orElseThrow(() -> new RuntimeException("CodeCategory not found with code: " + code));
 
-        codeCategory.setDeletedAt(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        List<Code> codes = codeRepository.findByCategoryCodeAndDeletedAtIsNull(code);
+        codes.forEach(c -> c.setDeletedAt(now));
+        codeRepository.saveAll(codes);
+        codeCategory.setDeletedAt(now);
         codeCategoryRepository.save(codeCategory);
     }
 
