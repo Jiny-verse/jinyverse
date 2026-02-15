@@ -5,6 +5,7 @@ import com.jinyverse.backend.domain.common.util.RequestContextHolder;
 import com.jinyverse.backend.domain.user.dto.UserImageRequestDto;
 import com.jinyverse.backend.domain.user.dto.UserRequestDto;
 import com.jinyverse.backend.domain.user.dto.UserResponseDto;
+import com.jinyverse.backend.domain.user.dto.UserUpdateDto;
 import com.jinyverse.backend.domain.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -68,10 +69,8 @@ public class UserController {
     @GetMapping
     public ResponseEntity<Page<UserResponseDto>> getAll(
             @RequestParam Map<String, Object> filter,
-            Pageable pageable
-    ) {
-        Page<UserResponseDto> responses =
-                userService.getAll(filter, pageable, RequestContextHolder.get());
+            Pageable pageable) {
+        Page<UserResponseDto> responses = userService.getAll(filter, pageable, RequestContextHolder.get());
         return ResponseEntity.ok(responses);
     }
 
@@ -81,11 +80,11 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{id}")
+    @PostMapping("/{id}")
     public ResponseEntity<UserResponseDto> update(
             @PathVariable UUID id,
-            @Valid @RequestBody UserRequestDto requestDto) {
-        UserResponseDto response = userService.update(id, requestDto);
+            @Valid @RequestBody UserUpdateDto updateDto) {
+        UserResponseDto response = userService.update(id, updateDto);
         return ResponseEntity.ok(response);
     }
 

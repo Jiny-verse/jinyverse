@@ -26,3 +26,26 @@ export const userSchema = z.object({
 });
 
 export type User = z.infer<typeof userSchema>;
+
+export const userUpdateInputSchema = z.object({
+  name: z.string().optional(),
+  nickname: z.string().optional(),
+  password: z.string().optional(),
+  currentPassword: z.string().optional(),
+  isActive: z.boolean().optional(),
+  isLocked: z.boolean().optional(),
+  role: z.string().optional(),
+});
+
+export type UserUpdateInput = z.infer<typeof userUpdateInputSchema>;
+
+export const userListParamsSchema = z.object({
+  page: z.number().int().min(0).optional(),
+  size: z.number().int().positive().optional(),
+  keyword: z.string().optional(),
+  isActive: z.boolean().optional(),
+  isLocked: z.boolean().optional(),
+  role: z.string().optional(),
+});
+
+export type UserListParams = z.infer<typeof userListParamsSchema>;

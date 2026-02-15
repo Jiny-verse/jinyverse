@@ -114,8 +114,36 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         }
         user.applyUpdate(requestDto);
-        User updated = userRepository.save(user);
-        return updated.toResponseDto();
+        return user.toResponseDto();
+    }
+
+    @Transactional
+    public UserResponseDto update(UUID id, com.jinyverse.backend.domain.user.dto.UserUpdateDto updateDto) {
+        User user = userRepository.findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", id));
+
+        if (updateDto.getPassword() != null && !updateDto.getPassword().isBlank()) {
+            if (updateDto.getCurrentPassword() == null
+                    || !passwordEncoder.matches(updateDto.getCurrentPassword(), user.getPassword())) {
+                throw new BadRequestException("INVALID_PASSWORD", "현재 비밀번호가 일치하지 않습니다.");
+            }
+            user.setPassword(passwordEncoder.encode(updateDto.getPassword()));
+        }
+
+        if (updateDto.getName() != null)
+            user.setName(updateDto.getName());
+        if (updateDto.getNickname() != null)
+            user.setNickname(updateDto.getNickname());
+        if (updateDto.getEmail() != null)
+            user.setEmail(updateDto.getEmail());
+        if (updateDto.getIsActive() != null)
+            user.setIsActive(updateDto.getIsActive());
+        if (updateDto.getIsLocked() != null)
+            user.setIsLocked(updateDto.getIsLocked());
+        if (updateDto.getRole() != null)
+            user.setRole(updateDto.getRole());
+
+        return user.toResponseDto();
     }
 
     @Transactional

@@ -12,7 +12,7 @@ export function useImageUrlFromFileId(
   const urlRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!fileId || !apiOptions?.baseUrl) {
+    if (!fileId || !apiOptions) {
       if (urlRef.current) {
         URL.revokeObjectURL(urlRef.current);
         urlRef.current = null;

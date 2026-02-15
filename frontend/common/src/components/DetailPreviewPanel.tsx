@@ -9,8 +9,8 @@ export interface DetailPreviewPanelProps {
   children: ReactNode;
   /** 닫기 버튼 클릭 시 → 미리보기 패널 숨김 */
   onClose: () => void;
-  /** 확장 버튼 클릭 시 이동할 URL (전체 상세 페이지) */
-  expandHref: string;
+  /** 확장 버튼 클릭 시 이동할 URL (전체 상세 페이지). 생략하면 버튼 숨김 */
+  expandHref?: string;
   /** 로딩 중일 때 true → children 대신 스피너 표시 */
   isLoading?: boolean;
   /** 패널 제목 (선택) */
@@ -33,12 +33,14 @@ export function DetailPreviewPanel({
       <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-gray-200 bg-white shrink-0">
         {title && <span className="text-sm font-medium text-gray-700 truncate">{title}</span>}
         <div className="flex items-center gap-2 ml-auto shrink-0">
-          <Link
-            href={expandHref}
-            className="rounded px-3 py-1.5 text-sm font-medium text-(--btn-primary,#374151) hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-(--focus-ring,#6b7280)"
-          >
-            확장
-          </Link>
+          {expandHref && (
+            <Link
+              href={expandHref}
+              className="rounded px-3 py-1.5 text-sm font-medium text-(--btn-primary,#374151) hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-(--focus-ring,#6b7280)"
+            >
+              확장
+            </Link>
+          )}
           <button
             type="button"
             onClick={onClose}
