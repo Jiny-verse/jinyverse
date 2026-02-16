@@ -33,7 +33,7 @@ export function Toast({ message, type = 'info', isOpen, onClose, duration = 3000
     <div className="fixed top-4 right-4 z-50 animate-slide-in">
       <div className={`${typeStyles[type]} px-4 py-3 rounded-lg shadow-lg flex items-center gap-2`}>
         <span>{message}</span>
-        <button onClick={onClose} className="ml-2 text-white hover:text-gray-200">
+        <button type="button" onClick={onClose} className="ml-2 text-white hover:text-gray-200">
           ×
         </button>
       </div>

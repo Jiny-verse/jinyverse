@@ -35,7 +35,7 @@ export function SpecialCharDialog({ isOpen, onClose, onSelect }: SpecialCharDial
       size="sm"
       footer={
         <div className="flex justify-end">
-          <Button variant="ghost" size="sm" onClick={onClose}>
+          <Button type="button" variant="ghost" size="sm" onClick={onClose}>
             {t('ui.button.close', '닫기')}
           </Button>
         </div>
@@ -48,6 +48,7 @@ export function SpecialCharDialog({ isOpen, onClose, onSelect }: SpecialCharDial
             <div className="flex flex-wrap gap-1">
               {chars.map((char) => (
                 <button
+                  type="button"
                   key={char}
                   onClick={() => handleSelect(char)}
                   className="w-8 h-8 flex items-center justify-center text-base rounded border border-gray-200 hover:bg-gray-100 hover:border-gray-400 transition-colors font-mono"

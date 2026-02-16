@@ -28,7 +28,7 @@ export function AlertDialog({
       title={title}
       footer={
         <div className="flex justify-end">
-          <Button variant="primary" onClick={onClose}>
+          <Button type="button" variant="primary" onClick={onClose}>
             {buttonText}
           </Button>
         </div>

@@ -33,10 +33,10 @@ export function TableDialog({ isOpen, onClose, onConfirm }: TableDialogProps) {
       size="sm"
       footer={
         <div className="flex justify-end gap-2">
-          <Button variant="ghost" size="sm" onClick={onClose}>
+          <Button type="button" variant="ghost" size="sm" onClick={onClose}>
             {t('ui.button.cancel', '취소')}
           </Button>
-          <Button variant="primary" size="sm" onClick={handleConfirm}>
+          <Button type="button" variant="primary" size="sm" onClick={handleConfirm}>
             {t('ui.button.confirm', '확인')}
           </Button>
         </div>

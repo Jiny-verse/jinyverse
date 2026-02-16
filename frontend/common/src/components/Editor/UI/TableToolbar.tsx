@@ -50,6 +50,7 @@ function MiniColorPicker({
     <div ref={ref} className="relative">
       <Tooltip content={label} position="bottom">
         <Button
+          type="button"
           variant="ghost"
           size="sm"
           className="p-1.5 h-7 w-7"
@@ -62,6 +63,7 @@ function MiniColorPicker({
         <div className="absolute top-full left-0 mt-1 z-50 bg-white border border-gray-200 rounded shadow-md p-1.5 flex flex-wrap gap-1 w-[112px]">
           {colors.map((c) => (
             <button
+              type="button"
               key={c}
               title={c}
               onClick={() => { onSelect(c); setOpen(false); }}
@@ -114,17 +116,17 @@ export function TableToolbar({
 
       {/* Row operations */}
       <Tooltip content={t('editor.table.addRowAbove', '위에 행 추가')} position="bottom">
-        <Button variant="ghost" size="sm" className="p-1.5 h-7 w-7 hover:bg-blue-100" onClick={onAddRowAbove}>
+        <Button type="button" variant="ghost" size="sm" className="p-1.5 h-7 w-7 hover:bg-blue-100" onClick={onAddRowAbove}>
           <ArrowUpFromLine size={14} />
         </Button>
       </Tooltip>
       <Tooltip content={t('editor.table.addRowBelow', '아래에 행 추가')} position="bottom">
-        <Button variant="ghost" size="sm" className="p-1.5 h-7 w-7 hover:bg-blue-100" onClick={onAddRowBelow}>
+        <Button type="button" variant="ghost" size="sm" className="p-1.5 h-7 w-7 hover:bg-blue-100" onClick={onAddRowBelow}>
           <ArrowDownFromLine size={14} />
         </Button>
       </Tooltip>
       <Tooltip content={t('editor.table.deleteRow', '행 삭제')} position="bottom">
-        <Button variant="ghost" size="sm" className="p-1.5 h-7 w-7 hover:bg-red-100 text-red-500" onClick={onDeleteRow}>
+        <Button type="button" variant="ghost" size="sm" className="p-1.5 h-7 w-7 hover:bg-red-100 text-red-500" onClick={onDeleteRow}>
           <Trash2 size={14} />
         </Button>
       </Tooltip>
@@ -133,17 +135,17 @@ export function TableToolbar({
 
       {/* Column operations */}
       <Tooltip content={t('editor.table.addColLeft', '왼쪽에 열 추가')} position="bottom">
-        <Button variant="ghost" size="sm" className="p-1.5 h-7 w-7 hover:bg-blue-100" onClick={onAddColLeft}>
+        <Button type="button" variant="ghost" size="sm" className="p-1.5 h-7 w-7 hover:bg-blue-100" onClick={onAddColLeft}>
           <ArrowLeftFromLine size={14} />
         </Button>
       </Tooltip>
       <Tooltip content={t('editor.table.addColRight', '오른쪽에 열 추가')} position="bottom">
-        <Button variant="ghost" size="sm" className="p-1.5 h-7 w-7 hover:bg-blue-100" onClick={onAddColRight}>
+        <Button type="button" variant="ghost" size="sm" className="p-1.5 h-7 w-7 hover:bg-blue-100" onClick={onAddColRight}>
           <ArrowRightFromLine size={14} />
         </Button>
       </Tooltip>
       <Tooltip content={t('editor.table.deleteCol', '열 삭제')} position="bottom">
-        <Button variant="ghost" size="sm" className="p-1.5 h-7 w-7 hover:bg-red-100 text-red-500" onClick={onDeleteCol}>
+        <Button type="button" variant="ghost" size="sm" className="p-1.5 h-7 w-7 hover:bg-red-100 text-red-500" onClick={onDeleteCol}>
           <ArrowLeftFromLine size={14} className="opacity-0 absolute" />
           <Trash2 size={14} style={{ transform: 'rotate(90deg)' }} />
         </Button>
@@ -170,6 +172,7 @@ export function TableToolbar({
       {/* Delete table */}
       <Tooltip content={t('editor.table.deleteTable', '표 삭제')} position="bottom">
         <Button
+          type="button"
           variant="ghost"
           size="sm"
           className="flex items-center gap-1 px-2 h-7 text-red-600 text-xs hover:bg-red-100"

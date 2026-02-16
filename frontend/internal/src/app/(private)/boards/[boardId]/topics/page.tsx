@@ -2,28 +2,25 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import {
   getTopics,
   getTopic,
   getComments,
-  getMenus,
-  getTags,
-  createTopic,
-  updateTopic,
   deleteTopic,
 } from 'common/services';
-import { buildMenuTree, menuTreeToSelectOptionsByCode, formatRelativeOrAbsolute } from 'common';
+import { formatRelativeOrAbsolute } from 'common';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import { DetailPreviewPanel, FilterSelect, ContentViewer } from 'common/components';
 import { Badge } from 'common/ui';
-import type { Topic, TopicCreateInput, TopicUpdateInput, Comment } from 'common/types';
-import { Table, CreateDialog, UpdateDialog } from './_components';
+import type { Topic, Comment } from 'common/types';
+import { Table } from './_components';
 
 const MENU_NONE = { value: '', label: '(없음)' };
 
 export default function TopicsPage() {
   const params = useParams();
+  const router = useRouter();
   const boardId = params.boardId as string;
   const options = useApiOptions();
   const [data, setData] = useState<{
@@ -43,25 +40,6 @@ export default function TopicsPage() {
   const [previewTopic, setPreviewTopic] = useState<Topic | null>(null);
   const [previewComments, setPreviewComments] = useState<Comment[]>([]);
   const [previewLoading, setPreviewLoading] = useState(false);
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [editing, setEditing] = useState<Topic | null>(null);
-  const [menuOptions, setMenuOptions] = useState<{ value: string; label: string }[]>([MENU_NONE]);
-  const [tagOptions, setTagOptions] = useState<{ value: string; label: string }[]>([]);
-
-  useEffect(() => {
-    getMenus(options, { size: 100 })
-      .then((res) => {
-        const tree = buildMenuTree(res.content);
-        setMenuOptions([MENU_NONE, ...menuTreeToSelectOptionsByCode(tree)]);
-      })
-      .catch(() => setMenuOptions([MENU_NONE]));
-  }, [options.baseUrl, options.channel]);
-
-  useEffect(() => {
-    getTags(options, { usage: 'topic', size: 100 })
-      .then((res) => setTagOptions(res.content.map((t) => ({ value: t.id, label: t.name }))))
-      .catch(() => setTagOptions([]));
-  }, [options.baseUrl, options.channel]);
 
   const load = useCallback(() => {
     getTopics(options, {
@@ -107,30 +85,6 @@ export default function TopicsPage() {
       cancelled = true;
     };
   }, [options.baseUrl, options.channel, selectedTopicId]);
-
-  const handleCreate = async (values: TopicCreateInput, intent?: string) => {
-    await createTopic(options, {
-      ...values,
-      boardId: values.boardId ?? boardId,
-      status: intent ?? 'created',
-      tagIds: values.tagIds?.length ? values.tagIds : undefined,
-      files: values.files?.length ? values.files : undefined,
-    });
-    setCreateDialogOpen(false);
-    load();
-  };
-
-  const handleUpdate = async (values: TopicUpdateInput, intent?: string) => {
-    if (!editing) return;
-    await updateTopic(options, editing.id, {
-      ...values,
-      status: intent ?? editing.status,
-      tagIds: values.tagIds,
-      files: values.files,
-    });
-    setEditing(null);
-    load();
-  };
 
   const handleDelete = async (id: string) => {
     if (!confirm('삭제하시겠습니까?')) return;
@@ -212,8 +166,8 @@ export default function TopicsPage() {
             }
             selection={{ selectedIds, onSelectionChange: setSelectedIds }}
             onBatchDelete={selectedIds.length ? handleBatchDelete : undefined}
-            onAdd={() => setCreateDialogOpen(true)}
-            onEdit={(row) => setEditing(row)}
+            onAdd={() => router.push(`/boards/${boardId}/topics/create`)}
+            onEdit={(row) => router.push(`/boards/${boardId}/topics/${row.id}/edit`)}
             onDelete={handleDelete}
             onRowClick={(row) => setSelectedTopicId(row.id)}
             selectedRowId={selectedTopicId}
@@ -268,24 +222,6 @@ export default function TopicsPage() {
           </div>
         )}
       </div>
-      <CreateDialog
-        open={createDialogOpen}
-        boardId={boardId}
-        apiOptions={options}
-        menuOptions={menuOptions}
-        tagOptions={tagOptions}
-        onClose={() => setCreateDialogOpen(false)}
-        onSubmit={handleCreate}
-      />
-      <UpdateDialog
-        open={!!editing}
-        topic={editing}
-        apiOptions={options}
-        menuOptions={menuOptions}
-        tagOptions={tagOptions}
-        onClose={() => setEditing(null)}
-        onSubmit={handleUpdate}
-      />
     </div>
   );
 }

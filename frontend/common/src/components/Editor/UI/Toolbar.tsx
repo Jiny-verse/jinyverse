@@ -107,6 +107,7 @@ function ColorPickerButton({ item, core, label }: { item: ToolbarItem; core: IEd
     <div ref={ref} className="relative">
       <Tooltip content={label} position="bottom">
         <Button
+          type="button"
           variant="ghost"
           size="sm"
           onClick={() => setOpen((v) => !v)}
@@ -121,6 +122,7 @@ function ColorPickerButton({ item, core, label }: { item: ToolbarItem; core: IEd
         <div className="absolute top-full left-0 mt-1 z-50 bg-white border border-gray-200 rounded shadow-md p-2 flex flex-wrap gap-1 w-[148px]">
           {item.colorOptions?.map((color) => (
             <button
+              type="button"
               key={color}
               title={color}
               onClick={() => {
@@ -155,6 +157,7 @@ function SelectButton({ item, core, label }: { item: ToolbarItem; core: IEditorC
     <div ref={ref} className="relative">
       <Tooltip content={label} position="bottom">
         <Button
+          type="button"
           variant="ghost"
           size="sm"
           onClick={() => setOpen((v) => !v)}
@@ -169,6 +172,7 @@ function SelectButton({ item, core, label }: { item: ToolbarItem; core: IEditorC
         <div className="absolute top-full left-0 mt-1 z-50 bg-white border border-gray-200 rounded shadow-md py-1 min-w-[100px]">
           {item.selectOptions?.map((opt) => (
             <button
+              type="button"
               key={opt.value}
               onClick={() => {
                 if (core) item.onSelect?.(opt.value, core);
@@ -216,6 +220,7 @@ export function Toolbar({
       {/* Undo */}
       <Tooltip content={t('editor.toolbar.undo', '실행 취소')} position="bottom">
         <Button
+          type="button"
           variant="ghost"
           size="sm"
           disabled={!canUndo}
@@ -233,6 +238,7 @@ export function Toolbar({
       {/* Redo */}
       <Tooltip content={t('editor.toolbar.redo', '다시 실행')} position="bottom">
         <Button
+          type="button"
           variant="ghost"
           size="sm"
           disabled={!canRedo}
@@ -272,6 +278,7 @@ export function Toolbar({
         return (
           <Tooltip key={item.id} content={label} position="bottom">
             <Button
+              type="button"
               variant="ghost"
               size="sm"
               onClick={() => item.action?.(core!)}
@@ -299,6 +306,7 @@ export function Toolbar({
         position="bottom"
       >
         <Button
+          type="button"
           variant="ghost"
           size="sm"
           onClick={onModeToggle}

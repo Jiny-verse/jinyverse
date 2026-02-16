@@ -48,10 +48,10 @@ export function LinkDialog({ isOpen, onClose, onConfirm, initialText }: LinkDial
       size="sm"
       footer={
         <div className="flex justify-end gap-2">
-          <Button variant="ghost" size="sm" onClick={handleClose}>
+          <Button type="button" variant="ghost" size="sm" onClick={handleClose}>
             {t('ui.button.cancel', '취소')}
           </Button>
-          <Button variant="primary" size="sm" onClick={handleConfirm} disabled={!url.trim()}>
+          <Button type="button" variant="primary" size="sm" onClick={handleConfirm} disabled={!url.trim()}>
             {t('ui.button.confirm', '확인')}
           </Button>
         </div>

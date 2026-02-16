@@ -112,12 +112,13 @@ export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
       size="lg"
       footer={
         <div className="flex justify-end gap-2">
-          <Button variant="secondary" onClick={onClose}>
+          <Button type="button" variant="secondary" onClick={onClose}>
             취소
           </Button>
           {submitButtons?.length
             ? submitButtons.map((btn) => (
                 <Button
+                  type="button"
                   key={btn.intent}
                   onClick={() => handleSubmit(btn.intent)}
                   disabled={submitting}
@@ -126,7 +127,7 @@ export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
                 </Button>
               ))
             : (
-                <Button onClick={() => handleSubmit()} disabled={submitting}>
+                <Button type="button" onClick={() => handleSubmit()} disabled={submitting}>
                   {submitting ? '저장 중...' : mode === 'create' ? '생성' : '수정'}
                 </Button>
               )}

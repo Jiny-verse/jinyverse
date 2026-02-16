@@ -61,7 +61,7 @@ export function DataTable<T extends Record<string, unknown>>({
     ) : null;
 
   const toolbarActionSlot = onAdd ? (
-    <Button size="sm" onClick={onAdd}>
+    <Button type="button" size="sm" onClick={onAdd}>
       {addButtonLabel}
     </Button>
   ) : null;

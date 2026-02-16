@@ -39,10 +39,10 @@ export function ConfirmDialog({
       title={title || t('message.confirm')}
       footer={
         <div className="flex justify-end gap-2">
-          <Button variant="ghost" onClick={onClose}>
+          <Button type="button" variant="ghost" onClick={onClose}>
             {cancelText || t('ui.button.cancel')}
           </Button>
-          <Button variant={variant === 'danger' ? 'danger' : 'primary'} onClick={handleConfirm}>
+          <Button type="button" variant={variant === 'danger' ? 'danger' : 'primary'} onClick={handleConfirm}>
             {confirmText || t('ui.button.confirm')}
           </Button>
         </div>

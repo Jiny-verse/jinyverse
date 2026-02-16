@@ -65,10 +65,11 @@ export function ImageDialog({ isOpen, onClose, onConfirm, onUpload }: ImageDialo
       size="sm"
       footer={
         <div className="flex justify-end gap-2">
-          <Button variant="ghost" size="sm" onClick={handleClose}>
+          <Button type="button" variant="ghost" size="sm" onClick={handleClose}>
             {t('ui.button.cancel', '취소')}
           </Button>
           <Button
+            type="button"
             variant="primary"
             size="sm"
             onClick={handleConfirm}
@@ -87,6 +88,7 @@ export function ImageDialog({ isOpen, onClose, onConfirm, onUpload }: ImageDialo
             </label>
             <div className="flex items-center gap-2">
               <Button
+                type="button"
                 variant="secondary"
                 size="sm"
                 onClick={() => fileInputRef.current?.click()}
