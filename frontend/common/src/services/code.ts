@@ -1,5 +1,5 @@
 import type { ApiOptions } from '../types/api';
-import { apiGet } from './api';
+import { apiGet, apiPost, apiPut, apiDelete } from './api';
 
 export type Code = {
   categoryCode: string;
@@ -16,8 +16,29 @@ export type Code = {
   deletedAt?: string | null;
 };
 
+export type CodeCategory = {
+  code: string;
+  isSealed: boolean;
+  name: string;
+  description?: string;
+  note?: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt?: string | null;
+};
+
 type CodePageResponse = {
   content: Code[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+};
+
+type CodeCategoryPageResponse = {
+  content: CodeCategory[];
   totalElements: number;
   totalPages: number;
   size: number;
@@ -37,4 +58,83 @@ export async function getCodes(
     size: params.size ?? 100,
   });
   return res.content ?? [];
+}
+
+/** 공통코드 분류 목록 조회 */
+export async function getCodeCategories(
+  options: ApiOptions,
+  params?: { page?: number; size?: number; q?: string }
+): Promise<CodeCategoryPageResponse> {
+  return apiGet<CodeCategoryPageResponse>(options, '/api/code-categories', {
+    page: params?.page ?? 0,
+    size: params?.size ?? 10,
+    q: params?.q,
+  });
+}
+
+/** 공통코드 분류 생성 */
+export async function createCodeCategory(
+  options: ApiOptions,
+  data: Omit<CodeCategory, 'createdAt' | 'updatedAt' | 'deletedAt'>
+): Promise<CodeCategory> {
+  return apiPost<CodeCategory>(options, '/api/code-categories', data);
+}
+
+/** 공통코드 분류 수정 */
+export async function updateCodeCategory(
+  options: ApiOptions,
+  code: string,
+  data: Partial<Omit<CodeCategory, 'code' | 'createdAt' | 'updatedAt' | 'deletedAt'>>
+): Promise<CodeCategory> {
+  return apiPut<CodeCategory>(options, `/api/code-categories/${code}`, data);
+}
+
+/** 공통코드 분류 삭제 */
+export async function deleteCodeCategory(options: ApiOptions, code: string): Promise<void> {
+  return apiDelete(options, `/api/code-categories/${code}`);
+}
+
+/** 공통코드 생성 */
+export async function createCode(
+  options: ApiOptions,
+  data: {
+    categoryCode: string;
+    code: string;
+    name: string;
+    value?: string;
+    description?: string;
+    note?: string;
+    order?: number;
+    upperCategoryCode?: string;
+    upperCode?: string;
+  }
+): Promise<Code> {
+  return apiPost<Code>(options, '/api/codes', data);
+}
+
+/** 공통코드 수정 */
+export async function updateCode(
+  options: ApiOptions,
+  catCode: string,
+  code: string,
+  data: Partial<{
+    name: string;
+    value: string;
+    description: string;
+    note: string;
+    order: number;
+    upperCategoryCode: string;
+    upperCode: string;
+  }>
+): Promise<Code> {
+  return apiPut<Code>(options, `/api/codes/${catCode}/${code}`, {
+    categoryCode: catCode,
+    code,
+    ...data,
+  });
+}
+
+/** 공통코드 삭제 */
+export async function deleteCode(options: ApiOptions, catCode: string, code: string): Promise<void> {
+  return apiDelete(options, `/api/codes/${catCode}/${code}`);
 }
