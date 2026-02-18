@@ -6,20 +6,20 @@ import {
   FormContainer,
   FormSection,
   FormField,
-  FormFieldGroup,
   FormActions,
-  Editor,
   FileAttachmentField,
+  TopicFormRenderer,
 } from 'common/components';
-import { Input, Switch, TagInput, DateTimePicker } from 'common/ui';
 import { createTopic, updateTopic } from 'common/services';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import { useAuth } from 'common';
-import type { Topic, TopicCreateInput, FileAttachmentItem } from 'common/schemas';
+import type { Topic, TopicCreateInput, FileAttachmentItem, Board } from 'common/schemas';
+import type { TopicFormState, TopicFormHandlers } from 'common/components';
+import type { BoardType } from 'common/constants';
 
 interface TopicFormProps {
   mode: 'create' | 'edit';
-  boardId: string;
+  board: Board;
   topicId?: string;
   initialData?: Partial<Topic>;
   onSuccess?: (topicId: string) => void;
@@ -28,7 +28,7 @@ interface TopicFormProps {
 
 export function TopicForm({
   mode,
-  boardId,
+  board,
   topicId,
   initialData,
   onSuccess,
@@ -37,78 +37,126 @@ export function TopicForm({
   const router = useRouter();
   const apiOptions = useApiOptions();
   const { user } = useAuth();
-  
+  const boardType = (board.type ?? 'normal') as BoardType;
+
   // Form state
   const [title, setTitle] = useState(initialData?.title || '');
   const [content, setContent] = useState(initialData?.content || '');
   const [isPublic, setIsPublic] = useState(initialData?.isPublic ?? true);
   const [isNotice, setIsNotice] = useState(initialData?.isNotice ?? false);
   const [isPinned, setIsPinned] = useState(initialData?.isPinned ?? false);
-  const [tags, setTags] = useState<string[]>(initialData?.tags?.map(t => t.name) || []);
-  const [files, setFiles] = useState<FileAttachmentItem[]>(
-    initialData?.files?.map(f => ({ fileId: f.fileId, order: f.order, isMain: f.isMain })) || []
-  );
+  const [tags, setTags] = useState<string[]>(initialData?.tags?.map((t) => t.name) || []);
   const [publishedAt, setPublishedAt] = useState(initialData?.publishedAt || '');
-  
+
+  // 기본 파일 첨부 (normal 타입)
+  const [files, setFiles] = useState<FileAttachmentItem[]>(
+    initialData?.files
+      ?.filter((f) => !f.isMain)
+      .map((f) => ({ fileId: f.fileId, order: f.order, isMain: f.isMain })) || []
+  );
+
+  // 썸네일/커버 파일 (blog/project/gallery 대표이미지)
+  const [thumbnailFile, setThumbnailFile] = useState<FileAttachmentItem[]>(
+    initialData?.files
+      ?.filter((f) => f.isMain)
+      .map((f) => ({ fileId: f.fileId, order: f.order, isMain: f.isMain })) || []
+  );
+
+  // 갤러리 추가 이미지 (isMain=false 인 파일들)
+  const [additionalFiles, setAdditionalFiles] = useState<FileAttachmentItem[]>(
+    boardType === 'gallery'
+      ? initialData?.files
+          ?.filter((f) => !f.isMain)
+          .map((f) => ({ fileId: f.fileId, order: f.order, isMain: f.isMain })) || []
+      : []
+  );
+
   // UI state
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [isDraftSaving, setIsDraftSaving] = useState(false);
 
-  // File metadata for preview if editing
-  const initialFileMeta = useMemo(() => {
-    const meta: Record<string, { originalName: string }> = {};
-    // Topic 상세 조회 데이터에 file 정보가 포함되어 있다고 가정
-    // fileId만으로는 이름을 알 수 없으므로 topic 데이터의 관계 필드를 활용해야 함
-    // (이 예시는 단순화를 위해 생략하거나 topic schema에 따라 구성)
-    return meta;
-  }, []);
+  const state: TopicFormState = {
+    title,
+    content,
+    isPublic,
+    isNotice,
+    isPinned,
+    tags,
+    thumbnailFile,
+    additionalFiles,
+    publishedAt,
+    errors,
+    isSaving,
+    isDraftSaving,
+  };
+
+  const handlers: TopicFormHandlers = {
+    setTitle,
+    setContent,
+    setIsPublic,
+    setIsNotice,
+    setIsPinned,
+    setTags,
+    setThumbnailFile,
+    setAdditionalFiles,
+    setPublishedAt,
+  };
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!title.trim()) {
       newErrors.title = '제목을 입력하세요';
     } else if (title.length > 200) {
       newErrors.title = '제목은 최대 200자까지 입력 가능합니다';
     }
-    
-    if (!content.trim()) {
+
+    if (boardType !== 'gallery' && !content.trim()) {
       newErrors.content = '내용을 입력하세요';
     }
-    
+
+    if (boardType === 'gallery' && thumbnailFile.length === 0) {
+      newErrors.thumbnailFile = '대표 이미지를 등록하세요';
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+  const buildFiles = (): FileAttachmentItem[] => {
+    if (boardType === 'normal') {
+      return files;
+    }
+    if (boardType === 'gallery') {
+      return [...thumbnailFile, ...additionalFiles];
+    }
+    // blog / project
+    return [...thumbnailFile, ...files];
+  };
+
   const saveTopic = async (status: string) => {
     if (!validateForm()) return;
-    
+
     if (status === 'created') setIsSaving(true);
     else setIsDraftSaving(true);
-    
+
     try {
-      // 태그 처리: 현재 프로젝트는 string[]이 아닌 tagIds 또는 tagNames를 기대할 수 있음
-      // topicCreateSchema 확인 결과 tagIds를 받음 (UUID[])
-      // 여기서는 단순화를 위해 태그 이름 그대로 사용하거나 백엔드 요구사항에 맞춰 변환 필요
-      // TODO: Tag 처리는 실제 백엔드 API 명세에 따라 고도화 필요
-      
       const payload: TopicCreateInput = {
         authorUserId: user?.userId || '',
-        boardId,
+        boardId: board.id,
         title: title.trim(),
-        content: content.trim(),
+        content: boardType === 'gallery' && !content.trim() ? ' ' : content.trim(),
         isNotice,
         isPinned,
         isPublic,
         status,
         publishedAt: publishedAt || undefined,
-        files: files,
-        // tagIds: tags... // 태그 구현 방식에 따라 추가
+        files: buildFiles(),
       };
-      
+
       let resultId: string;
-      
+
       if (mode === 'create') {
         const result = await createTopic(apiOptions, payload);
         resultId = result.id;
@@ -116,13 +164,12 @@ export function TopicForm({
         const result = await updateTopic(apiOptions, topicId!, payload);
         resultId = result.id;
       }
-      
+
       if (status === 'created') {
         onSuccess?.(resultId);
       } else {
-        // 임시저장 성공 시
         if (mode === 'create') {
-          router.push(`/boards/${boardId}/topics/${resultId}/edit`);
+          router.push(`/boards/${board.id}/topics/${resultId}/edit`);
         }
       }
     } catch (error: any) {
@@ -144,82 +191,27 @@ export function TopicForm({
 
   return (
     <div className="max-w-5xl mx-auto">
-      <FormContainer onSubmit={(e) => { e.preventDefault(); saveTopic('created'); }} disabled={isSaving || isDraftSaving}>
-        <FormSection 
-          title="기본 정보" 
-          description="게시글의 제목과 내용을 입력하세요"
-        >
-          <FormField
-            label="제목"
-            name="title"
-            required
-            error={errors.title}
-            description="게시글 제목 (최대 200자)"
-          >
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              maxLength={200}
-              placeholder="제목을 입력하세요"
-              autoFocus
-            />
-          </FormField>
+      <FormContainer
+        onSubmit={(e) => {
+          e.preventDefault();
+          saveTopic('created');
+        }}
+        disabled={isSaving || isDraftSaving}
+      >
+        <TopicFormRenderer board={board} state={state} handlers={handlers} apiOptions={apiOptions} />
 
-          <FormField
-            label="본문"
-            name="content"
-            required
-            error={errors.content}
-          >
-            <Editor
-              defaultValue={content}
-              onChange={setContent}
-              defaultMode="text"
-              minHeight="500px"
-              placeholder="내용을 입력하세요..."
-            />
-          </FormField>
-        </FormSection>
-
-        <FormSection title="추가 설정" description="태그와 파일을 관리하세요">
-          <FormFieldGroup columns={2} gap="lg">
-            <FormField label="태그" name="tags" description="Enter 또는 콤마(,)로 추가">
-              <TagInput selected={tags} onChange={setTags} maxTags={10} />
-            </FormField>
-            
-            <FormField label="파일 첨부" name="files" description="드래그 앤 드롭 지원">
+        {boardType === 'normal' && (
+          <FormSection title="파일 첨부" description="파일을 첨부하세요">
+            <FormField label="파일" name="files" description="드래그 앤 드롭 지원">
               <FileAttachmentField
                 apiOptions={apiOptions}
                 value={files}
                 onChange={setFiles}
-                fileMeta={initialFileMeta}
                 multiple={true}
               />
             </FormField>
-          </FormFieldGroup>
-        </FormSection>
-
-        <FormSection title="게시 및 노출 설정">
-          <FormFieldGroup columns={2} gap="lg">
-            <FormField label="게시 일시" name="publishedAt" description="예약 게시가 필요한 경우 설정하세요">
-              <DateTimePicker value={publishedAt} onChange={setPublishedAt} />
-            </FormField>
-            
-            <div className="flex gap-6 pt-4">
-              <FormField label="공개" name="isPublic">
-                <Switch checked={isPublic} onChange={(e) => setIsPublic(e.target.checked)} />
-              </FormField>
-              
-              <FormField label="공지" name="isNotice">
-                <Switch checked={isNotice} onChange={(e) => setIsNotice(e.target.checked)} />
-              </FormField>
-              
-              <FormField label="상단 고정" name="isPinned">
-                <Switch checked={isPinned} onChange={(e) => setIsPinned(e.target.checked)} />
-              </FormField>
-            </div>
-          </FormFieldGroup>
-        </FormSection>
+          </FormSection>
+        )}
 
         {errors.submit && (
           <div className="p-3 bg-red-100 border border-red-200 text-red-700 rounded text-sm mb-4">

@@ -8,21 +8,27 @@ import {
   getTopic,
   getComments,
   deleteTopic,
+  getBoard,
 } from 'common/services';
 import { formatRelativeOrAbsolute } from 'common';
 import { useApiOptions } from '@/app/providers/ApiProvider';
-import { DetailPreviewPanel, FilterSelect, ContentViewer } from 'common/components';
-import { Badge } from 'common/ui';
-import type { Topic, Comment } from 'common/types';
+import {
+  DetailPreviewPanel,
+  FilterSelect,
+  ContentViewer,
+  TopicListRenderer,
+} from 'common/components';
+import { Badge, PaginationFooter } from 'common/ui';
+import type { Topic, Comment, Board } from 'common/types';
 import { Table } from './_components';
-
-const MENU_NONE = { value: '', label: '(없음)' };
 
 export default function TopicsPage() {
   const params = useParams();
   const router = useRouter();
   const boardId = params.boardId as string;
   const options = useApiOptions();
+
+  const [board, setBoard] = useState<Board | null>(null);
   const [data, setData] = useState<{
     content: Topic[];
     totalElements: number;
@@ -40,6 +46,13 @@ export default function TopicsPage() {
   const [previewTopic, setPreviewTopic] = useState<Topic | null>(null);
   const [previewComments, setPreviewComments] = useState<Comment[]>([]);
   const [previewLoading, setPreviewLoading] = useState(false);
+
+  // 게시판 정보 로드
+  useEffect(() => {
+    getBoard(options, boardId)
+      .then(setBoard)
+      .catch(() => setBoard(null));
+  }, [options.baseUrl, options.channel, boardId]);
 
   const load = useCallback(() => {
     getTopics(options, {
@@ -113,6 +126,8 @@ export default function TopicsPage() {
   }
 
   const hasPreview = selectedTopicId != null;
+  const boardType = board?.type ?? 'normal';
+  const isNormal = boardType === 'normal';
 
   return (
     <div className="">
@@ -122,56 +137,127 @@ export default function TopicsPage() {
       <h1 className="text-2xl font-bold mb-6">게시글 관리</h1>
       <div className={hasPreview ? 'flex gap-0 h-[calc(100vh-10rem)] min-h-[400px]' : ''}>
         <div className={hasPreview ? 'w-1/2 min-w-0 pr-4 flex flex-col' : ''}>
-          <Table
-            boardId={boardId}
-            data={data?.content ?? []}
-            isLoading={!data}
-            pagination={
-              data
-                ? {
-                    page,
-                    size,
-                    totalElements: data.totalElements,
-                    totalPages: data.totalPages,
-                    onPageChange: setPage,
-                    onSizeChange: (s) => {
-                      setSize(s);
-                      setPage(0);
-                    },
-                  }
-                : undefined
-            }
-            search={{
-              value: search,
-              onChange: (v) => {
-                setSearch(v);
-                setPage(0);
-              },
-              placeholder: '제목·내용 검색',
-            }}
-            filterSlot={
-              <FilterSelect
-                label="공개 여부"
-                value={isPublic === undefined ? '' : isPublic ? 'true' : 'false'}
-                options={[
-                  { value: 'true', label: '공개' },
-                  { value: 'false', label: '비공개' },
-                ]}
-                placeholder="전체"
-                onChange={(v) => {
-                  setIsPublic(v === '' ? undefined : v === 'true');
+          {isNormal ? (
+            <Table
+              boardId={boardId}
+              data={data?.content ?? []}
+              isLoading={!data}
+              pagination={
+                data
+                  ? {
+                      page,
+                      size,
+                      totalElements: data.totalElements,
+                      totalPages: data.totalPages,
+                      onPageChange: setPage,
+                      onSizeChange: (s) => {
+                        setSize(s);
+                        setPage(0);
+                      },
+                    }
+                  : undefined
+              }
+              search={{
+                value: search,
+                onChange: (v) => {
+                  setSearch(v);
                   setPage(0);
-                }}
-              />
-            }
-            selection={{ selectedIds, onSelectionChange: setSelectedIds }}
-            onBatchDelete={selectedIds.length ? handleBatchDelete : undefined}
-            onAdd={() => router.push(`/boards/${boardId}/topics/create`)}
-            onEdit={(row) => router.push(`/boards/${boardId}/topics/${row.id}/edit`)}
-            onDelete={handleDelete}
-            onRowClick={(row) => setSelectedTopicId(row.id)}
-            selectedRowId={selectedTopicId}
-          />
+                },
+                placeholder: '제목·내용 검색',
+              }}
+              filterSlot={
+                <FilterSelect
+                  label="공개 여부"
+                  value={isPublic === undefined ? '' : isPublic ? 'true' : 'false'}
+                  options={[
+                    { value: 'true', label: '공개' },
+                    { value: 'false', label: '비공개' },
+                  ]}
+                  placeholder="전체"
+                  onChange={(v) => {
+                    setIsPublic(v === '' ? undefined : v === 'true');
+                    setPage(0);
+                  }}
+                />
+              }
+              selection={{ selectedIds, onSelectionChange: setSelectedIds }}
+              onBatchDelete={selectedIds.length ? handleBatchDelete : undefined}
+              onAdd={() => router.push(`/boards/${boardId}/topics/create`)}
+              onEdit={(row) => router.push(`/boards/${boardId}/topics/${row.id}/edit`)}
+              onDelete={handleDelete}
+              onRowClick={(row) => setSelectedTopicId(row.id)}
+              selectedRowId={selectedTopicId}
+            />
+          ) : (
+            <div className="flex flex-col gap-4">
+              {/* 어드민 툴바 */}
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={search}
+                    onChange={(e) => { setSearch(e.target.value); setPage(0); }}
+                    placeholder="제목·내용 검색"
+                    className="border border-gray-300 rounded px-3 py-1.5 text-sm w-60"
+                  />
+                  <FilterSelect
+                    label="공개 여부"
+                    value={isPublic === undefined ? '' : isPublic ? 'true' : 'false'}
+                    options={[
+                      { value: 'true', label: '공개' },
+                      { value: 'false', label: '비공개' },
+                    ]}
+                    placeholder="전체"
+                    onChange={(v) => {
+                      setIsPublic(v === '' ? undefined : v === 'true');
+                      setPage(0);
+                    }}
+                  />
+                </div>
+                <div className="flex items-center gap-2">
+                  {selectedIds.length > 0 && (
+                    <button
+                      onClick={handleBatchDelete}
+                      className="px-3 py-1.5 text-sm text-red-600 border border-red-200 rounded hover:bg-red-50"
+                    >
+                      선택 삭제 ({selectedIds.length})
+                    </button>
+                  )}
+                  <button
+                    onClick={() => router.push(`/boards/${boardId}/topics/create`)}
+                    className="px-3 py-1.5 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
+                  >
+                    + 추가
+                  </button>
+                </div>
+              </div>
+
+              {/* 타입별 목록 렌더러 */}
+              {board && data ? (
+                <TopicListRenderer
+                  board={board}
+                  topics={data.content}
+                  apiOptions={options}
+                  onTopicClick={(topic) => setSelectedTopicId(topic.id)}
+                />
+              ) : (
+                <div className="py-8 text-center text-gray-400">로딩 중...</div>
+              )}
+
+              {/* 페이지네이션 */}
+              {data && (
+                <PaginationFooter
+                  page={page}
+                  size={size}
+                  totalElements={data.totalElements}
+                  totalPages={data.totalPages}
+                  onPageChange={setPage}
+                  onSizeChange={(s) => { setSize(s); setPage(0); }}
+                  currentCount={data.content.length}
+                />
+              )}
+            </div>
+          )}
         </div>
         {hasPreview && (
           <div className="w-1/2 min-w-0 flex flex-col">
@@ -185,7 +271,9 @@ export default function TopicsPage() {
                 <>
                   <article className="rounded-lg border border-gray-200 bg-white p-4 mb-4">
                     <p className="text-sm text-gray-500 mb-2">
-                      {previewTopic.author?.nickname ?? '-'} · {formatRelativeOrAbsolute(previewTopic.createdAt)} · 조회 {previewTopic.viewCount ?? 0}
+                      {previewTopic.author?.nickname ?? '-'} ·{' '}
+                      {formatRelativeOrAbsolute(previewTopic.createdAt)} · 조회{' '}
+                      {previewTopic.viewCount ?? 0}
                     </p>
                     {previewTopic.tags?.length ? (
                       <div className="flex flex-wrap gap-1 mb-2">
@@ -210,7 +298,10 @@ export default function TopicsPage() {
                             key={c.id}
                             className="rounded border border-gray-200 p-2 bg-white text-sm"
                           >
-                            <p className="text-gray-500 text-xs">{c.author?.nickname ?? '-'} · {formatRelativeOrAbsolute(c.createdAt)}</p>
+                            <p className="text-gray-500 text-xs">
+                              {c.author?.nickname ?? '-'} ·{' '}
+                              {formatRelativeOrAbsolute(c.createdAt)}
+                            </p>
                             <p className="mt-0.5 text-gray-900">{c.content}</p>
                           </li>
                         ))}

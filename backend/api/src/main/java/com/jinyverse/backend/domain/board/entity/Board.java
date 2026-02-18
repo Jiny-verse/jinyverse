@@ -88,7 +88,7 @@ public class Board extends BaseEntity {
         return Board.builder()
                 .menuCode(dto.getMenuCode())
                 .typeCategoryCode(blankToNull(dto.getTypeCategoryCode()) != null ? dto.getTypeCategoryCode() : "board_type")
-                .type(blankToNull(dto.getType()) != null ? dto.getType() : "project")
+                .type(blankToNull(dto.getType()) != null ? dto.getType() : "normal")
                 .name(dto.getName())
                 .description(dto.getDescription())
                 .note(dto.getNote())

@@ -26,7 +26,9 @@
       "common/types": ["../common/src/types"],
       "common/data": ["../common/src/data"],
       "common/ui": ["../common/src/ui"],
-      "common/services": ["../common/src/services"]
+      "common/services": ["../common/src/services"],
+      "common/constants": ["../common/src/constants"],
+      "common/hooks": ["../common/src/hooks"]
     },
     "target": "ES2017"
   },

@@ -8,3 +8,4 @@ export * from './Table';
 export * from './File';
 export * from './Editor';
 export * from './Form';
+export * from './Topic';

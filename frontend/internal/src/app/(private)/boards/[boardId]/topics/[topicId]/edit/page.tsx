@@ -3,35 +3,31 @@
 import { TopicForm } from '@/components/topic';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import type { Topic } from 'common/schemas';
+import { getBoard, getTopic } from 'common/services';
+import { useApiOptions } from '@/app/providers/ApiProvider';
+import type { Topic, Board } from 'common/schemas';
 
 export default function EditTopicPage() {
   const params = useParams();
   const router = useRouter();
   const boardId = params.boardId as string;
   const topicId = params.topicId as string;
-  
+  const options = useApiOptions();
+
+  const [board, setBoard] = useState<Board | null>(null);
   const [topic, setTopic] = useState<Topic | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchTopic = async () => {
-      try {
-        const response = await fetch(`/api/topics/${topicId}`);
-        if (!response.ok) throw new Error('Failed to fetch topic');
-        const data = await response.json();
-        setTopic(data);
-      } catch (err) {
-        console.error('Failed to fetch topic:', err);
-        setError('게시글을 불러오는데 실패했습니다.');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchTopic();
-  }, [topicId]);
+    Promise.all([getBoard(options, boardId), getTopic(options, topicId)])
+      .then(([b, t]) => {
+        setBoard(b);
+        setTopic(t);
+      })
+      .catch(() => setError('데이터를 불러오는데 실패했습니다.'))
+      .finally(() => setIsLoading(false));
+  }, [boardId, topicId]);
 
   if (isLoading) {
     return (
@@ -41,10 +37,10 @@ export default function EditTopicPage() {
     );
   }
 
-  if (error || !topic) {
+  if (error || !board || !topic) {
     return (
       <div className="container mx-auto py-8 px-4">
-        <div className="text-red-500">{error || '게시글을 찾을 수 없습니다.'}</div>
+        <div className="text-red-500">{error || '데이터를 찾을 수 없습니다.'}</div>
       </div>
     );
   }
@@ -56,7 +52,7 @@ export default function EditTopicPage() {
       </h1>
       <TopicForm
         mode="edit"
-        boardId={boardId}
+        board={board}
         topicId={topicId}
         initialData={topic}
         onSuccess={() => router.push(`/boards/${boardId}/topics/${topicId}`)}
