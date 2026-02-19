@@ -8,3 +8,7 @@ export { FileAttachmentField } from './FileAttachmentField';
 export type { FileAttachmentFieldProps } from './FileAttachmentField';
 export { SingleImageField } from './SingleImageField';
 export type { SingleImageFieldProps } from './SingleImageField';
+export { ImagePreviewField } from './ImagePreviewField';
+export type { ImagePreviewFieldProps } from './ImagePreviewField';
+export { ImageGridField } from './ImageGridField';
+export type { ImageGridFieldProps } from './ImageGridField';

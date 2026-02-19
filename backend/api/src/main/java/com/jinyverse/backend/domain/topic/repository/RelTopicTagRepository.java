@@ -14,4 +14,6 @@ public interface RelTopicTagRepository extends JpaRepository<RelTopicTag, UUID> 
     List<RelTopicTag> findByTopicIdIn(List<UUID> topicIds);
 
     void deleteByTopicId(UUID topicId);
+
+    void deleteByTagId(UUID tagId);
 }

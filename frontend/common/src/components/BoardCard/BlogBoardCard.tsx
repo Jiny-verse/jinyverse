@@ -1,19 +1,19 @@
 'use client';
 
-import type { ApiOptions } from '../../../types/api';
-import type { Topic } from '../../../schemas/topic';
-import { Badge } from '../../../ui/Badge';
-import { formatRelativeOrAbsolute } from '../../../utils/formatDateTime';
-import { getMainFileId, getExcerpt } from '../../../utils/topic';
-import { useImageUrlFromFileId } from '../../../hooks/useImageUrlFromFileId';
+import type { ApiOptions } from '../../types/api';
+import type { Topic } from '../../schemas/topic';
+import { Badge } from '../../ui/Badge';
+import { formatRelativeOrAbsolute } from '../../utils/formatDateTime';
+import { getMainFileId, getExcerpt } from '../../utils/post';
+import { useImageUrlFromFileId } from '../../hooks/useImageUrlFromFileId';
 
-interface BlogTopicCardProps {
+interface BlogBoardCardProps {
   topic: Topic;
   apiOptions: ApiOptions;
   onClick?: () => void;
 }
 
-export function BlogTopicCard({ topic, apiOptions, onClick }: BlogTopicCardProps) {
+export function BlogBoardCard({ topic, apiOptions, onClick }: BlogBoardCardProps) {
   const mainFileId = getMainFileId(topic);
   const thumbnailUrl = useImageUrlFromFileId(mainFileId, apiOptions);
   const excerpt = getExcerpt(topic.content);

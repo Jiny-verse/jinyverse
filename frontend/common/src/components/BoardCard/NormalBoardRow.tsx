@@ -1,15 +1,15 @@
 'use client';
 
-import type { Topic } from '../../../schemas/topic';
-import { Badge } from '../../../ui/Badge';
-import { formatRelativeOrAbsolute } from '../../../utils/formatDateTime';
+import type { Topic } from '../../schemas/topic';
+import { Badge } from '../../ui/Badge';
+import { formatRelativeOrAbsolute } from '../../utils/formatDateTime';
 
-interface NormalTopicRowProps {
+interface NormalBoardRowProps {
   topic: Topic;
   onClick?: () => void;
 }
 
-export function NormalTopicRow({ topic, onClick }: NormalTopicRowProps) {
+export function NormalBoardRow({ topic, onClick }: NormalBoardRowProps) {
   return (
     <tr
       className="border-b border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors"

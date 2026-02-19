@@ -4,8 +4,16 @@ import type { CommonFile } from '../../schemas/file';
 import type { RelTopicFile } from '../../schemas/file';
 import { FileDownloadLink } from './FileDownloadLink';
 import type { ApiOptions } from '../../types/api';
+import { useImageUrlFromFileId } from '../../hooks/useImageUrlFromFileId';
 
 export type FileListItem = { id: string; originalName?: string; fileSize?: number } | CommonFile | RelTopicFile;
+
+const IMAGE_EXTS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+
+function isImageFile(name: string): boolean {
+  const ext = name.split('.').pop()?.toLowerCase() ?? '';
+  return IMAGE_EXTS.includes(ext);
+}
 
 function getFileId(item: FileListItem): string {
   if ('fileId' in item && typeof (item as RelTopicFile).fileId === 'string') return (item as RelTopicFile).fileId;
@@ -20,6 +28,51 @@ function getFileSize(item: FileListItem): number | undefined {
   return undefined;
 }
 
+interface FileListRowProps {
+  item: FileListItem;
+  onRemove?: (id: string) => void;
+  readOnly: boolean;
+  apiOptions: ApiOptions;
+}
+
+function FileListRow({ item, onRemove, readOnly, apiOptions }: FileListRowProps) {
+  const id = getFileId(item);
+  const name = getDisplayName(item);
+  const size = getFileSize(item);
+  const showThumb = isImageFile(name);
+  const thumbUrl = useImageUrlFromFileId(showThumb ? id : null, apiOptions);
+
+  return (
+    <li className="flex items-center justify-between gap-2 rounded border border-[#333] bg-[#1f1f1f] px-3 py-2 text-sm">
+      <div className="flex items-center gap-2 min-w-0 flex-1">
+        {showThumb && (
+          <div className="shrink-0 w-10 h-10 rounded overflow-hidden bg-gray-700">
+            {thumbUrl ? (
+              <img src={thumbUrl} alt={name} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-gray-600 animate-pulse" />
+            )}
+          </div>
+        )}
+        <span className="min-w-0 truncate text-gray-300" title={name}>
+          {name}
+        </span>
+      </div>
+      {size != null && <span className="shrink-0 text-gray-500">{formatSize(size)}</span>}
+      <FileDownloadLink fileId={id} label="다운로드" apiOptions={apiOptions} className="shrink-0 text-blue-400 hover:underline" />
+      {!readOnly && onRemove && (
+        <button
+          type="button"
+          onClick={() => onRemove(id)}
+          className="shrink-0 text-red-400 hover:underline"
+        >
+          삭제
+        </button>
+      )}
+    </li>
+  );
+}
+
 export interface FileListProps {
   files: FileListItem[];
   onRemove?: (id: string) => void;
@@ -31,29 +84,15 @@ export function FileList({ files, onRemove, readOnly = false, apiOptions }: File
   if (files.length === 0) return null;
   return (
     <ul className="list-none space-y-1 p-0">
-      {files.map((item) => {
-        const id = getFileId(item);
-        const name = getDisplayName(item);
-        const size = getFileSize(item);
-        return (
-          <li key={id} className="flex items-center justify-between gap-2 rounded border border-[#333] bg-[#1f1f1f] px-3 py-2 text-sm">
-            <span className="min-w-0 flex-1 truncate text-gray-300" title={name}>
-              {name}
-            </span>
-            {size != null && <span className="shrink-0 text-gray-500">{formatSize(size)}</span>}
-            <FileDownloadLink fileId={id} label="다운로드" apiOptions={apiOptions} className="shrink-0 text-blue-400 hover:underline" />
-            {!readOnly && onRemove && (
-              <button
-                type="button"
-                onClick={() => onRemove(id)}
-                className="shrink-0 text-red-400 hover:underline"
-              >
-                삭제
-              </button>
-            )}
-          </li>
-        );
-      })}
+      {files.map((item) => (
+        <FileListRow
+          key={getFileId(item)}
+          item={item}
+          onRemove={onRemove}
+          readOnly={readOnly}
+          apiOptions={apiOptions}
+        />
+      ))}
     </ul>
   );
 }

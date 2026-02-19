@@ -1,20 +1,20 @@
 'use client';
 
-import type { ApiOptions } from '../../../types/api';
-import type { Topic } from '../../../schemas/topic';
-import { GalleryTopicCard } from '../TopicCard/GalleryTopicCard';
+import type { ApiOptions } from '../../types/api';
+import type { Topic } from '../../schemas/topic';
+import { GalleryBoardCard } from '../BoardCard/GalleryBoardCard';
 
-interface GalleryTopicListProps {
+interface GalleryBoardListProps {
   topics: Topic[];
   apiOptions: ApiOptions;
   onTopicClick?: (topic: Topic) => void;
 }
 
-export function GalleryTopicList({ topics, apiOptions, onTopicClick }: GalleryTopicListProps) {
+export function GalleryBoardList({ topics, apiOptions, onTopicClick }: GalleryBoardListProps) {
   return (
     <div className="grid grid-cols-3 gap-0">
       {topics.map((topic) => (
-        <GalleryTopicCard
+        <GalleryBoardCard
           key={topic.id}
           topic={topic}
           apiOptions={apiOptions}

@@ -1,20 +1,20 @@
 'use client';
 
-import type { ApiOptions } from '../../../types/api';
-import type { Topic } from '../../../schemas/topic';
-import { BlogTopicCard } from '../TopicCard/BlogTopicCard';
+import type { ApiOptions } from '../../types/api';
+import type { Topic } from '../../schemas/topic';
+import { BlogBoardCard } from '../BoardCard/BlogBoardCard';
 
-interface BlogTopicListProps {
+interface BlogBoardListProps {
   topics: Topic[];
   apiOptions: ApiOptions;
   onTopicClick?: (topic: Topic) => void;
 }
 
-export function BlogTopicList({ topics, apiOptions, onTopicClick }: BlogTopicListProps) {
+export function BlogBoardList({ topics, apiOptions, onTopicClick }: BlogBoardListProps) {
   return (
     <div className="divide-y divide-gray-200">
       {topics.map((topic) => (
-        <BlogTopicCard
+        <BlogBoardCard
           key={topic.id}
           topic={topic}
           apiOptions={apiOptions}

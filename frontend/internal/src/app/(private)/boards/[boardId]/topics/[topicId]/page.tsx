@@ -3,11 +3,10 @@
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { getTopic, getComments } from 'common/services';
-import { formatRelativeOrAbsolute } from 'common';
-import { ContentViewer } from 'common/components';
+import { getTopic, getComments, getBoard } from 'common/services';
+import { PostDetailRenderer } from 'common/components';
 import { useApiOptions } from '@/app/providers/ApiProvider';
-import type { Topic, Comment } from 'common/types';
+import type { Topic, Comment, Board } from 'common/types';
 import { CommentSection, CommentWriteForm } from './_components';
 
 export default function TopicDetailPage() {
@@ -15,18 +14,24 @@ export default function TopicDetailPage() {
   const boardId = params.boardId as string;
   const topicId = params.topicId as string;
   const options = useApiOptions();
+  const [board, setBoard] = useState<Board | null>(null);
   const [topic, setTopic] = useState<Topic | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(() => {
-    Promise.all([getTopic(options, topicId), getComments(options, { topicId, size: 50 })])
-      .then(([t, res]) => {
+    Promise.all([
+      getBoard(options, boardId),
+      getTopic(options, topicId),
+      getComments(options, { topicId, size: 50 }),
+    ])
+      .then(([b, t, res]) => {
+        setBoard(b);
         setTopic(t);
         setComments(res.content);
       })
       .catch((e) => setError(e instanceof Error ? e.message : String(e)));
-  }, [options.baseUrl, options.channel, topicId]);
+  }, [options.baseUrl, options.channel, boardId, topicId]);
 
   useEffect(() => {
     load();
@@ -46,7 +51,7 @@ export default function TopicDetailPage() {
     );
   }
 
-  if (!topic) {
+  if (!topic || !board) {
     return (
       <div className="">
         <p className="text-gray-400">로딩 중...</p>
@@ -62,13 +67,11 @@ export default function TopicDetailPage() {
       >
         ← 게시글 목록
       </Link>
-      <article className="rounded-lg border border-gray-700 bg-gray-800/50 p-6 mb-8">
-        <h1 className="text-2xl font-bold mb-2">{topic.title}</h1>
-        <p className="text-sm text-gray-400 mb-4">
-          {topic.author?.nickname ?? '-'} · {formatRelativeOrAbsolute(topic.createdAt)} · 조회 {topic.viewCount ?? 0}
-        </p>
-        <ContentViewer content={topic.content} className="prose-invert max-w-none" />
-      </article>
+
+      <div className="rounded-lg border border-gray-700 bg-gray-800/50 p-6 mb-8">
+        <PostDetailRenderer board={board} topic={topic} apiOptions={options} />
+      </div>
+
       <CommentWriteForm topicId={topicId} apiOptions={options} onSuccess={load} />
       <CommentSection topicId={topicId} comments={comments} apiOptions={options} onReload={load} />
     </div>

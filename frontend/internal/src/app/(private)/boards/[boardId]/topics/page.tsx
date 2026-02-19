@@ -15,10 +15,10 @@ import { useApiOptions } from '@/app/providers/ApiProvider';
 import {
   DetailPreviewPanel,
   FilterSelect,
-  ContentViewer,
-  TopicListRenderer,
+  BoardListRenderer,
+  PostDetailRenderer,
 } from 'common/components';
-import { Badge, PaginationFooter } from 'common/ui';
+import { PaginationFooter } from 'common/ui';
 import type { Topic, Comment, Board } from 'common/types';
 import { Table } from './_components';
 
@@ -234,7 +234,7 @@ export default function TopicsPage() {
 
               {/* 타입별 목록 렌더러 */}
               {board && data ? (
-                <TopicListRenderer
+                <BoardListRenderer
                   board={board}
                   topics={data.content}
                   apiOptions={options}
@@ -267,25 +267,15 @@ export default function TopicsPage() {
               isLoading={previewLoading}
               title={previewTopic?.title}
             >
-              {previewTopic && (
+              {previewTopic && board && (
                 <>
-                  <article className="rounded-lg border border-gray-200 bg-white p-4 mb-4">
-                    <p className="text-sm text-gray-500 mb-2">
-                      {previewTopic.author?.nickname ?? '-'} ·{' '}
-                      {formatRelativeOrAbsolute(previewTopic.createdAt)} · 조회{' '}
-                      {previewTopic.viewCount ?? 0}
-                    </p>
-                    {previewTopic.tags?.length ? (
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {previewTopic.tags.map((t) => (
-                          <Badge key={t.id} variant="default" className="text-xs">
-                            {t.name}
-                          </Badge>
-                        ))}
-                      </div>
-                    ) : null}
-                    <ContentViewer content={previewTopic.content} className="prose-sm max-w-none" />
-                  </article>
+                  <div className="mb-4">
+                    <PostDetailRenderer
+                      board={board}
+                      topic={previewTopic}
+                      apiOptions={options}
+                    />
+                  </div>
                   <section>
                     <h2 className="text-sm font-semibold text-gray-700 mb-2">
                       댓글 ({previewComments.length})

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   FormContainer,
@@ -8,13 +8,13 @@ import {
   FormField,
   FormActions,
   FileAttachmentField,
-  TopicFormRenderer,
+  PostFormRenderer,
 } from 'common/components';
-import { createTopic, updateTopic } from 'common/services';
+import { createTopic, updateTopic, getTags, createTag } from 'common/services';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import { useAuth } from 'common';
 import type { Topic, TopicCreateInput, FileAttachmentItem, Board } from 'common/schemas';
-import type { TopicFormState, TopicFormHandlers } from 'common/components';
+import type { PostFormState, PostFormHandlers } from 'common/components';
 import type { BoardType } from 'common/constants';
 
 interface TopicFormProps {
@@ -50,33 +50,40 @@ export function TopicForm({
 
   // 기본 파일 첨부 (normal 타입)
   const [files, setFiles] = useState<FileAttachmentItem[]>(
-    initialData?.files
-      ?.filter((f) => !f.isMain)
-      .map((f) => ({ fileId: f.fileId, order: f.order, isMain: f.isMain })) || []
-  );
-
-  // 썸네일/커버 파일 (blog/project/gallery 대표이미지)
-  const [thumbnailFile, setThumbnailFile] = useState<FileAttachmentItem[]>(
-    initialData?.files
-      ?.filter((f) => f.isMain)
-      .map((f) => ({ fileId: f.fileId, order: f.order, isMain: f.isMain })) || []
-  );
-
-  // 갤러리 추가 이미지 (isMain=false 인 파일들)
-  const [additionalFiles, setAdditionalFiles] = useState<FileAttachmentItem[]>(
-    boardType === 'gallery'
-      ? initialData?.files
-          ?.filter((f) => !f.isMain)
-          .map((f) => ({ fileId: f.fileId, order: f.order, isMain: f.isMain })) || []
+    boardType === 'normal'
+      ? initialData?.files?.map((f) => ({ fileId: f.fileId, order: f.order, isMain: f.isMain })) || []
       : []
   );
+
+  // 썸네일/커버 파일 (blog/project 대표이미지) — 단일값
+  const [thumbnailFile, setThumbnailFile] = useState<FileAttachmentItem | null>(() => {
+    const main = initialData?.files?.find((f) => f.isMain);
+    if (!main || boardType === 'gallery' || boardType === 'project') return null;
+    return { fileId: main.fileId, order: main.order, isMain: true };
+  });
+
+  // 갤러리/프로젝트 추가 이미지
+  const [additionalFiles, setAdditionalFiles] = useState<FileAttachmentItem[]>(() => {
+    if (boardType === 'gallery' || boardType === 'project') {
+      return initialData?.files?.map((f) => ({ fileId: f.fileId, order: f.order, isMain: f.isMain })) || [];
+    }
+    return [];
+  });
+
+  // 갤러리/프로젝트 대표 이미지 fileId
+  const [mainFileId, setMainFileId] = useState<string | null>(() => {
+    if (boardType === 'gallery' || boardType === 'project') {
+      return initialData?.files?.find((f) => f.isMain)?.fileId ?? null;
+    }
+    return null;
+  });
 
   // UI state
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [isDraftSaving, setIsDraftSaving] = useState(false);
 
-  const state: TopicFormState = {
+  const state: PostFormState = {
     title,
     content,
     isPublic,
@@ -85,13 +92,14 @@ export function TopicForm({
     tags,
     thumbnailFile,
     additionalFiles,
+    mainFileId,
     publishedAt,
     errors,
     isSaving,
     isDraftSaving,
   };
 
-  const handlers: TopicFormHandlers = {
+  const handlers: PostFormHandlers = {
     setTitle,
     setContent,
     setIsPublic,
@@ -100,6 +108,7 @@ export function TopicForm({
     setTags,
     setThumbnailFile,
     setAdditionalFiles,
+    setMainFileId,
     setPublishedAt,
   };
 
@@ -116,8 +125,8 @@ export function TopicForm({
       newErrors.content = '내용을 입력하세요';
     }
 
-    if (boardType === 'gallery' && thumbnailFile.length === 0) {
-      newErrors.thumbnailFile = '대표 이미지를 등록하세요';
+    if ((boardType === 'project' || boardType === 'gallery') && additionalFiles.length === 0) {
+      newErrors.images = '이미지를 최소 1장 등록하세요';
     }
 
     setErrors(newErrors);
@@ -128,11 +137,37 @@ export function TopicForm({
     if (boardType === 'normal') {
       return files;
     }
-    if (boardType === 'gallery') {
-      return [...thumbnailFile, ...additionalFiles];
+    if (boardType === 'gallery' || boardType === 'project') {
+      return additionalFiles.map((f, i) => ({
+        fileId: f.fileId,
+        order: i,
+        isMain: f.fileId === mainFileId,
+      }));
     }
-    // blog / project
-    return [...thumbnailFile, ...files];
+    // blog: thumbnailFile(isMain=true)
+    const result: FileAttachmentItem[] = [];
+    if (thumbnailFile) {
+      result.push({ fileId: thumbnailFile.fileId, order: 0, isMain: true });
+    }
+    return result;
+  };
+
+  const resolveTagIds = async (tagNames: string[]): Promise<string[]> => {
+    if (!tagNames.length) return [];
+    const ids: string[] = [];
+    for (const name of tagNames) {
+      const result = await getTags(apiOptions, { q: name, size: 20 });
+      const existing = result.content.find(
+        (t) => t.name.toLowerCase() === name.toLowerCase()
+      );
+      if (existing) {
+        ids.push(existing.id);
+      } else {
+        const created = await createTag(apiOptions, { name });
+        ids.push(created.id);
+      }
+    }
+    return ids;
   };
 
   const saveTopic = async (status: string) => {
@@ -142,16 +177,19 @@ export function TopicForm({
     else setIsDraftSaving(true);
 
     try {
+      const tagIds = await resolveTagIds(tags);
+
       const payload: TopicCreateInput = {
         authorUserId: user?.userId || '',
         boardId: board.id,
         title: title.trim(),
-        content: boardType === 'gallery' && !content.trim() ? ' ' : content.trim(),
+        content: boardType === 'gallery' && !content.trim() ? '' : content.trim(),
         isNotice,
         isPinned,
         isPublic,
         status,
         publishedAt: publishedAt || undefined,
+        tagIds: tagIds.length ? tagIds : undefined,
         files: buildFiles(),
       };
 
@@ -198,7 +236,7 @@ export function TopicForm({
         }}
         disabled={isSaving || isDraftSaving}
       >
-        <TopicFormRenderer board={board} state={state} handlers={handlers} apiOptions={apiOptions} />
+        <PostFormRenderer board={board} state={state} handlers={handlers} apiOptions={apiOptions} />
 
         {boardType === 'normal' && (
           <FormSection title="파일 첨부" description="파일을 첨부하세요">
@@ -224,14 +262,16 @@ export function TopicForm({
           onCancel={handleCancel}
           isSubmitting={isSaving}
           extraActions={
-            <button
-              type="button"
-              onClick={() => saveTopic('temporary')}
-              disabled={isSaving || isDraftSaving}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
-            >
-              {isDraftSaving ? '저장 중...' : '임시저장'}
-            </button>
+            boardType !== 'gallery' ? (
+              <button
+                type="button"
+                onClick={() => saveTopic('temporary')}
+                disabled={isSaving || isDraftSaving}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
+              >
+                {isDraftSaving ? '저장 중...' : '임시저장'}
+              </button>
+            ) : undefined
           }
         />
       </FormContainer>

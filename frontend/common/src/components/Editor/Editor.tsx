@@ -62,6 +62,19 @@ export function Editor({
     const onEmbedDialog = () => setEmbedDialogOpen(true);
     const onTableDialog = () => setTableDialogOpen(true);
     const onTableActive = ({ active }: { active: boolean }) => setIsInTable(active);
+    const onDropImage = async ({ files }: { files: File[] }) => {
+      if (!onUploadImage) return;
+      const mode = coreRef.current?.getCurrentMode();
+      for (const file of files) {
+        try {
+          const url = await onUploadImage(file);
+          if (mode instanceof TextMode) mode.insertImage(url, '');
+          else if (mode instanceof MarkdownMode) mode.insertImage(url, '');
+        } catch {
+          // ignore individual file upload errors
+        }
+      }
+    };
 
     core.on('dialog:link', onLinkDialog);
     core.on('dialog:image', onImageDialog);
@@ -69,6 +82,7 @@ export function Editor({
     core.on('dialog:embed', onEmbedDialog);
     core.on('dialog:table', onTableDialog);
     core.on('table:active', onTableActive);
+    core.on('drop:image', onDropImage);
 
     return () => {
       core.off('dialog:link', onLinkDialog);
@@ -77,6 +91,7 @@ export function Editor({
       core.off('dialog:embed', onEmbedDialog);
       core.off('dialog:table', onTableDialog);
       core.off('table:active', onTableActive);
+      core.off('drop:image', onDropImage);
     };
   }, [coreRef.current]); // eslint-disable-line react-hooks/exhaustive-deps
 

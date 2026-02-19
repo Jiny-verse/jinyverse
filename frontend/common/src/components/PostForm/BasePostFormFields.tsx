@@ -1,24 +1,35 @@
 'use client';
 
-import { Input } from '../../../ui/Input';
-import { Switch } from '../../../ui/Switch';
-import { TagInput } from '../../../ui/TagInput';
-import { DateTimePicker } from '../../../ui/DateTimePicker';
-import { Editor } from '../../Editor/Editor';
-import { FormSection } from '../../Form/FormSection';
-import { FormField } from '../../Form/FormField';
-import { FormFieldGroup } from '../../Form/FormFieldGroup';
-import type { BoardType } from '../../../constants/boardType';
-import type { TopicFormState, TopicFormHandlers } from './types';
+import { Input } from '../../ui/Input';
+import { Switch } from '../../ui/Switch';
+import { TagInput } from '../../ui/TagInput';
+import { DateTimePicker } from '../../ui/DateTimePicker';
+import { Editor } from '../Editor/Editor';
+import { FormSection } from '../Form/FormSection';
+import { FormField } from '../Form/FormField';
+import { FormFieldGroup } from '../Form/FormFieldGroup';
+import type { BoardType } from '../../constants/boardType';
+import type { PostFormState, PostFormHandlers } from './types';
+import type { ApiOptions } from '../../types/api';
+import { uploadFile } from '../../services/file';
+import { getPublicImageUrl } from '../../utils/file';
 
-interface BaseTopicFormFieldsProps {
+interface BasePostFormFieldsProps {
   boardType: BoardType;
-  state: TopicFormState;
-  handlers: TopicFormHandlers;
+  state: PostFormState;
+  handlers: PostFormHandlers;
+  apiOptions?: ApiOptions;
 }
 
-export function BaseTopicFormFields({ boardType, state, handlers }: BaseTopicFormFieldsProps) {
+export function BasePostFormFields({ boardType, state, handlers, apiOptions }: BasePostFormFieldsProps) {
   const isGallery = boardType === 'gallery';
+
+  const handleUploadImage = apiOptions
+    ? async (file: File): Promise<string> => {
+        const uploaded = await uploadFile(apiOptions, file);
+        return getPublicImageUrl(uploaded.id, apiOptions);
+      }
+    : undefined;
 
   return (
     <>
@@ -33,21 +44,18 @@ export function BaseTopicFormFields({ boardType, state, handlers }: BaseTopicFor
           />
         </FormField>
 
-        <FormField
-          label="본문"
-          name="content"
-          required={!isGallery}
-          error={state.errors.content}
-          description={isGallery ? '갤러리 타입에서는 선택 사항입니다' : undefined}
-        >
-          <Editor
-            defaultValue={state.content}
-            onChange={handlers.setContent}
-            defaultMode="text"
-            minHeight="500px"
-            placeholder="내용을 입력하세요..."
-          />
-        </FormField>
+        {!isGallery && (
+          <FormField label="본문" name="content" required error={state.errors.content}>
+            <Editor
+              defaultValue={state.content}
+              onChange={handlers.setContent}
+              defaultMode="text"
+              minHeight="500px"
+              placeholder="내용을 입력하세요..."
+              onUploadImage={handleUploadImage}
+            />
+          </FormField>
+        )}
       </FormSection>
 
       <FormSection title="추가 설정" description="태그를 관리하세요">

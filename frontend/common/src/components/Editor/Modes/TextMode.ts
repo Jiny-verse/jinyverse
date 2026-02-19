@@ -76,6 +76,11 @@ export class TextMode implements IEditorMode {
   private compositionEndHandler: (() => void) | null = null;
   private savedLinkRange: Range | null = null;
   private savedSelection: Range | null = null;
+  private dragoverHandler: ((e: DragEvent) => void) | null = null;
+  private dropHandler: ((e: DragEvent) => void) | null = null;
+  private draggedImage: HTMLImageElement | null = null;
+  private dragstartHandler: ((e: DragEvent) => void) | null = null;
+  private dragendHandler: ((e: DragEvent) => void) | null = null;
 
   render(container: HTMLElement, core: IEditorCore): void {
     this.container = container;
@@ -129,6 +134,49 @@ export class TextMode implements IEditorMode {
       core.emit('table:active', { active: this.isInTable() });
     };
     document.addEventListener('selectionchange', this.selectionHandler);
+
+    // Drag-and-drop: internal image reorder + external file drop
+    this.dragstartHandler = (e: DragEvent) => {
+      if (e.target instanceof HTMLImageElement && div.contains(e.target)) {
+        this.draggedImage = e.target;
+        e.dataTransfer?.setData('text/x-editor-image', e.target.src);
+      }
+    };
+    this.dragendHandler = () => { this.draggedImage = null; };
+    div.addEventListener('dragstart', this.dragstartHandler);
+    div.addEventListener('dragend', this.dragendHandler);
+
+    this.dragoverHandler = (e: DragEvent) => {
+      if (e.dataTransfer?.types.includes('Files')) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'copy';
+      } else if (e.dataTransfer?.types.includes('text/x-editor-image')) {
+        const targetImg = (e.target as Element).closest?.('img') as HTMLImageElement | null;
+        if (targetImg && div.contains(targetImg) && targetImg !== this.draggedImage) {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+        }
+      }
+    };
+    this.dropHandler = (e: DragEvent) => {
+      if (e.dataTransfer?.types.includes('text/x-editor-image') && this.draggedImage) {
+        const targetImg = (e.target as Element).closest?.('img') as HTMLImageElement | null;
+        if (targetImg && div.contains(targetImg) && targetImg !== this.draggedImage) {
+          e.preventDefault();
+          this.mergeImagesIntoLayout(this.draggedImage, targetImg);
+          return;
+        }
+      }
+      const files = Array.from(e.dataTransfer?.files ?? []).filter((f) =>
+        f.type.startsWith('image/')
+      );
+      if (files.length > 0) {
+        e.preventDefault();
+        core.emit('drop:image', { files });
+      }
+    };
+    div.addEventListener('dragover', this.dragoverHandler);
+    div.addEventListener('drop', this.dropHandler);
 
     container.appendChild(div);
   }
@@ -266,6 +314,10 @@ export class TextMode implements IEditorMode {
       if (this.inputHandler) this.editorDiv.removeEventListener('input', this.inputHandler);
       if (this.compositionStartHandler) this.editorDiv.removeEventListener('compositionstart', this.compositionStartHandler);
       if (this.compositionEndHandler) this.editorDiv.removeEventListener('compositionend', this.compositionEndHandler);
+      if (this.dragoverHandler) this.editorDiv.removeEventListener('dragover', this.dragoverHandler);
+      if (this.dropHandler) this.editorDiv.removeEventListener('drop', this.dropHandler);
+      if (this.dragstartHandler) this.editorDiv.removeEventListener('dragstart', this.dragstartHandler);
+      if (this.dragendHandler) this.editorDiv.removeEventListener('dragend', this.dragendHandler);
     }
     if (this.selectionHandler) {
       document.removeEventListener('selectionchange', this.selectionHandler);
@@ -281,6 +333,11 @@ export class TextMode implements IEditorMode {
     this.selectionHandler = null;
     this.compositionStartHandler = null;
     this.compositionEndHandler = null;
+    this.dragoverHandler = null;
+    this.dropHandler = null;
+    this.dragstartHandler = null;
+    this.dragendHandler = null;
+    this.draggedImage = null;
   }
 
   getContent(): string {
@@ -876,9 +933,16 @@ export class TextMode implements IEditorMode {
   insertImage(url: string, alt = ''): void {
     if (!this.editorDiv || !this.core) return;
     const previousHTML = this.editorDiv.innerHTML;
+    const savedSel = this.savedSelection?.cloneRange() ?? null;
     this.core.executeCommand({
       description: 'Insert Image',
       execute: () => {
+        this.editorDiv!.focus();
+        if (savedSel) {
+          const sel = window.getSelection();
+          sel?.removeAllRanges();
+          sel?.addRange(savedSel);
+        }
         document.execCommand(
           'insertHTML', false,
           `<img src="${DOMPurify.sanitize(url)}" alt="${DOMPurify.sanitize(alt)}">`,
@@ -886,6 +950,130 @@ export class TextMode implements IEditorMode {
       },
       undo: () => {
         if (this.editorDiv) this.editorDiv.innerHTML = DOMPurify.sanitize(previousHTML);
+      },
+    });
+  }
+
+  insertImageLayout(urls: string[], columns: number): void {
+    if (!this.editorDiv || !this.core) return;
+    const prev = this.editorDiv.innerHTML;
+    const core = this.core;
+    const editorDiv = this.editorDiv;
+    const cols = Math.min(3, Math.max(1, columns));
+    const range = this.savedSelection?.cloneRange() ?? (() => {
+      const sel = window.getSelection();
+      return (sel && sel.rangeCount > 0) ? sel.getRangeAt(0).cloneRange() : null;
+    })();
+
+    const doInsert = () => {
+      const figure = document.createElement('figure');
+      figure.className = 'editor-image-layout';
+      figure.setAttribute('data-columns', String(cols));
+      urls.forEach((url) => {
+        const img = document.createElement('img');
+        img.src = url;
+        figure.appendChild(img);
+      });
+
+      let insertAfter: Node | null = null;
+      if (range) {
+        let block: Node | null = range.commonAncestorContainer;
+        while (block && block !== editorDiv) {
+          if (block instanceof HTMLElement && ['P', 'DIV', 'H1', 'H2', 'H3', 'LI', 'BLOCKQUOTE', 'PRE'].includes(block.tagName)) {
+            insertAfter = block;
+            break;
+          }
+          block = block.parentNode;
+        }
+      }
+
+      if (insertAfter && insertAfter.parentNode === editorDiv) {
+        editorDiv.insertBefore(figure, insertAfter.nextSibling);
+      } else {
+        editorDiv.appendChild(figure);
+      }
+
+      if (!figure.nextSibling) {
+        const p = document.createElement('p');
+        p.innerHTML = '<br>';
+        editorDiv.appendChild(p);
+      }
+
+      core.emit('content:change', { content: editorDiv.innerHTML });
+    };
+
+    core.executeCommand({
+      description: 'Insert Image Layout',
+      execute: doInsert,
+      undo: () => {
+        editorDiv.innerHTML = DOMPurify.sanitize(prev, { ADD_ATTR: ['style'] });
+        core.emit('content:change', { content: editorDiv.innerHTML });
+      },
+    });
+  }
+
+  private mergeImagesIntoLayout(source: HTMLImageElement, target: HTMLImageElement): void {
+    if (!this.editorDiv || !this.core) return;
+    const prev = this.editorDiv.innerHTML;
+    const core = this.core;
+    const editorDiv = this.editorDiv;
+
+    const doMerge = () => {
+      const existingFigure = target.closest('figure.editor-image-layout') as HTMLElement | null;
+
+      if (existingFigure) {
+        // target이 이미 layout figure 안에 있음
+        const currentCount = existingFigure.querySelectorAll('img').length;
+        if (currentCount < 3) {
+          // source의 부모(e.g. <p>) 처리 후 figure에 추가
+          const sourceParent = source.parentElement;
+          source.remove();
+          if (sourceParent && sourceParent !== editorDiv) {
+            const inner = sourceParent.innerHTML.trim();
+            if (inner === '' || inner === '<br>') sourceParent.remove();
+          }
+          existingFigure.appendChild(source);
+          const newCount = existingFigure.querySelectorAll('img').length;
+          existingFigure.setAttribute('data-columns', String(Math.min(3, newCount)));
+        }
+      } else {
+        // target이 standalone — 새 figure 생성
+        const figure = document.createElement('figure');
+        figure.className = 'editor-image-layout';
+        figure.setAttribute('data-columns', '2');
+
+        // target 위치에 figure 삽입
+        target.parentNode?.insertBefore(figure, target);
+        figure.appendChild(target);
+
+        // source 제거 후 figure에 추가
+        const sourceParent = source.parentElement;
+        source.remove();
+        figure.appendChild(source);
+
+        // source의 부모가 비었으면 제거
+        if (sourceParent && sourceParent !== editorDiv) {
+          const inner = sourceParent.innerHTML.trim();
+          if (inner === '' || inner === '<br>') sourceParent.remove();
+        }
+
+        // figure 다음에 단락 보장
+        if (!figure.nextSibling) {
+          const p = document.createElement('p');
+          p.innerHTML = '<br>';
+          editorDiv.appendChild(p);
+        }
+      }
+
+      core.emit('content:change', { content: editorDiv.innerHTML });
+    };
+
+    core.executeCommand({
+      description: 'Merge Images Into Layout',
+      execute: doMerge,
+      undo: () => {
+        editorDiv.innerHTML = DOMPurify.sanitize(prev, { ADD_ATTR: ['style'] });
+        core.emit('content:change', { content: editorDiv.innerHTML });
       },
     });
   }

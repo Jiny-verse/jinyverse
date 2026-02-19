@@ -429,6 +429,29 @@ export class MarkdownMode implements IEditorMode {
     });
   }
 
+  insertImageLayout(urls: string[], _columns: number): void {
+    if (!this.textarea || !this.core) return;
+    const ta = this.textarea;
+    const pos = ta.selectionStart;
+    const snippet = urls.map((url) => `![](${url})`).join('\n');
+    const prev = ta.value;
+    this.core.executeCommand({
+      description: 'Insert Image Layout',
+      execute: () => {
+        ta.value = ta.value.slice(0, pos) + snippet + ta.value.slice(pos);
+        ta.selectionStart = pos + snippet.length;
+        ta.selectionEnd = pos + snippet.length;
+        ta.dispatchEvent(new Event('input', { bubbles: true }));
+      },
+      undo: () => {
+        ta.value = prev;
+        ta.selectionStart = pos;
+        ta.selectionEnd = pos;
+        ta.dispatchEvent(new Event('input', { bubbles: true }));
+      },
+    });
+  }
+
   transformData(input: string): string {
     if (!input.trim()) return '';
     if (!input.trimStart().startsWith('<')) return input;

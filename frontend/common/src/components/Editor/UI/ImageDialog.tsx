@@ -21,11 +21,11 @@ export function ImageDialog({ isOpen, onClose, onConfirm, onUpload }: ImageDialo
   const [error, setError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleConfirm = () => {
-    if (!url.trim()) return;
-    onConfirm(url.trim(), alt.trim());
-    reset();
-    onClose();
+  const reset = () => {
+    setUrl('');
+    setAlt('');
+    setError('');
+    setUploading(false);
   };
 
   const handleClose = () => {
@@ -33,11 +33,11 @@ export function ImageDialog({ isOpen, onClose, onConfirm, onUpload }: ImageDialo
     onClose();
   };
 
-  const reset = () => {
-    setUrl('');
-    setAlt('');
-    setError('');
-    setUploading(false);
+  const handleUrlConfirm = () => {
+    if (!url.trim()) return;
+    onConfirm(url.trim(), alt.trim());
+    reset();
+    onClose();
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,8 +47,9 @@ export function ImageDialog({ isOpen, onClose, onConfirm, onUpload }: ImageDialo
     setError('');
     try {
       const uploadedUrl = await onUpload(file);
-      setUrl(uploadedUrl);
-      if (!alt) setAlt(file.name.replace(/\.[^.]+$/, ''));
+      onConfirm(uploadedUrl, file.name.replace(/\.[^.]+$/, ''));
+      reset();
+      onClose();
     } catch {
       setError(t('editor.dialog.image.uploadError', '업로드에 실패했습니다.'));
     } finally {
@@ -57,31 +58,23 @@ export function ImageDialog({ isOpen, onClose, onConfirm, onUpload }: ImageDialo
     }
   };
 
-  return (
-    <Modal
-      isOpen={isOpen}
-      onClose={handleClose}
-      title={t('editor.dialog.image.title', '이미지 삽입')}
-      size="sm"
-      footer={
-        <div className="flex justify-end gap-2">
-          <Button type="button" variant="ghost" size="sm" onClick={handleClose}>
-            {t('ui.button.cancel', '취소')}
-          </Button>
-          <Button
-            type="button"
-            variant="primary"
-            size="sm"
-            onClick={handleConfirm}
-            disabled={!url.trim() || uploading}
-          >
-            {t('ui.button.confirm', '확인')}
-          </Button>
-        </div>
-      }
-    >
-      <div className="flex flex-col gap-3">
-        {onUpload && (
+  // File-upload UI
+  if (onUpload) {
+    return (
+      <Modal
+        isOpen={isOpen}
+        onClose={handleClose}
+        title={t('editor.dialog.image.title', '이미지 삽입')}
+        size="sm"
+        footer={
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="ghost" size="sm" onClick={handleClose}>
+              {t('ui.button.cancel', '취소')}
+            </Button>
+          </div>
+        }
+      >
+        <div className="flex flex-col gap-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               {t('editor.dialog.image.upload', '파일 업로드')}
@@ -106,17 +99,46 @@ export function ImageDialog({ isOpen, onClose, onConfirm, onUpload }: ImageDialo
             </div>
             {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
           </div>
-        )}
+        </div>
+      </Modal>
+    );
+  }
+
+  // URL-only UI (no onUpload)
+  return (
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title={t('editor.dialog.image.title', '이미지 삽입')}
+      size="sm"
+      footer={
+        <div className="flex justify-end gap-2">
+          <Button type="button" variant="ghost" size="sm" onClick={handleClose}>
+            {t('ui.button.cancel', '취소')}
+          </Button>
+          <Button
+            type="button"
+            variant="primary"
+            size="sm"
+            onClick={handleUrlConfirm}
+            disabled={!url.trim() || uploading}
+          >
+            {t('ui.button.confirm', '확인')}
+          </Button>
+        </div>
+      }
+    >
+      <div className="flex flex-col gap-3">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            URL {!onUpload && <span className="text-red-500">*</span>}
+            URL <span className="text-red-500">*</span>
           </label>
           <Input
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder="https://example.com/image.png"
-            onKeyDown={(e) => e.key === 'Enter' && handleConfirm()}
-            autoFocus={!onUpload}
+            onKeyDown={(e) => e.key === 'Enter' && handleUrlConfirm()}
+            autoFocus
           />
         </div>
         <div>

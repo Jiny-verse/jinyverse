@@ -1,20 +1,20 @@
 'use client';
 
-import type { ApiOptions } from '../../../types/api';
-import type { Topic } from '../../../schemas/topic';
-import { ProjectTopicCard } from '../TopicCard/ProjectTopicCard';
+import type { ApiOptions } from '../../types/api';
+import type { Topic } from '../../schemas/topic';
+import { ProjectBoardCard } from '../BoardCard/ProjectBoardCard';
 
-interface ProjectTopicListProps {
+interface ProjectBoardListProps {
   topics: Topic[];
   apiOptions: ApiOptions;
   onTopicClick?: (topic: Topic) => void;
 }
 
-export function ProjectTopicList({ topics, apiOptions, onTopicClick }: ProjectTopicListProps) {
+export function ProjectBoardList({ topics, apiOptions, onTopicClick }: ProjectBoardListProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {topics.map((topic) => (
-        <ProjectTopicCard
+        <ProjectBoardCard
           key={topic.id}
           topic={topic}
           apiOptions={apiOptions}

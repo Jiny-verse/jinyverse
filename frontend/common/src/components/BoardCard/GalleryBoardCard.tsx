@@ -1,17 +1,17 @@
 'use client';
 
-import type { ApiOptions } from '../../../types/api';
-import type { Topic } from '../../../schemas/topic';
-import { getMainFileId } from '../../../utils/topic';
-import { useImageUrlFromFileId } from '../../../hooks/useImageUrlFromFileId';
+import type { ApiOptions } from '../../types/api';
+import type { Topic } from '../../schemas/topic';
+import { getMainFileId } from '../../utils/post';
+import { useImageUrlFromFileId } from '../../hooks/useImageUrlFromFileId';
 
-interface GalleryTopicCardProps {
+interface GalleryBoardCardProps {
   topic: Topic;
   apiOptions: ApiOptions;
   onClick?: () => void;
 }
 
-export function GalleryTopicCard({ topic, apiOptions, onClick }: GalleryTopicCardProps) {
+export function GalleryBoardCard({ topic, apiOptions, onClick }: GalleryBoardCardProps) {
   const mainFileId = getMainFileId(topic);
   const imageUrl = useImageUrlFromFileId(mainFileId, apiOptions);
 

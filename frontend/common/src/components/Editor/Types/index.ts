@@ -102,6 +102,7 @@ export interface EditorEventMap {
   'dialog:embed': { mode: 'text' | 'markdown' };
   'dialog:table': { mode: 'text' | 'markdown' };
   'table:active': { active: boolean };
+  'drop:image': { files: File[] };
 }
 
 // Editor Props

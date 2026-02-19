@@ -7,6 +7,7 @@ import com.jinyverse.backend.domain.tag.dto.TagRequestDto;
 import com.jinyverse.backend.domain.tag.dto.TagResponseDto;
 import com.jinyverse.backend.domain.tag.entity.Tag;
 import com.jinyverse.backend.domain.tag.repository.TagRepository;
+import com.jinyverse.backend.domain.topic.repository.RelTopicTagRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -27,6 +28,7 @@ import static com.jinyverse.backend.domain.common.util.CommonSpecifications.PAGI
 public class TagService {
 
     private final TagRepository tagRepository;
+    private final RelTopicTagRepository relTopicTagRepository;
     private final AuditLogHelper auditLogHelper;
 
     @Transactional
@@ -66,6 +68,7 @@ public class TagService {
         Tag tag = tagRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Tag not found with id: " + id));
         TagResponseDto before = tag.toResponseDto();
+        relTopicTagRepository.deleteByTagId(id);
         tagRepository.delete(tag);
         auditLogHelper.log("TAG", id, "DELETE", before, null);
     }

@@ -1,14 +1,14 @@
 'use client';
 
-import type { Topic } from '../../../schemas/topic';
-import { NormalTopicRow } from '../TopicCard/NormalTopicRow';
+import type { Topic } from '../../schemas/topic';
+import { NormalBoardRow } from '../BoardCard/NormalBoardRow';
 
-interface NormalTopicListProps {
+interface NormalBoardListProps {
   topics: Topic[];
   onTopicClick?: (topic: Topic) => void;
 }
 
-export function NormalTopicList({ topics, onTopicClick }: NormalTopicListProps) {
+export function NormalBoardList({ topics, onTopicClick }: NormalBoardListProps) {
   return (
     <table className="w-full text-left border-collapse">
       <thead>
@@ -21,7 +21,7 @@ export function NormalTopicList({ topics, onTopicClick }: NormalTopicListProps) 
       </thead>
       <tbody>
         {topics.map((topic) => (
-          <NormalTopicRow key={topic.id} topic={topic} onClick={() => onTopicClick?.(topic)} />
+          <NormalBoardRow key={topic.id} topic={topic} onClick={() => onTopicClick?.(topic)} />
         ))}
       </tbody>
     </table>

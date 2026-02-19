@@ -1,3 +1,4 @@
-export * from './TopicForm';
-export * from './TopicCard';
-export * from './TopicList';
+// Backward compatibility re-exports — use BoardCard, BoardList, PostForm directly
+export * from '../BoardCard';
+export * from '../BoardList';
+export * from '../PostForm';
