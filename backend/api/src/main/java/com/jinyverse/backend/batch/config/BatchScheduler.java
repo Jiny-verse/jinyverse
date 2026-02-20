@@ -1,5 +1,6 @@
 package com.jinyverse.backend.batch.config;
 
+import com.jinyverse.backend.batch.job.CleanupIdempotencyRecordsJobConfig;
 import com.jinyverse.backend.batch.job.CleanupOrphanFilesJobConfig;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,9 @@ public class BatchScheduler {
     @Qualifier(CleanupOrphanFilesJobConfig.JOB_NAME)
     private final Job cleanupOrphanFilesJob;
 
+    @Qualifier(CleanupIdempotencyRecordsJobConfig.JOB_NAME)
+    private final Job cleanupIdempotencyRecordsJob;
+
     @Scheduled(cron = "0 0 0 * * *")
     public void runCleanupOrphanFiles() {
         try {
@@ -31,6 +35,19 @@ public class BatchScheduler {
             log.info("BatchScheduler: cleanupOrphanFilesJob 실행 시작");
         } catch (Exception e) {
             log.error("BatchScheduler: cleanupOrphanFilesJob 실행 실패 - {}", e.getMessage(), e);
+        }
+    }
+
+    @Scheduled(cron = "0 0 0 * * *")
+    public void runCleanupIdempotencyRecords() {
+        try {
+            JobParameters params = new JobParametersBuilder()
+                    .addLong("runAt", System.currentTimeMillis())
+                    .toJobParameters();
+            jobLauncher.run(cleanupIdempotencyRecordsJob, params);
+            log.info("BatchScheduler: cleanupIdempotencyRecordsJob 실행 시작");
+        } catch (Exception e) {
+            log.error("BatchScheduler: cleanupIdempotencyRecordsJob 실행 실패 - {}", e.getMessage(), e);
         }
     }
 }

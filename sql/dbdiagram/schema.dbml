@@ -240,6 +240,22 @@ Table rel__topic_tag {
   }
 }
 
+Table idempotency_record {
+  idempotency_key varchar(36) [pk, not null, note: "클라이언트가 제공한 UUID v4 멱등성 키"]
+  request_path    varchar(255) [not null, note: "요청 경로"]
+  request_method  varchar(10)  [not null, note: "요청 HTTP 메서드"]
+  request_hash    varchar(64)  [not null, note: "요청 body의 SHA-256 해시"]
+  status          varchar(20)  [not null, default: 'PROCESSING', note: "처리 상태 (PROCESSING, COMPLETED, FAILED)"]
+  response_status integer      [note: "캐시된 응답 HTTP 상태 코드"]
+  response_body   text         [note: "캐시된 응답 body"]
+  created_at      timestamp    [not null, default: `now()`, note: "생성일시"]
+  completed_at    timestamp    [note: "처리 완료일시"]
+
+  indexes {
+    created_at [name: "idx_idempotency_record_created_at"]
+  }
+}
+
 /* Relations */
 Ref: code.category_code > code_category.code
 Ref: code.upper_category_code > code_category.code

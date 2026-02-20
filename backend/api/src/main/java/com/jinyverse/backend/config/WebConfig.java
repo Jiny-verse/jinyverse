@@ -2,6 +2,7 @@ package com.jinyverse.backend.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jinyverse.backend.domain.common.util.JwtUtil;
+import com.jinyverse.backend.domain.idempotency.service.IdempotencyService;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,7 +29,7 @@ public class WebConfig {
         FilterRegistrationBean<CsrfProtectionFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(new CsrfProtectionFilter(objectMapper));
         registration.addUrlPatterns("/api/*", "/api/*/*", "/api/*/*/*", "/api/*/*/*/*");
-        registration.setOrder(Ordered.LOWEST_PRECEDENCE - 1);
+        registration.setOrder(Ordered.LOWEST_PRECEDENCE - 2);
         return registration;
     }
 
@@ -39,6 +40,18 @@ public class WebConfig {
     ) {
         FilterRegistrationBean<JwtAuthenticationFilter> registration = new FilterRegistrationBean<>();
         registration.setFilter(new JwtAuthenticationFilter(jwtUtil, objectMapper));
+        registration.addUrlPatterns("/api/*", "/api/*/*", "/api/*/*/*", "/api/*/*/*/*");
+        registration.setOrder(Ordered.LOWEST_PRECEDENCE - 1);
+        return registration;
+    }
+
+    @Bean
+    public FilterRegistrationBean<IdempotencyFilter> idempotencyFilter(
+            IdempotencyService idempotencyService,
+            ObjectMapper objectMapper
+    ) {
+        FilterRegistrationBean<IdempotencyFilter> registration = new FilterRegistrationBean<>();
+        registration.setFilter(new IdempotencyFilter(idempotencyService, objectMapper));
         registration.addUrlPatterns("/api/*", "/api/*/*", "/api/*/*/*", "/api/*/*/*/*");
         registration.setOrder(Ordered.LOWEST_PRECEDENCE);
         return registration;

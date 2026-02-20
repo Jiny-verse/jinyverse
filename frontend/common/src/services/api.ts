@@ -2,7 +2,7 @@ import type { ApiOptions } from '../types/api';
 
 const CREDENTIALS: RequestCredentials = 'include';
 
-const headers = (options: ApiOptions, omitContentType = false): HeadersInit => {
+const headers = (options: ApiOptions, omitContentType = false, idempotencyKey?: string): HeadersInit => {
   const h: Record<string, string> = {
     'X-Channel': options.channel,
     'X-Requested-With': 'XMLHttpRequest',
@@ -13,8 +13,13 @@ const headers = (options: ApiOptions, omitContentType = false): HeadersInit => {
   if (options.role) {
     h['X-Role'] = options.role;
   }
+  if (idempotencyKey) {
+    h['Idempotency-Key'] = idempotencyKey;
+  }
   return h;
 };
+
+const newIdempotencyKey = () => crypto.randomUUID();
 
 const buildUrl = (
   baseUrl: string,
@@ -63,7 +68,7 @@ export async function apiPost<T>(options: ApiOptions, path: string, body: unknow
   const url = buildUrl(options.baseUrl, path);
   const res = await fetch(url, {
     method: 'POST',
-    headers: headers(options, false),
+    headers: headers(options, false, newIdempotencyKey()),
     body: JSON.stringify(body),
     credentials: CREDENTIALS,
   });
@@ -84,7 +89,7 @@ export async function apiPut<T>(options: ApiOptions, path: string, body: unknown
   const url = buildUrl(options.baseUrl, path);
   const res = await fetch(url, {
     method: 'PUT',
-    headers: headers(options, false),
+    headers: headers(options, false, newIdempotencyKey()),
     body: JSON.stringify(body),
     credentials: CREDENTIALS,
   });
@@ -109,7 +114,7 @@ export async function apiPostFormData<T>(
   const url = buildUrl(options.baseUrl, path);
   const res = await fetch(url, {
     method: 'POST',
-    headers: headers(options, true),
+    headers: headers(options, true, newIdempotencyKey()),
     body: formData,
     credentials: CREDENTIALS,
   });
@@ -128,7 +133,7 @@ export async function apiPostFormData<T>(
 
 export async function apiDelete(options: ApiOptions, path: string): Promise<void> {
   const url = buildUrl(options.baseUrl, path);
-  const res = await fetch(url, { method: 'DELETE', headers: headers(options, false), credentials: CREDENTIALS });
+  const res = await fetch(url, { method: 'DELETE', headers: headers(options, false, newIdempotencyKey()), credentials: CREDENTIALS });
   if (res.status === 401) {
     options.on401?.();
   }
