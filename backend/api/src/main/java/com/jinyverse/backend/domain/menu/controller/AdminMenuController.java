@@ -24,10 +24,8 @@ public class AdminMenuController {
     public ResponseEntity<Page<MenuResponseDto>> getAllForManagement(
             @RequestParam Map<String, Object> filter,
             Pageable pageable,
-            @RequestHeader(value = "X-Channel", required = false) String channel,
-            @RequestHeader(value = "X-Role", required = false) String role
+            RequestContext ctx
     ) {
-        RequestContext ctx = RequestContext.fromHeaders(channel, role);
         if (ctx.getChannel() == null || !Channel.INTERNAL.equals(ctx.getChannel()) || !ctx.isAdmin()) {
             return ResponseEntity.status(403).build();
         }

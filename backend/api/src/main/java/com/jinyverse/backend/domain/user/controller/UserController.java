@@ -1,7 +1,6 @@
 package com.jinyverse.backend.domain.user.controller;
 
 import com.jinyverse.backend.domain.common.util.RequestContext;
-import com.jinyverse.backend.domain.common.util.RequestContextHolder;
 import com.jinyverse.backend.domain.user.dto.UserImageRequestDto;
 import com.jinyverse.backend.domain.user.dto.UserRequestDto;
 import com.jinyverse.backend.domain.user.dto.UserResponseDto;
@@ -26,11 +25,8 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponseDto> getMe(
-            @RequestHeader(value = "X-Channel", required = false) String channel,
-            @RequestHeader(value = "X-Role", required = false) String role) {
-        RequestContext ctx = RequestContextHolder.get();
-        if (ctx == null || !ctx.isAuthenticated() || ctx.getCurrentUserId() == null) {
+    public ResponseEntity<UserResponseDto> getMe(RequestContext ctx) {
+        if (!ctx.isAuthenticated() || ctx.getCurrentUserId() == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         UserResponseDto response = userService.getMe(ctx.getCurrentUserId());
@@ -39,9 +35,9 @@ public class UserController {
 
     @PostMapping("/me/profile-image")
     public ResponseEntity<UserResponseDto> setProfileImage(
-            @Valid @RequestBody UserImageRequestDto body) {
-        RequestContext ctx = RequestContextHolder.get();
-        if (ctx == null || !ctx.isAuthenticated() || ctx.getCurrentUserId() == null) {
+            @Valid @RequestBody UserImageRequestDto body,
+            RequestContext ctx) {
+        if (!ctx.isAuthenticated() || ctx.getCurrentUserId() == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         userService.setProfileImage(ctx.getCurrentUserId(), body.getFileId());
@@ -50,9 +46,8 @@ public class UserController {
     }
 
     @DeleteMapping("/me/profile-image")
-    public ResponseEntity<UserResponseDto> clearProfileImage() {
-        RequestContext ctx = RequestContextHolder.get();
-        if (ctx == null || !ctx.isAuthenticated() || ctx.getCurrentUserId() == null) {
+    public ResponseEntity<UserResponseDto> clearProfileImage(RequestContext ctx) {
+        if (!ctx.isAuthenticated() || ctx.getCurrentUserId() == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         userService.clearProfileImage(ctx.getCurrentUserId());
@@ -69,8 +64,9 @@ public class UserController {
     @GetMapping
     public ResponseEntity<Page<UserResponseDto>> getAll(
             @RequestParam Map<String, Object> filter,
-            Pageable pageable) {
-        Page<UserResponseDto> responses = userService.getAll(filter, pageable, RequestContextHolder.get());
+            Pageable pageable,
+            RequestContext ctx) {
+        Page<UserResponseDto> responses = userService.getAll(filter, pageable, ctx);
         return ResponseEntity.ok(responses);
     }
 

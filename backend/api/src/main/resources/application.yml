@@ -51,6 +51,12 @@ server:
 
 # JWT (환경변수 필수, 기본값 없음)
 app:
+  cors:
+    allowed-origins:
+      - http://localhost:3000
+      - http://localhost:3001
+      - http://127.0.0.1:3000
+      - http://127.0.0.1:3001
   file:
     storage:
       base-path: ${FILE_STORAGE_BASE_PATH:}

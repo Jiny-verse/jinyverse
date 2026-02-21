@@ -1,8 +1,12 @@
 package com.jinyverse.backend.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jinyverse.backend.config.properties.CorsProperties;
+import com.jinyverse.backend.config.resolver.RequestContextArgumentResolver;
 import com.jinyverse.backend.domain.common.util.JwtUtil;
 import com.jinyverse.backend.domain.idempotency.service.IdempotencyService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,11 +14,22 @@ import org.springframework.core.Ordered;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
 
 @Configuration
-public class WebConfig {
+@EnableConfigurationProperties(CorsProperties.class)
+@RequiredArgsConstructor
+public class WebConfig implements WebMvcConfigurer {
+
+    private final CorsProperties corsProperties;
+
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(new RequestContextArgumentResolver());
+    }
 
     @Bean
     public FilterRegistrationBean<AppRequestContextFilter> appRequestContextFilter() {
@@ -61,12 +76,7 @@ public class WebConfig {
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.setAllowedOrigins(List.of(
-                "http://localhost:3000",
-                "http://localhost:3001",
-                "http://127.0.0.1:3000",
-                "http://127.0.0.1:3001"
-        ));
+        config.setAllowedOrigins(corsProperties.getAllowedOrigins());
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("*"));

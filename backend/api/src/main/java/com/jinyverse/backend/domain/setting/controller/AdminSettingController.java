@@ -18,11 +18,7 @@ public class AdminSettingController {
     private final SystemSettingService systemSettingService;
 
     @GetMapping("/file-storage")
-    public ResponseEntity<FileStorageSettingDto> getFileStorageSetting(
-            @RequestHeader(value = "X-Channel", required = false) String channel,
-            @RequestHeader(value = "X-Role", required = false) String role
-    ) {
-        RequestContext ctx = RequestContext.fromHeaders(channel, role);
+    public ResponseEntity<FileStorageSettingDto> getFileStorageSetting(RequestContext ctx) {
         if (ctx.getChannel() == null || !Channel.INTERNAL.equals(ctx.getChannel()) || !ctx.isAdmin()) {
             return ResponseEntity.status(403).build();
         }
@@ -31,11 +27,9 @@ public class AdminSettingController {
 
     @PostMapping("/file-storage")
     public ResponseEntity<FileStorageSettingDto> updateFileStorageSetting(
-            @RequestHeader(value = "X-Channel", required = false) String channel,
-            @RequestHeader(value = "X-Role", required = false) String role,
-            @Valid @RequestBody FileStorageSettingDto dto
+            @Valid @RequestBody FileStorageSettingDto dto,
+            RequestContext ctx
     ) {
-        RequestContext ctx = RequestContext.fromHeaders(channel, role);
         if (ctx.getChannel() == null || !Channel.INTERNAL.equals(ctx.getChannel()) || !ctx.isAdmin()) {
             return ResponseEntity.status(403).build();
         }

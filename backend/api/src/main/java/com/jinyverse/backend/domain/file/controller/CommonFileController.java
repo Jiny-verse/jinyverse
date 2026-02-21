@@ -1,7 +1,6 @@
 package com.jinyverse.backend.domain.file.controller;
 
 import com.jinyverse.backend.domain.common.util.RequestContext;
-import com.jinyverse.backend.domain.common.util.RequestContextHolder;
 import com.jinyverse.backend.domain.file.dto.CommonFileRequestDto;
 import com.jinyverse.backend.domain.file.dto.CommonFileResponseDto;
 import com.jinyverse.backend.domain.file.dto.UploadSessionResponseDto;
@@ -35,9 +34,8 @@ public class CommonFileController {
     private final UploadSessionService uploadSessionService;
 
     @PostMapping("/upload-session")
-    public ResponseEntity<UploadSessionResponseDto> createUploadSession() {
-        var ctx = RequestContextHolder.get();
-        if (ctx == null || !ctx.isAuthenticated() || ctx.getCurrentUserId() == null) {
+    public ResponseEntity<UploadSessionResponseDto> createUploadSession(RequestContext ctx) {
+        if (!ctx.isAuthenticated() || ctx.getCurrentUserId() == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         UploadSessionResponseDto dto = uploadSessionService.issue(ctx.getCurrentUserId());
@@ -47,10 +45,10 @@ public class CommonFileController {
     @PostMapping("/upload")
     public ResponseEntity<?> upload(
             @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "sessionId", required = false) String sessionId) {
+            @RequestParam(value = "sessionId", required = false) String sessionId,
+            RequestContext ctx) {
         if (sessionId != null && !sessionId.isBlank()) {
-            var ctx = RequestContextHolder.get();
-            if (ctx == null || !ctx.isAuthenticated() || ctx.getCurrentUserId() == null) {
+            if (!ctx.isAuthenticated() || ctx.getCurrentUserId() == null) {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
             }
             uploadSessionService.validate(sessionId, ctx.getCurrentUserId());
@@ -69,9 +67,8 @@ public class CommonFileController {
     }
 
     @GetMapping("/{id}/download")
-    public ResponseEntity<Resource> download(@PathVariable UUID id) {
+    public ResponseEntity<Resource> download(@PathVariable UUID id, RequestContext ctx) {
         try {
-            var ctx = RequestContextHolder.get();
             commonFileService.checkDownloadAccess(id, ctx);
 
             CommonFileResponseDto meta = commonFileService.getById(id);
@@ -103,9 +100,8 @@ public class CommonFileController {
     public ResponseEntity<Page<CommonFileResponseDto>> getAll(
             @RequestParam Map<String, Object> filter,
             Pageable pageable,
-            @RequestHeader(value = "X-Channel", required = false) String channel) {
-        Page<CommonFileResponseDto> responses = commonFileService.getAll(filter, pageable,
-                RequestContext.fromChannelHeader(channel));
+            RequestContext ctx) {
+        Page<CommonFileResponseDto> responses = commonFileService.getAll(filter, pageable, ctx);
         return ResponseEntity.ok(responses);
     }
 

@@ -35,11 +35,9 @@ public class MenuController {
     public ResponseEntity<Page<MenuResponseDto>> getAll(
             @RequestParam Map<String, Object> filter,
             Pageable pageable,
-            @RequestHeader(value = "X-Channel", required = false) String channel,
-            @RequestHeader(value = "X-Role", required = false) String role
+            RequestContext ctx
     ) {
-        Page<MenuResponseDto> responses =
-                menuService.getAll(filter, pageable, RequestContext.fromHeaders(channel, role));
+        Page<MenuResponseDto> responses = menuService.getAll(filter, pageable, ctx);
         return ResponseEntity.ok(responses);
     }
 

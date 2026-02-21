@@ -32,10 +32,9 @@ public class AuditLogController {
     public ResponseEntity<Page<AuditLogResponseDto>> getAll(
             @RequestParam Map<String, Object> filter,
             Pageable pageable,
-            @RequestHeader(value = "X-Channel", required = false) String channel
+            RequestContext ctx
     ) {
-        Page<AuditLogResponseDto> responses =
-                auditLogService.getAll(filter, pageable, RequestContext.fromChannelHeader(channel));
+        Page<AuditLogResponseDto> responses = auditLogService.getAll(filter, pageable, ctx);
         return ResponseEntity.ok(responses);
     }
 

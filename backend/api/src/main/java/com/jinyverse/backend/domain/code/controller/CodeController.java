@@ -31,10 +31,9 @@ public class CodeController {
     public ResponseEntity<Page<CodeResponseDto>> getAll(
             @RequestParam Map<String, Object> filter,
             Pageable pageable,
-            @RequestHeader(value = "X-Channel", required = false) String channel
+            RequestContext ctx
     ) {
-        Page<CodeResponseDto> responses =
-                codeService.getAll(filter, pageable, RequestContext.fromChannelHeader(channel));
+        Page<CodeResponseDto> responses = codeService.getAll(filter, pageable, ctx);
         return ResponseEntity.ok(responses);
     }
 

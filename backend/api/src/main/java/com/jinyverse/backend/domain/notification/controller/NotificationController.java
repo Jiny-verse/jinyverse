@@ -32,10 +32,9 @@ public class NotificationController {
     public ResponseEntity<Page<NotificationResponseDto>> getAll(
             @RequestParam Map<String, Object> filter,
             Pageable pageable,
-            @RequestHeader(value = "X-Channel", required = false) String channel
+            RequestContext ctx
     ) {
-        Page<NotificationResponseDto> responses =
-                notificationService.getAll(filter, pageable, RequestContext.fromChannelHeader(channel));
+        Page<NotificationResponseDto> responses = notificationService.getAll(filter, pageable, ctx);
         return ResponseEntity.ok(responses);
     }
 

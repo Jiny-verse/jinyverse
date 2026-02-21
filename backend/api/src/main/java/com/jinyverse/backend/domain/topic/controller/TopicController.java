@@ -29,10 +29,9 @@ public class TopicController {
     @PostMapping
     public ResponseEntity<TopicResponseDto> create(
             @Validated(CreateGroup.class) @RequestBody TopicRequestDto requestDto,
-            @RequestHeader(value = "X-Channel", required = false) String channel,
-            @RequestHeader(value = "X-Role", required = false) String role
+            RequestContext ctx
     ) {
-        TopicResponseDto response = topicService.create(requestDto, RequestContext.fromHeaders(channel, role));
+        TopicResponseDto response = topicService.create(requestDto, ctx);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -40,11 +39,9 @@ public class TopicController {
     public ResponseEntity<Page<TopicResponseDto>> getAll(
             @RequestParam Map<String, Object> filter,
             @PageableDefault(sort = {"isPinned", "createdAt"}, direction = Sort.Direction.DESC) Pageable pageable,
-            @RequestHeader(value = "X-Channel", required = false) String channel,
-            @RequestHeader(value = "X-Role", required = false) String role
+            RequestContext ctx
     ) {
-        Page<TopicResponseDto> responses =
-                topicService.getAll(filter, pageable, RequestContext.fromHeaders(channel, role));
+        Page<TopicResponseDto> responses = topicService.getAll(filter, pageable, ctx);
         return ResponseEntity.ok(responses);
     }
 
@@ -57,10 +54,9 @@ public class TopicController {
     @GetMapping("/{id}")
     public ResponseEntity<TopicResponseDto> getById(
             @PathVariable UUID id,
-            @RequestHeader(value = "X-Channel", required = false) String channel,
-            @RequestHeader(value = "X-Role", required = false) String role
+            RequestContext ctx
     ) {
-        TopicResponseDto response = topicService.getById(id, RequestContext.fromHeaders(channel, role));
+        TopicResponseDto response = topicService.getById(id, ctx);
         return ResponseEntity.ok(response);
     }
 
@@ -68,20 +64,18 @@ public class TopicController {
     public ResponseEntity<TopicResponseDto> update(
             @PathVariable UUID id,
             @Valid @RequestBody TopicRequestDto requestDto,
-            @RequestHeader(value = "X-Channel", required = false) String channel,
-            @RequestHeader(value = "X-Role", required = false) String role
+            RequestContext ctx
     ) {
-        TopicResponseDto response = topicService.update(id, requestDto, RequestContext.fromHeaders(channel, role));
+        TopicResponseDto response = topicService.update(id, requestDto, ctx);
         return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @PathVariable UUID id,
-            @RequestHeader(value = "X-Channel", required = false) String channel,
-            @RequestHeader(value = "X-Role", required = false) String role
+            RequestContext ctx
     ) {
-        topicService.delete(id, RequestContext.fromHeaders(channel, role));
+        topicService.delete(id, ctx);
         return ResponseEntity.noContent().build();
     }
 }

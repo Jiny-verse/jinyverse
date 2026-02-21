@@ -1,6 +1,7 @@
 package com.jinyverse.backend.domain.tag.controller;
 
 import com.jinyverse.backend.domain.common.util.RequestContext;
+
 import com.jinyverse.backend.domain.tag.dto.TagRequestDto;
 import com.jinyverse.backend.domain.tag.dto.TagResponseDto;
 import com.jinyverse.backend.domain.tag.service.TagService;
@@ -32,10 +33,9 @@ public class TagController {
     public ResponseEntity<Page<TagResponseDto>> getAll(
             @RequestParam Map<String, Object> filter,
             Pageable pageable,
-            @RequestHeader(value = "X-Channel", required = false) String channel
+            RequestContext ctx
     ) {
-        Page<TagResponseDto> responses =
-                tagService.getAll(filter, pageable, RequestContext.fromChannelHeader(channel));
+        Page<TagResponseDto> responses = tagService.getAll(filter, pageable, ctx);
         return ResponseEntity.ok(responses);
     }
 
