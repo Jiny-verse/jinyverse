@@ -29,8 +29,7 @@ public class TopicController {
     @PostMapping
     public ResponseEntity<TopicResponseDto> create(
             @Validated(CreateGroup.class) @RequestBody TopicRequestDto requestDto,
-            RequestContext ctx
-    ) {
+            RequestContext ctx) {
         TopicResponseDto response = topicService.create(requestDto, ctx);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -38,9 +37,8 @@ public class TopicController {
     @GetMapping
     public ResponseEntity<Page<TopicResponseDto>> getAll(
             @RequestParam Map<String, Object> filter,
-            @PageableDefault(sort = {"isPinned", "createdAt"}, direction = Sort.Direction.DESC) Pageable pageable,
-            RequestContext ctx
-    ) {
+            @PageableDefault(sort = { "isPinned", "createdAt" }, direction = Sort.Direction.DESC) Pageable pageable,
+            RequestContext ctx) {
         Page<TopicResponseDto> responses = topicService.getAll(filter, pageable, ctx);
         return ResponseEntity.ok(responses);
     }
@@ -54,8 +52,7 @@ public class TopicController {
     @GetMapping("/{id}")
     public ResponseEntity<TopicResponseDto> getById(
             @PathVariable UUID id,
-            RequestContext ctx
-    ) {
+            RequestContext ctx) {
         TopicResponseDto response = topicService.getById(id, ctx);
         return ResponseEntity.ok(response);
     }
@@ -64,8 +61,7 @@ public class TopicController {
     public ResponseEntity<TopicResponseDto> update(
             @PathVariable UUID id,
             @Valid @RequestBody TopicRequestDto requestDto,
-            RequestContext ctx
-    ) {
+            RequestContext ctx) {
         TopicResponseDto response = topicService.update(id, requestDto, ctx);
         return ResponseEntity.ok(response);
     }
@@ -73,8 +69,7 @@ public class TopicController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(
             @PathVariable UUID id,
-            RequestContext ctx
-    ) {
+            RequestContext ctx) {
         topicService.delete(id, ctx);
         return ResponseEntity.noContent().build();
     }
