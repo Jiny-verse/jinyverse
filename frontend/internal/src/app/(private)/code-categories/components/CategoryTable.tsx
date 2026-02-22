@@ -4,6 +4,7 @@ import { Pencil, Trash2 } from 'lucide-react';
 import { DataTable } from 'common/components';
 import type { ColumnDef } from 'common/components';
 import type { CodeCategory } from 'common/services';
+import { useLanguage } from 'common/utils';
 
 interface CategoryTableProps {
   data: CodeCategory[];
@@ -40,30 +41,31 @@ export function CategoryTable({
   onEdit,
   onDelete,
 }: CategoryTableProps) {
+  const { t } = useLanguage();
   const btnBase =
     'inline-flex items-center justify-center w-9 h-9 rounded-lg border transition-colors focus:outline-none';
 
   const columns: ColumnDef<CodeCategory>[] = [
-    { key: 'code', header: '분류 코드' },
-    { key: 'name', header: '분류명' },
+    { key: 'code', header: t('form.label.code') },
+    { key: 'name', header: t('form.label.name') },
     {
       key: 'isSealed',
-      header: '잠금',
+      header: t('admin.category.sealedHeader'),
       render: (row) =>
         row.isSealed ? (
           <span className="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
-            잠김
+            {t('admin.category.sealed')}
           </span>
         ) : (
           <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
-            열림
+            {t('admin.category.unsealed')}
           </span>
         ),
     },
-    { key: 'createdAt', header: '생성일' },
+    { key: 'createdAt', header: t('form.label.createdAt') },
     {
       key: '_actions' as keyof CodeCategory,
-      header: '작업',
+      header: t('table.actions'),
       render: (row) => (
         <div className="flex items-center gap-1">
           <button
@@ -78,7 +80,7 @@ export function CategoryTable({
                 ? 'cursor-not-allowed opacity-40'
                 : 'hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600'
             }`}
-            aria-label="수정"
+            aria-label={t('ui.button.edit')}
           >
             <Pencil className="w-4 h-4" />
           </button>
@@ -94,7 +96,7 @@ export function CategoryTable({
                 ? 'cursor-not-allowed opacity-40'
                 : 'hover:bg-red-50 hover:border-red-300 hover:text-red-600'
             }`}
-            aria-label="삭제"
+            aria-label={t('ui.button.delete')}
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -105,12 +107,12 @@ export function CategoryTable({
 
   return (
     <div>
-      <h2 className="mb-3 text-lg font-semibold">코드 분류</h2>
+      <h2 className="mb-3 text-lg font-semibold">{t('admin.category.title')}</h2>
       <DataTable<CodeCategory>
         data={data}
         columns={columns}
         isLoading={isLoading}
-        emptyMessage="등록된 분류가 없습니다."
+        emptyMessage={t('common.noData')}
         pagination={{
           page,
           size,
@@ -122,10 +124,10 @@ export function CategoryTable({
         search={{
           value: search,
           onChange: onSearchChange,
-          placeholder: '분류 코드·이름 검색',
+          placeholder: t('form.placeholder.search'),
         }}
         onAdd={onAdd}
-        addButtonLabel="분류 추가"
+        addButtonLabel={t('ui.button.add')}
         onRowClick={onSelect}
         getRowId={(row) => row.code}
         selectedRowId={selectedCode}

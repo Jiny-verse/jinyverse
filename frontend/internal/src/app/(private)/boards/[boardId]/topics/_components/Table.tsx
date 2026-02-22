@@ -4,6 +4,7 @@ import { ReactNode } from 'react';
 import { DataTable } from 'common/components';
 import type { Topic } from 'common/types';
 import { getColumns } from './Column';
+import { useLanguage } from 'common/utils';
 
 export interface TableProps {
   boardId: string;
@@ -46,12 +47,13 @@ export function Table({
   onRowClick,
   selectedRowId,
 }: TableProps) {
+  const { t } = useLanguage();
   const columns = getColumns(boardId, {
     onDetailView: onRowClick,
     onEdit,
     onDelete,
     previewMode: !!onRowClick,
-  });
+  }, t);
 
   const getRowClassName = (row: Topic) => {
     if (row.isNotice) return 'bg-amber-50';
@@ -64,14 +66,14 @@ export function Table({
       data={data}
       columns={columns}
       isLoading={isLoading}
-      emptyMessage="등록된 게시글이 없습니다."
+      emptyMessage={t('post.noPost')}
       pagination={pagination}
       search={search}
       filterSlot={filterSlot}
       selection={selection}
       onBatchDelete={onBatchDelete}
       onAdd={onAdd}
-      addButtonLabel="게시글 추가"
+      addButtonLabel={`${t('ui.button.add')} ${t('board.topic.title')}`}
       onRowClick={onRowClick}
       selectedRowId={selectedRowId}
       getRowClassName={getRowClassName}

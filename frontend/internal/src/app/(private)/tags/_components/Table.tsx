@@ -5,6 +5,7 @@ import { DataTable, FilterSelect } from 'common/components';
 import type { Tag } from 'common/types';
 import type { ApiOptions } from 'common/types';
 import { getTags } from 'common/services';
+import { useLanguage } from 'common/utils';
 import { getColumns } from './Column';
 import { useTagContext } from '../_hooks/useTagContext';
 
@@ -13,6 +14,7 @@ export interface TableProps {
 }
 
 export function Table({ apiOptions }: TableProps) {
+  const { t } = useLanguage();
   const domain = useTagContext();
   const [data, setData] = useState<{
     content: Tag[];
@@ -45,17 +47,20 @@ export function Table({ apiOptions }: TableProps) {
     setSelectedIds([]);
   };
 
-  const columns = getColumns({
-    onEdit: domain.dialogs.update.onOpen,
-    onDelete: domain.crud.delete,
-  });
+  const columns = getColumns(
+    {
+      onEdit: domain.dialogs.update.onOpen,
+      onDelete: domain.crud.delete,
+    },
+    t
+  );
 
   return (
     <DataTable<Tag>
       data={data?.content ?? []}
       columns={columns}
       isLoading={!data}
-      emptyMessage="등록된 태그가 없습니다."
+      emptyMessage={t('common.noData')}
       pagination={{
         page,
         size,
@@ -73,18 +78,18 @@ export function Table({ apiOptions }: TableProps) {
           setSearch(v);
           setPage(0);
         },
-        placeholder: '이름·설명 검색',
+        placeholder: t('form.placeholder.search'),
       }}
       filterSlot={
         <FilterSelect
-          label="용도"
+          label={t('form.label.usage')}
           value={usage}
           options={[
-            { value: '', label: '전체' },
+            { value: '', label: t('common.all') },
             { value: 'topic', label: '게시글' },
             { value: 'board', label: '게시판' },
           ]}
-          placeholder="전체"
+          placeholder={t('common.all')}
           onChange={(v) => {
             setUsage(v);
             setPage(0);
@@ -94,7 +99,7 @@ export function Table({ apiOptions }: TableProps) {
       selection={{ selectedIds, onSelectionChange: setSelectedIds }}
       onBatchDelete={selectedIds.length ? handleBatchDelete : undefined}
       onAdd={domain.dialogs.create.onOpen}
-      addButtonLabel="태그 추가"
+      addButtonLabel={t('admin.tag.create')}
     />
   );
 }

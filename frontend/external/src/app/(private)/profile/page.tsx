@@ -8,11 +8,13 @@ import { SingleImageField } from 'common/components';
 import { Avatar } from 'common/ui';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import type { User } from 'common/types';
+import { useLanguage } from 'common/utils';
 
 export default function ProfilePage() {
   const router = useRouter();
   const { user: authUser, isLoading: authLoading } = useAuth();
   const options = useApiOptions();
+  const { t } = useLanguage();
 
   const [me, setMe] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -42,7 +44,7 @@ export default function ProfilePage() {
         }
       })
       .catch(() => {
-        if (!done) setMessage({ type: 'error', text: '프로필을 불러오지 못했습니다.' });
+        if (!done) setMessage({ type: 'error', text: t('user.profile.loadFailed') });
       })
       .finally(() => {
         if (!done) setLoading(false);
@@ -58,7 +60,7 @@ export default function ProfilePage() {
         setMe(data);
         setNickname(data.nickname);
       })
-      .catch(() => setMessage({ type: 'error', text: '프로필을 불러오지 못했습니다.' }));
+      .catch(() => setMessage({ type: 'error', text: t('user.profile.loadFailed') }));
   };
 
   const handleSaveNickname = async (e: React.FormEvent) => {
@@ -68,10 +70,10 @@ export default function ProfilePage() {
     setSavingNickname(true);
     try {
       await updateUser(options, me.id, { nickname: nickname.trim() });
-      setMessage({ type: 'ok', text: '닉네임이 변경되었습니다.' });
+      setMessage({ type: 'ok', text: t('user.profile.nicknameChanged') });
       loadMe();
     } catch (err) {
-      setMessage({ type: 'error', text: err instanceof Error ? err.message : '닉네임 변경에 실패했습니다.' });
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : t('user.profile.nicknameChangeFailed') });
     } finally {
       setSavingNickname(false);
     }
@@ -84,11 +86,11 @@ export default function ProfilePage() {
     setSavingPassword(true);
     try {
       await updateUser(options, me.id, { currentPassword, password: newPassword });
-      setMessage({ type: 'ok', text: '비밀번호가 변경되었습니다.' });
+      setMessage({ type: 'ok', text: t('user.profile.passwordChanged') });
       setCurrentPassword('');
       setNewPassword('');
     } catch (err) {
-      setMessage({ type: 'error', text: err instanceof Error ? err.message : '비밀번호 변경에 실패했습니다.' });
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : t('user.profile.passwordChangeFailed') });
     } finally {
       setSavingPassword(false);
     }
@@ -97,7 +99,7 @@ export default function ProfilePage() {
   if (authLoading || loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <p className="text-neutral-400">로딩 중...</p>
+        <p className="text-neutral-400">{t('common.loading')}</p>
       </div>
     );
   }
@@ -105,14 +107,14 @@ export default function ProfilePage() {
   if (!me) {
     return (
       <div className="flex items-center justify-center py-20">
-        <p className="text-neutral-400">프로필을 불러올 수 없습니다.</p>
+        <p className="text-neutral-400">{t('user.profile.notFound')}</p>
       </div>
     );
   }
 
   return (
     <div className="max-w-xl mx-auto">
-      <h1 className="mb-6 text-2xl font-bold text-white">내 프로필</h1>
+      <h1 className="mb-6 text-2xl font-bold text-white">{t('user.profile.myProfile')}</h1>
 
       {message && (
         <p className={`mb-4 text-sm ${message.type === 'ok' ? 'text-green-400' : 'text-red-400'}`}>
@@ -135,7 +137,7 @@ export default function ProfilePage() {
             <p className="text-neutral-400 text-sm">{me.email}</p>
             {me.createdAt && (
               <p className="text-neutral-500 text-xs mt-1">
-                가입일: {new Date(me.createdAt).toLocaleDateString('ko-KR')}
+                {t('user.profile.joinedAt', { date: new Date(me.createdAt).toLocaleDateString() })}
               </p>
             )}
           </div>
@@ -144,7 +146,7 @@ export default function ProfilePage() {
 
       {/* 프로필 이미지 */}
       <section className="mb-6 rounded-lg border border-[#333] bg-[#1f1f1f] p-6">
-        <h2 className="mb-3 text-lg font-semibold text-white">프로필 이미지</h2>
+        <h2 className="mb-3 text-lg font-semibold text-white">{t('user.profile.image')}</h2>
         <SingleImageField
           apiOptions={options}
           value={me.profileImageFileId ?? null}
@@ -158,18 +160,18 @@ export default function ProfilePage() {
               }
               loadMe();
             } catch (err) {
-              setMessage({ type: 'error', text: err instanceof Error ? err.message : '이미지 변경에 실패했습니다.' });
+              setMessage({ type: 'error', text: err instanceof Error ? err.message : t('user.profile.imageChangeFailed') });
             }
           }}
-          uploadLabel="업로드"
+          uploadLabel={t('ui.button.upload')}
           showRemove={true}
-          onError={(e) => setMessage({ type: 'error', text: `이미지 설정 실패: ${e.message}` })}
+          onError={(e) => setMessage({ type: 'error', text: t('user.profile.imageSetFailed', { msg: e.message }) })}
         />
       </section>
 
       {/* 닉네임 수정 */}
       <section className="mb-6 rounded-lg border border-[#333] bg-[#1f1f1f] p-6">
-        <h2 className="mb-3 text-lg font-semibold text-white">닉네임 수정</h2>
+        <h2 className="mb-3 text-lg font-semibold text-white">{t('user.profile.editNickname')}</h2>
         <form onSubmit={handleSaveNickname} className="flex gap-2">
           <input
             type="text"
@@ -184,17 +186,17 @@ export default function ProfilePage() {
             disabled={savingNickname}
             className="rounded border border-[#555] bg-[#333] px-4 py-2 text-sm font-medium text-white hover:bg-[#444] disabled:opacity-50"
           >
-            {savingNickname ? '저장 중...' : '저장'}
+            {savingNickname ? t('common.saving') : t('ui.button.save')}
           </button>
         </form>
       </section>
 
       {/* 비밀번호 변경 */}
       <section className="rounded-lg border border-[#333] bg-[#1f1f1f] p-6">
-        <h2 className="mb-3 text-lg font-semibold text-white">비밀번호 변경</h2>
+        <h2 className="mb-3 text-lg font-semibold text-white">{t('user.profile.changePassword')}</h2>
         <form onSubmit={handleChangePassword} className="flex flex-col gap-3">
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-gray-300">현재 비밀번호</span>
+            <span className="text-sm font-medium text-gray-300">{t('user.profile.currentPassword')}</span>
             <input
               type="password"
               value={currentPassword}
@@ -205,7 +207,7 @@ export default function ProfilePage() {
             />
           </label>
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-gray-300">새 비밀번호</span>
+            <span className="text-sm font-medium text-gray-300">{t('auth.reset.newPassword')}</span>
             <input
               type="password"
               value={newPassword}
@@ -214,7 +216,7 @@ export default function ProfilePage() {
               minLength={8}
               maxLength={100}
               autoComplete="new-password"
-              placeholder="영문, 숫자, 특수문자 포함 8자 이상"
+              placeholder={t('auth.reset.passwordPlaceholder')}
               className="rounded border border-[#444] bg-[#181818] px-3 py-2 text-white placeholder:text-gray-500 focus:border-[#666] focus:outline-none"
             />
           </label>
@@ -223,7 +225,7 @@ export default function ProfilePage() {
             disabled={savingPassword}
             className="self-start rounded border border-[#555] bg-[#333] px-4 py-2 text-sm font-medium text-white hover:bg-[#444] disabled:opacity-50"
           >
-            {savingPassword ? '변경 중...' : '비밀번호 변경'}
+            {savingPassword ? t('user.profile.changingPassword') : t('user.profile.changePassword')}
           </button>
         </form>
       </section>

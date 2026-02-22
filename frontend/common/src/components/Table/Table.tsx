@@ -3,6 +3,7 @@
 import { ReactNode } from 'react';
 import { Spinner, Checkbox, Toolbar, PaginationFooter } from '../../ui';
 import type { ColumnDef, PaginationConfig, SearchConfig, TableSelectionConfig } from './types';
+import useLanguage from '../../utils/i18n/hooks/useLanguage';
 
 export interface TableProps<T extends Record<string, unknown>> {
   data: T[];
@@ -26,7 +27,7 @@ export function Table<T extends Record<string, unknown>>({
   data,
   columns,
   isLoading = false,
-  emptyMessage = '데이터가 없습니다.',
+  emptyMessage,
   pagination,
   search,
   filterSlot,
@@ -38,6 +39,8 @@ export function Table<T extends Record<string, unknown>>({
   getRowId = (row) => String((row as { id?: unknown }).id ?? ''),
   getRowClassName,
 }: TableProps<T>) {
+  const { t } = useLanguage();
+  const resolvedEmptyMessage = emptyMessage ?? t('common.noData');
   const idKey = selection?.idKey as string;
   const selectedSet = new Set(selection?.selectedIds ?? []);
   const allIds = data.map((row) => String(row[idKey] ?? '')).filter(Boolean);
@@ -82,7 +85,7 @@ export function Table<T extends Record<string, unknown>>({
             <tr>
               {selection && (
                 <th className="px-4 py-3 text-left w-10">
-                  <Checkbox checked={allSelected} onChange={toggleAll} aria-label="전체 선택" />
+                  <Checkbox checked={allSelected} onChange={toggleAll} aria-label={t('table.selectAll')} />
                 </th>
               )}
               {columns.map((col) => (
@@ -108,7 +111,7 @@ export function Table<T extends Record<string, unknown>>({
                 <td colSpan={colSpanTotal} className="px-4 py-12 text-center text-gray-500">
                   <div className="flex justify-center items-center gap-2">
                     <Spinner size="sm" />
-                    <span>로딩 중...</span>
+                    <span>{t('common.loading')}</span>
                   </div>
                 </td>
               </tr>
@@ -134,7 +137,7 @@ export function Table<T extends Record<string, unknown>>({
                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                       />
                     </svg>
-                    <p className="text-sm font-medium text-gray-500">{emptyMessage}</p>
+                    <p className="text-sm font-medium text-gray-500">{resolvedEmptyMessage}</p>
                   </div>
                 </td>
               </tr>
@@ -166,7 +169,7 @@ export function Table<T extends Record<string, unknown>>({
                           <Checkbox
                             checked={selectedSet.has(selectionRowId)}
                             onChange={() => toggleRow(selectionRowId)}
-                            aria-label={`행 ${selectionRowId} 선택`}
+                            aria-label={t('table.selectRow', { id: selectionRowId })}
                           />
                         </td>
                       )}

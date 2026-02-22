@@ -3,6 +3,7 @@
 import { z } from 'zod';
 import { AutoDialog } from 'common/components';
 import type { AutoDialogField } from 'common/components';
+import { useLanguage } from 'common/utils';
 
 const schema = z.object({
   code: z.string().min(1).max(40),
@@ -20,20 +21,22 @@ interface CreateCategoryDialogProps {
   onSubmit: (data: FormValues) => Promise<void>;
 }
 
-const fields: AutoDialogField[] = [
-  { key: 'code', label: '분류 코드', type: 'text', placeholder: 'e.g. board_type' },
-  { key: 'name', label: '분류명', type: 'text' },
-  { key: 'isSealed', label: '잠금 (수정/추가 불가)', type: 'toggle', optional: true, defaultValue: false },
-  { key: 'description', label: '설명', type: 'textarea', optional: true },
-  { key: 'note', label: '비고', type: 'textarea', optional: true },
-];
-
 export function CreateCategoryDialog({ open, onClose, onSubmit }: CreateCategoryDialogProps) {
+  const { t } = useLanguage();
+
+  const fields: AutoDialogField[] = [
+    { key: 'code', label: t('form.label.categoryCode'), type: 'text', placeholder: 'e.g. board_type' },
+    { key: 'name', label: t('form.label.categoryName'), type: 'text' },
+    { key: 'isSealed', label: t('form.label.isSealed'), type: 'toggle', optional: true, defaultValue: false },
+    { key: 'description', label: t('form.label.description'), type: 'textarea', optional: true },
+    { key: 'note', label: t('form.label.note'), type: 'textarea', optional: true },
+  ];
+
   return (
     <AutoDialog
       open={open}
       onClose={onClose}
-      title="분류 추가"
+      title={t('admin.category.add')}
       schema={schema}
       fields={fields}
       mode="create"

@@ -6,6 +6,7 @@ import { ImageGridField } from '../File/ImageGridField';
 import { FormSection } from '../Form/FormSection';
 import { FormField } from '../Form/FormField';
 import { Textarea } from '../../ui/Textarea';
+import useLanguage from '../../utils/i18n/hooks/useLanguage';
 
 interface GalleryPostFormFieldsProps {
   apiOptions: ApiOptions;
@@ -28,13 +29,14 @@ export function GalleryPostFormFields({
   onContentChange,
   imagesError,
 }: GalleryPostFormFieldsProps) {
+  const { t } = useLanguage();
   return (
     <>
       <FormSection
-        title="이미지"
-        description="갤러리에 표시될 이미지를 업로드하세요 (필수, 최소 1장, 최대 10장)"
+        title={t('board.form.images')}
+        description={t('board.form.galleryImagesDesc')}
       >
-        <FormField label="이미지" name="images" required error={imagesError}>
+        <FormField label={t('board.form.images')} name="images" required error={imagesError}>
           <ImageGridField
             apiOptions={apiOptions}
             value={images}
@@ -48,12 +50,12 @@ export function GalleryPostFormFields({
         </FormField>
       </FormSection>
 
-      <FormSection title="설명" description="이미지에 대한 간단한 설명을 입력하세요 (선택)">
-        <FormField label="설명" name="content">
+      <FormSection title={t('board.form.galleryDesc')} description={t('board.form.galleryDescSub')}>
+        <FormField label={t('board.form.galleryDesc')} name="content">
           <Textarea
             value={content}
             onChange={(e) => onContentChange(e.target.value)}
-            placeholder="설명을 입력하세요..."
+            placeholder={t('form.placeholder.description')}
             rows={4}
           />
         </FormField>

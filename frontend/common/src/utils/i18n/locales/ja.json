@@ -1,0 +1,467 @@
+{
+  "ui": {
+    "button": {
+      "accept": "承認",
+      "cancel": "キャンセル",
+      "confirm": "確認",
+      "delete": "削除",
+      "save": "保存",
+      "edit": "編集",
+      "close": "閉じる",
+      "login": "ログイン",
+      "register": "登録",
+      "logout": "ログアウト",
+      "add": "追加",
+      "create": "作成",
+      "change": "変更",
+      "preview": "プレビュー",
+      "search": "検索",
+      "upload": "アップロード",
+      "back": "戻る",
+      "saving": "保存中...",
+      "uploading": "アップロード中...",
+      "loading": "読み込み中..."
+    },
+    "input": {
+      "placeholder": "入力してください",
+      "search": "検索"
+    },
+    "dialog": {
+      "alert": "アラート"
+    }
+  },
+  "message": {
+    "warning": "以下の点に注意してください",
+    "error": "エラーが発生しました",
+    "success": "正常に完了しました",
+    "confirm": "本当に進めますか？",
+    "loginRequired": "ログインが必要です。",
+    "commentFailed": "コメントの投稿に失敗しました。"
+  },
+  "validation": {
+    "required": "必須入力項目です",
+    "email": "正しいメール形式ではありません",
+    "minLength": "{{min}}文字以上入力してください",
+    "maxLength": "{{max}}文字以下で入力してください",
+    "pattern": "正しい形式ではありません",
+    "passwordMismatch": "パスワードが一致しません"
+  },
+  "error": {
+    "notFound": "リクエストしたページが見つかりません",
+    "unauthorized": "認証が必要です",
+    "forbidden": "アクセス権限がありません",
+    "serverError": "サーバーエラーが発生しました",
+    "networkError": "ネットワークエラーが発生しました",
+    "timeout": "リクエストがタイムアウトしました"
+  },
+  "common": {
+    "loading": "読み込み中...",
+    "noData": "データがありません",
+    "retry": "再試行",
+    "back": "戻る",
+    "next": "次へ",
+    "previous": "前へ",
+    "submit": "送信",
+    "reset": "リセット",
+    "all": "すべて",
+    "list": "一覧",
+    "detail": "詳細",
+    "required": "(必須)",
+    "optional": "(任意)",
+    "saving": "保存中...",
+    "uploading": "アップロード中...",
+    "redirecting": "移動中...",
+    "yes": "はい",
+    "no": "いいえ"
+  },
+  "datetime": {
+    "secondsAgo": "{{count}}秒前",
+    "minutesAgo": "{{count}}分前",
+    "hoursAgo": "{{count}}時間前",
+    "daysAgo": "{{count}}日前",
+    "now": "たった今"
+  },
+  "channel": {
+    "internal": "内部",
+    "external": "外部",
+    "public": "公開"
+  },
+  "form": {
+    "label": {
+      "email": "メールアドレス",
+      "password": "パスワード",
+      "name": "名前",
+      "phone": "電話番号",
+      "username": "ユーザー名",
+      "nickname": "ニックネーム",
+      "title": "タイトル",
+      "description": "説明",
+      "usage": "用途",
+      "action": "アクション",
+      "targetType": "対象種類",
+      "createdAt": "作成日時",
+      "tagName": "タグ名",
+      "sortOrder": "並び順",
+      "category": "カテゴリ",
+      "code": "コード",
+      "content": "内容",
+      "thumbnail": "サムネイル",
+      "image": "画像",
+      "file": "ファイル",
+      "tags": "タグ",
+      "author": "著者",
+      "status": "ステータス",
+      "viewCount": "閲覧",
+      "type": "タイプ",
+      "note": "備考",
+      "order": "順序",
+      "isPublic": "公開",
+      "isPrivate": "非公開",
+      "menuCode": "メニューコード",
+      "typeCategory": "タイプ分類",
+      "updatedAt": "更新日",
+      "categoryCode": "分類コード",
+      "categoryName": "分類名",
+      "isSealed": "ロック (編集/追加不可)",
+      "value": "値"
+    },
+    "placeholder": {
+      "email": "メールアドレスを入力してください",
+      "password": "パスワードを入力してください",
+      "name": "名前を入力してください",
+      "phone": "電話番号を入力してください",
+      "nickname": "ニックネームを入力してください",
+      "title": "タイトルを入力してください",
+      "description": "説明を入力してください",
+      "content": "内容を入力してください",
+      "search": "検索キーワードを入力してください",
+      "url": "URLを入力してください",
+      "tagName": "タグ名を入力してください"
+    }
+  },
+  "table": {
+    "noData": "表示するデータがありません",
+    "loading": "データを読み込み中...",
+    "pageInfo": "{{current}} / {{total}} ページ",
+    "rowsPerPage": "ページあたりの行数",
+    "actions": "操作",
+    "selected": "{{count}}件選択",
+    "batchDelete": "一括削除",
+    "selectAll": "全選択",
+    "selectRow": "行{{id}}選択"
+  },
+  "modal": {
+    "close": "閉じる",
+    "confirm": "確認",
+    "cancel": "キャンセル"
+  },
+  "editor": {
+    "toolbar": {
+      "bold": "太字",
+      "italic": "斜体",
+      "underline": "下線",
+      "strike": "取り消し線",
+      "code": "インラインコード",
+      "codeBlock": "コードブロック",
+      "h1": "見出し1",
+      "h2": "見出し2",
+      "h3": "見出し3",
+      "ul": "箇条書き",
+      "ol": "番号付きリスト",
+      "link": "リンク",
+      "image": "画像",
+      "blockquote": "引用",
+      "hr": "水平線",
+      "alignLeft": "左揃え",
+      "alignCenter": "中央揃え",
+      "alignRight": "右揃え",
+      "textColor": "文字色",
+      "highlight": "ハイライト",
+      "lineHeight": "行間",
+      "specialChar": "特殊文字",
+      "fontFamily": "フォント",
+      "fontSize": "サイズ",
+      "callout": "コールアウト",
+      "embed": "埋め込み",
+      "table": "表",
+      "undo": "元に戻す",
+      "redo": "やり直し",
+      "switchMode": "モード切替"
+    },
+    "mode": {
+      "text": "リッチテキスト",
+      "markdown": "マークダウン"
+    },
+    "status": {
+      "cursor": "{{line}}:{{col}}",
+      "chars": "{{count}}文字"
+    },
+    "placeholder": "内容を入力してください"
+  },
+  "editorDialog": {
+    "link": {
+      "title": "リンク挿入",
+      "text": "表示テキスト",
+      "textPlaceholder": "リンクテキスト（任意）"
+    },
+    "table": {
+      "title": "表挿入",
+      "rows": "行数",
+      "cols": "列数",
+      "hasHeader": "最初の行をヘッダーに",
+      "preview": "プレビュー"
+    },
+    "embed": {
+      "title": "埋め込み挿入",
+      "placeholder": "YouTubeまたはVimeo의 URLを入力してください",
+      "supported": "✅ 対応形式です（YouTube / Vimeo）",
+      "unsupported": "⚠️ YouTube/VimeoのURLではありません。リンクカードとして挿入されます。"
+    },
+    "image": {
+      "title": "画像挿入",
+      "upload": "ファイルアップ로드",
+      "selectFile": "ファイル選択",
+      "uploadError": "アップロードに失敗しました。",
+      "alt": "代替テキスト（alt）",
+      "altPlaceholder": "画像の説明（任意）"
+    }
+  },
+  "editorTable": {
+    "addRowAbove": "上に行を追加",
+    "addRowBelow": "下に行を追加",
+    "deleteRow": "行を削除",
+    "addColLeft": "左に列を追加",
+    "addColRight": "右に列を追加",
+    "deleteCol": "列を削除",
+    "cellBgColor": "セル背景色",
+    "cellTextColor": "セル文字色",
+    "deleteTable": "表を削除"
+  },
+  "auth": {
+    "login": {
+      "title": "ログイン",
+      "forgot": "パスワードをお忘れの方",
+      "register": "登録",
+      "error": "ログインに失敗しました。",
+      "submitting": "ログイン中...",
+      "username": "ユーザー名"
+    },
+    "register": {
+      "title": "登録",
+      "submit": "登録する",
+      "submitting": "登録中...",
+      "error": "登録に失敗しました。",
+      "agreeError": "利用規約に同意する必要があります。",
+      "agreeLabel": "利用規約に同意します",
+      "verifyEmailSent": "{{email}}に認証メールを送信しました。メールの認証コードを入力してください。",
+      "verifyEmailLink": "メール認証する"
+    },
+    "verify": {
+      "title": "メール認証",
+      "description": "メールをご確認ください",
+      "submit": "認証する",
+      "submitting": "認証中...",
+      "error": "認証に失敗しました。",
+      "code": "認証コード",
+      "codePlaceholder": "メールで受け取ったコード",
+      "resend": "再送信",
+      "resending": "送信中...",
+      "resendSuccess": "認証メールを再送信しました。"
+    },
+    "forgot": {
+      "title": "パスワードをお忘れの方",
+      "description": "登録時のメールアドレスを入力すると、再設定リンクをお送りします。",
+      "submit": "再設定メールを受け取る",
+      "submitting": "送信中...",
+      "error": "リクエストに失敗しました。",
+      "sentTitle": "パスワード再設定メール送信",
+      "sentDesc": "{{email}}にパスワード再設定メールを送信しました。メールのリンクまたはコードで新しいパスワードを設定してください。",
+      "resetLink": "パスワードを再設定する"
+    },
+    "reset": {
+      "title": "パスワードの再設定",
+      "doneTitle": "パスワード再設定完了",
+      "doneDesc": "パスワードが変更されました。新しいパスワードでログインしてください。",
+      "submit": "パスワード変更",
+      "submitting": "再設定中...",
+      "error": "パスワードの再設定に失敗しました。",
+      "newPassword": "新しいパスワード",
+      "verifyCode": "認証コード",
+      "verifyCodePlaceholder": "メールで受け取ったコード",
+      "passwordPlaceholder": "英字・数字・記号を含む8文字以上"
+    }
+  },
+  "user": {
+    "profile": {
+      "title": "プロフィール",
+      "myProfile": "マイプロフィール",
+      "nicknameChanged": "ニックネームが変更されました",
+      "nicknameChangeFailed": "ニックネームの変更に失敗しました。",
+      "loadError": "プロフィールを読み込めませんでした",
+      "loadFailed": "プロフィールを読み込めませんでした。",
+      "notFound": "プロフィールを読み込めません。",
+      "image": "プロフィール画像",
+      "imageChangeFailed": "画像の変更に失敗しました。",
+      "imageSetFailed": "画像設定失敗: {{msg}}",
+      "editNickname": "ニックネーム編集",
+      "basicInfo": "基本情報編集",
+      "changePassword": "パスワード変更",
+      "currentPassword": "現在のパスワード",
+      "passwordChanged": "パスワードが変更されました。",
+      "passwordChangeFailed": "パスワードの変更に失敗しました。",
+      "changingPassword": "変更中...",
+      "joinedAt": "登録日: {{date}}",
+      "saveFailed": "保存に失敗しました。",
+      "saved": "情報が保存されました。"
+    }
+  },
+  "board": {
+    "title": {
+      "main": "掲示板"
+    },
+    "topic": {
+      "title": "投稿",
+      "create": "投稿作成",
+      "edit": "投稿編集"
+    },
+    "form": {
+      "basicInfo": "基本情報",
+      "basicInfoDesc": "投稿のタイトルと内容を入力してください",
+      "extraSettings": "追加設定",
+      "tagDesc": "EnterまたはカンマでＴ追加",
+      "publishSettings": "公開・表示設定",
+      "publishAt": "公開日時",
+      "publishAtDesc": "予約公開が必要な場合は設定してください",
+      "isPublic": "公開",
+      "isNotice": "お知らせ",
+      "isPinned": "上部固定",
+      "titleMaxLen": "投稿タイトル（最大200文字）",
+      "body": "本文",
+      "coverImage": "カバー画像",
+      "coverImageDesc": "一覧に表示される代表画像をアップロードしてください（任意）",
+      "images": "画像",
+      "galleryImagesDesc": "ギャラリーに表示する画像をアップロードしてください（必須、最小1枚、最大10枚）",
+      "projectImagesDesc": "プロジェクト画像をアップロードしてください。クリックしてカバー(★)を指定（必須、最小1枚、最大10枚）",
+      "galleryDesc": "説明",
+      "galleryDescSub": "画像の簡単な説明を入力してください（任意）"
+    }
+  },
+  "file": {
+    "add": "ファイル追加",
+    "upload": "ファイルアップロード",
+    "uploading": "アップロード中...",
+    "download": "ダウンロード",
+    "noFile": "ファイルなし",
+    "attachFile": "ファイル添付",
+    "selectFile": "ファイル選択",
+    "changeImage": "画像変更",
+    "deleteImage": "画像削除",
+    "mainImage": "代表画像",
+    "imageOnly": "画像ファイルのみアップロード可能です",
+    "uploadFailed": "アップロード失敗",
+    "uploadFailedMsg": "アップロード失敗: {{msg}}",
+    "dragOrClick": "画像をドラッグするかクリックしてください",
+    "remove": "削除",
+    "delete": "削除",
+    "current": "現在:",
+    "imageSelect": "画像選択",
+    "addImage": "画像追加",
+    "mainImageHint": "クリックして代表画像(★)を変更 · 最大{{max}}枚",
+    "mainImageHintMin": "(最小{{min}}枚)"
+  },
+  "admin": {
+    "none": "(なし)",
+    "audit": {
+      "title": "監査ログ",
+      "detail": "監査ログ詳細",
+      "actorId": "行為者ID",
+      "targetId": "対象ID",
+      "ipAddress": "IPアドレス",
+      "before": "変更前",
+      "after": "変更後",
+      "sealed": "ロック — 編集不可",
+      "selectCategory": "左側のカテゴリを選択するとコード一覧が表示されます。"
+    },
+    "setting": {
+      "title": "設定",
+      "loadFailed": "設定を読み込めませんでした。",
+      "saved": "保存しました。",
+      "saveFailed": "保存に失敗しました。管理者権限を確認してください。",
+      "fileStorage": "ファイルストレージ",
+      "fileStorageDesc": "アップロードされたファイルを保存するサーバーディレクトリパスです。空にするとapplication.ymlまたは環境変数のデフォルト値を使用します。",
+      "savePath": "保存パス",
+      "profileImage": "プロフィール画像",
+      "profileImageDesc": "プロフィール画像をアップロードすると自分のアカウントに関連付けられます。（ログイン済みユーザーのみ使用可能）",
+      "profileImageSetFailed": "プロフィール画像設定失敗: {{msg}}"
+    },
+    "tag": {
+      "title": "タグ管理",
+      "create": "タグ作成",
+      "edit": "タグ編集"
+    },
+    "category": {
+      "title": "コードカテゴリ管理",
+      "add": "カテゴリ追加",
+      "edit": "カテゴリ編集",
+      "sealed": "ロック",
+      "unsealed": "未ロック",
+      "sealedHeader": "ロック"
+    },
+    "code": {
+      "title": "コード管理",
+      "add": "コード追加",
+      "edit": "コード編集"
+    },
+    "menu": {
+      "title": "メニュー管理",
+      "create": "メニュー作成",
+      "add": "メニュー追加",
+      "edit": "メニュー編集",
+      "deleteConfirm": "このメニューを削除しますか？",
+      "hierarchy": "階層",
+      "internal": "内部",
+      "external": "外部",
+      "public": "公開"
+    },
+    "user": {
+      "title": "ユーザー管理"
+    },
+    "board": {
+      "title": "掲示板管理",
+      "create": "掲示板作成",
+      "edit": "掲示板編集"
+    }
+  },
+  "nav": {
+    "loading": "読み込み中...",
+    "all": "すべて",
+    "search": "検索",
+    "notification": "通知",
+    "profile": "プロフィール"
+  },
+  "post": {
+    "create": "投稿",
+    "edit": "編集",
+    "delete": "削除",
+    "list": "一覧",
+    "noPost": "投稿がありません",
+    "notice": "お知らせ",
+    "pinned": "固定",
+    "viewCount": "閲覧 {{count}}",
+    "attachments": "添付ファイル",
+    "imageGallery": "画像ギャラリー",
+    "zoomIn": "画像を拡大",
+    "close": "閉じる",
+    "prev": "前へ",
+    "next": "次へ",
+    "saveDraft": "下書き保存",
+    "comments": "コメント",
+    "commentLoginHint": "コメントするにはログインしてください。",
+    "reply": "返信",
+    "registerComment": "コメント投稿",
+    "submitting": "送信中...",
+    "replyPlaceholder": "返信を入力してください。",
+    "commentPlaceholder": "コメントを入力してください。",
+    "deleteComment": "このコメントを削除しますか？"
+  }
+}

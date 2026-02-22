@@ -7,6 +7,7 @@ import { formatRelativeOrAbsolute } from 'common';
 import { ContentViewer } from 'common/components';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import type { Topic, Comment } from 'common/types';
+import { useLanguage } from 'common/utils';
 
 function buildCommentTree(comments: Comment[]) {
   const visible = comments.filter((c) => !c.isDeleted);
@@ -28,6 +29,7 @@ export default function TopicDetailPage() {
   const boardId = params.boardId as string;
   const topicId = params.topicId as string;
   const options = useApiOptions();
+  const { t } = useLanguage();
   const [topic, setTopic] = useState<Topic | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -37,9 +39,9 @@ export default function TopicDetailPage() {
     let cancelled = false;
     setError(null);
     Promise.all([getTopic(options, topicId), getComments(options, { topicId, size: 50 })])
-      .then(([t, res]) => {
+      .then(([topicData, res]) => {
         if (!cancelled) {
-          setTopic(t);
+          setTopic(topicData);
           setComments(res.content);
         }
       })
@@ -62,7 +64,7 @@ export default function TopicDetailPage() {
   if (!topic) {
     return (
       <div className="min-h-screen pt-[90px]">
-        <p className="text-gray-400">로딩 중...</p>
+        <p className="text-gray-400">{t('common.loading')}</p>
       </div>
     );
   }
@@ -72,14 +74,14 @@ export default function TopicDetailPage() {
       <article className="rounded-lg border border-gray-700 bg-gray-800/50 p-6 mb-8">
         <h1 className="text-2xl font-bold mb-2">{topic.title}</h1>
         <p className="text-sm text-gray-400 mb-4">
-          {topic.author?.nickname ?? '-'} · {formatRelativeOrAbsolute(topic.createdAt)} · 조회 {topic.viewCount ?? 0}
+          {topic.author?.nickname ?? '-'} · {formatRelativeOrAbsolute(topic.createdAt)} · {t('post.viewCount', { count: topic.viewCount ?? 0 })}
         </p>
         <ContentViewer content={topic.content} className="prose-invert max-w-none" />
       </article>
       <section>
-        <h2 className="text-lg font-semibold mb-4">댓글 ({comments.filter((c) => !c.isDeleted).length})</h2>
+        <h2 className="text-lg font-semibold mb-4">{t('post.comments')} ({comments.filter((c) => !c.isDeleted).length})</h2>
         {!options.role && (
-          <p className="text-gray-500 text-sm mb-4">댓글을 달려면 로그인해 주세요.</p>
+          <p className="text-gray-500 text-sm mb-4">{t('post.commentLoginHint')}</p>
         )}
         <ul className="space-y-3 list-none pl-0">
           {roots.map((c) => (

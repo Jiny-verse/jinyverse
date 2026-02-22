@@ -6,11 +6,13 @@ import { useEffect, useState } from 'react';
 import { Button, Input } from 'common/ui';
 import { useAuth, verifyEmail as verifyEmailApi } from 'common';
 import { FormError, AuthLink } from '../_components';
+import { useLanguage } from 'common/utils';
 
 function VerifyEmailContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { baseUrl, user, isLoading } = useAuth();
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
@@ -27,7 +29,7 @@ function VerifyEmailContent() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-neutral-400">로딩 중...</p>
+        <p className="text-neutral-400">{t('common.loading')}</p>
       </div>
     );
   }
@@ -44,7 +46,7 @@ function VerifyEmailContent() {
       await verifyEmailApi(baseUrl, { email, code });
       setDone(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '인증에 실패했습니다.');
+      setError(err instanceof Error ? err.message : t('auth.verify.error'));
     } finally {
       setSubmitting(false);
     }
@@ -53,20 +55,20 @@ function VerifyEmailContent() {
   if (done) {
     return (
       <>
-        <h1 className="text-2xl font-bold text-white">이메일 인증 완료</h1>
-        <p className="text-neutral-400 text-sm">이메일 인증이 완료되었습니다. 로그인해 주세요.</p>
-        <AuthLink href="/login">로그인</AuthLink>
+        <h1 className="text-2xl font-bold text-white">{t('auth.verify.title')}</h1>
+        <p className="text-neutral-400 text-sm">{t('auth.verify.description')}</p>
+        <AuthLink href="/login">{t('auth.login.title')}</AuthLink>
       </>
     );
   }
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-white">이메일 인증</h1>
+      <h1 className="text-2xl font-bold text-white">{t('auth.verify.title')}</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <FormError message={error} />
         <Input
-          label="이메일"
+          label={t('form.label.email')}
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -75,19 +77,19 @@ function VerifyEmailContent() {
           autoComplete="email"
         />
         <Input
-          label="인증 코드"
+          label={t('auth.verify.code')}
           value={code}
           onChange={(e) => setCode(e.target.value)}
           required
           maxLength={50}
-          placeholder="이메일로 받은 6자리 코드"
+          placeholder={t('auth.verify.codePlaceholder')}
         />
         <Button type="submit" disabled={submitting} className="w-full">
-          {submitting ? '인증 중...' : '인증하기'}
+          {submitting ? t('auth.verify.submitting') : t('auth.verify.submit')}
         </Button>
       </form>
       <div className="flex justify-center pt-2">
-        <AuthLink href="/login">로그인</AuthLink>
+        <AuthLink href="/login">{t('auth.login.title')}</AuthLink>
       </div>
     </>
   );
@@ -98,7 +100,7 @@ export default function VerifyEmailPage() {
     <Suspense
       fallback={
         <div className="flex items-center justify-center py-12">
-          <p className="text-neutral-400">로딩 중...</p>
+          <p className="text-neutral-400">...</p>
         </div>
       }
     >

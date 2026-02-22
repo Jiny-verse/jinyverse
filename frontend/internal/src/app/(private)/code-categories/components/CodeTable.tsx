@@ -4,6 +4,7 @@ import { Pencil, Trash2 } from 'lucide-react';
 import { DataTable } from 'common/components';
 import type { ColumnDef } from 'common/components';
 import type { Code } from 'common/services';
+import { useLanguage } from 'common/utils';
 
 interface CodeTableProps {
   categoryCode: string | null;
@@ -24,25 +25,26 @@ export function CodeTable({
   onEdit,
   onDelete,
 }: CodeTableProps) {
+  const { t } = useLanguage();
   const btnBase =
     'inline-flex items-center justify-center w-9 h-9 rounded-lg border transition-colors focus:outline-none';
 
   const columns: ColumnDef<Code>[] = [
-    { key: 'code', header: '코드' },
-    { key: 'name', header: '이름' },
+    { key: 'code', header: t('form.label.code') },
+    { key: 'name', header: t('form.label.name') },
     {
       key: 'value',
-      header: '값',
+      header: t('form.label.value'),
       render: (row) => row.value ?? '-',
     },
     {
       key: 'order',
-      header: '순서',
+      header: t('form.label.order'),
       render: (row) => (row.order != null ? String(row.order) : '-'),
     },
     {
       key: '_actions' as keyof Code,
-      header: '작업',
+      header: t('table.actions'),
       render: (row) => (
         <div className="flex items-center gap-1">
           <button
@@ -57,7 +59,7 @@ export function CodeTable({
                 ? 'cursor-not-allowed opacity-40'
                 : 'hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600'
             }`}
-            aria-label="수정"
+            aria-label={t('ui.button.edit')}
           >
             <Pencil className="w-4 h-4" />
           </button>
@@ -73,7 +75,7 @@ export function CodeTable({
                 ? 'cursor-not-allowed opacity-40'
                 : 'hover:bg-red-50 hover:border-red-300 hover:text-red-600'
             }`}
-            aria-label="삭제"
+            aria-label={t('ui.button.delete')}
           >
             <Trash2 className="w-4 h-4" />
           </button>
@@ -85,9 +87,9 @@ export function CodeTable({
   if (!categoryCode) {
     return (
       <div>
-        <h2 className="mb-3 text-lg font-semibold">코드 목록</h2>
+        <h2 className="mb-3 text-lg font-semibold">{t('admin.code.title')}</h2>
         <div className="flex h-48 items-center justify-center rounded-lg border border-dashed border-gray-300 text-sm text-gray-400">
-          좌측에서 분류를 선택하면 코드 목록이 표시됩니다.
+          {t('admin.audit.selectCategory')}
         </div>
       </div>
     );
@@ -96,10 +98,10 @@ export function CodeTable({
   return (
     <div>
       <h2 className="mb-3 text-lg font-semibold">
-        코드 목록
+        {t('admin.code.title')}
         {isSealed && (
           <span className="ml-2 inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-700">
-            잠김 — 수정 불가
+            {t('admin.audit.sealed')}
           </span>
         )}
       </h2>
@@ -107,9 +109,9 @@ export function CodeTable({
         data={codes}
         columns={columns}
         isLoading={isLoading}
-        emptyMessage="등록된 코드가 없습니다."
+        emptyMessage={t('common.noData')}
         onAdd={isSealed ? undefined : onAdd}
-        addButtonLabel="코드 추가"
+        addButtonLabel={t('ui.button.add')}
         getRowId={(row) => `${row.categoryCode}:${row.code}`}
       />
     </div>

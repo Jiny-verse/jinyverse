@@ -9,6 +9,7 @@ import { Switch } from '../ui/Switch';
 import { Select } from '../ui/Select';
 import { Editor } from './Editor/Editor';
 import type { z } from 'zod';
+import useLanguage from '../utils/i18n/hooks/useLanguage';
 
 export type AutoDialogField = {
   key: string;
@@ -66,6 +67,7 @@ export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const { t } = useLanguage();
 
   const handleChange = useCallback((key: string, value: unknown) => {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -113,7 +115,7 @@ export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
       footer={
         <div className="flex justify-end gap-2">
           <Button type="button" variant="secondary" onClick={onClose}>
-            취소
+            {t('ui.button.cancel')}
           </Button>
           {submitButtons?.length
             ? submitButtons.map((btn) => (
@@ -123,12 +125,12 @@ export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
                   onClick={() => handleSubmit(btn.intent)}
                   disabled={submitting}
                 >
-                  {submitting ? '저장 중...' : btn.label}
+                  {submitting ? t('common.saving') : btn.label}
                 </Button>
               ))
             : (
                 <Button type="button" onClick={() => handleSubmit()} disabled={submitting}>
-                  {submitting ? '저장 중...' : mode === 'create' ? '생성' : '수정'}
+                  {submitting ? t('common.saving') : mode === 'create' ? t('ui.button.create') : t('ui.button.edit')}
                 </Button>
               )}
         </div>

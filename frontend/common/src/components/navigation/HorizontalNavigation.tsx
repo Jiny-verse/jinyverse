@@ -5,6 +5,8 @@ import { usePathname } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
 import { ChevronDown } from 'lucide-react';
 import type { NavigationItem } from '../../types/navigation';
+import useLanguage from '../../utils/i18n/hooks/useLanguage';
+import { LanguageSelector } from '../LanguageSelector';
 
 interface Props {
   items: NavigationItem[];
@@ -21,6 +23,7 @@ function NavLinkItem({
   const hasChildren = item.children && item.children.length > 0;
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLLIElement>(null);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const close = (e: MouseEvent) => {
@@ -59,7 +62,7 @@ function NavLinkItem({
                 className="block px-4 py-2.5 text-sm text-[#e5e5e5] no-underline hover:bg-[#333] hover:text-white"
                 onClick={() => setOpen(false)}
               >
-                {item.label} (전체)
+                {item.label} ({t('nav.all')})
               </Link>
             </li>
             {item.children!.map((child) => (
@@ -98,6 +101,7 @@ function NavLinkItem({
 export function Navigation({ items, isLoading = false }: Props) {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -127,7 +131,7 @@ export function Navigation({ items, isLoading = false }: Props) {
 
           <nav>
             {isLoading ? (
-              <span className="text-sm text-gray-400">로딩 중...</span>
+              <span className="text-sm text-gray-400">{t('common.loading')}</span>
             ) : (
               <ul className="m-0 flex list-none items-center gap-[18px] p-0">
                 {items.map((item) => (
@@ -140,10 +144,11 @@ export function Navigation({ items, isLoading = false }: Props) {
 
         {/* Secondary Navigation */}
         <div className="flex h-full items-center justify-end gap-[15px]">
+          <LanguageSelector />
           <button
             type="button"
             className="relative mt-0.5 border-0 bg-transparent p-0.5 px-1.5 text-2xl leading-none text-white cursor-pointer"
-            aria-label="검색"
+            aria-label={t('nav.search')}
           >
             <svg viewBox="0 0 24 24" width={24} height={24} fill="currentColor">
               <path
@@ -157,7 +162,7 @@ export function Navigation({ items, isLoading = false }: Props) {
           <button
             type="button"
             className="relative mt-0.5 border-0 bg-transparent p-0.5 px-1.5 text-2xl leading-none text-white cursor-pointer"
-            aria-label="알림"
+            aria-label={t('nav.notification')}
           >
             <svg viewBox="0 0 24 24" width={24} height={24} fill="currentColor">
               <path
@@ -171,12 +176,12 @@ export function Navigation({ items, isLoading = false }: Props) {
           <button
             type="button"
             className="flex w-full items-center border-0 bg-transparent p-0 cursor-pointer"
-            aria-label="프로필"
+            aria-label={t('nav.profile')}
           >
             <div className="relative inline-block">
               <img
                 src="https://occ-0-988-3997.1.nflxso.net/dnm/api/v6/vN7bi_My87NPKvsBoib006Llxzg/AAAABTZ2zlLdBVC05fsd2YQAR43J6vB1NAUBOOrxt7oaFATxMhtdzlNZ846H3D8TZzooe2-FT853YVYs8p001KVFYopWi4D4NXM.png?r=229"
-                alt="프로필"
+                alt={t('nav.profile')}
                 className="inline-block h-8 w-8 align-middle rounded"
               />
             </div>

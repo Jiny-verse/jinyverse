@@ -4,32 +4,27 @@ import type { ColumnDef } from 'common/components';
 import { createActionColumn } from 'common/components';
 import type { Tag } from 'common/types';
 
-const TAG_LABELS: Record<string, string> = {
-  id: 'ID',
-  name: '이름',
-  description: '설명',
-  usageCategoryCode: '용도 분류',
-  usage: '용도',
-  createdAt: '생성일',
-};
-
-export function getColumns(options?: {
-  onEdit?: (row: Tag) => void;
-  onDelete?: (id: string) => void;
-}): ColumnDef<Tag>[] {
+export function getColumns(
+  options?: {
+    onEdit?: (row: Tag) => void;
+    onDelete?: (id: string) => void;
+  },
+  t?: (key: string) => string
+): ColumnDef<Tag>[] {
+  const tr = t ?? ((k: string) => k);
   const cols: ColumnDef<Tag>[] = [
-    { key: 'name', header: TAG_LABELS.name },
+    { key: 'name', header: tr('form.label.tagName') },
     {
       key: 'description',
-      header: TAG_LABELS.description,
+      header: tr('form.label.description'),
       render: (row) =>
         row.description
           ? String(row.description).slice(0, 50) + (String(row.description).length > 50 ? '…' : '')
           : '-',
     },
-    { key: 'usage', header: TAG_LABELS.usage },
-    { key: 'usageCategoryCode', header: TAG_LABELS.usageCategoryCode },
-    { key: 'createdAt', header: TAG_LABELS.createdAt },
+    { key: 'usage', header: tr('form.label.usage') },
+    { key: 'usageCategoryCode', header: tr('form.label.typeCategory') },
+    { key: 'createdAt', header: tr('form.label.createdAt') },
   ];
   if (options?.onEdit || options?.onDelete) {
     cols.push(

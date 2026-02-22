@@ -1,4 +1,5 @@
 export * from './navigation';
+export { LanguageSelector } from './LanguageSelector';
 export { ConfirmDialog } from './ConfirmDialog';
 export { AutoDialog } from './AutoDialog';
 export type { AutoDialogField } from './AutoDialog';

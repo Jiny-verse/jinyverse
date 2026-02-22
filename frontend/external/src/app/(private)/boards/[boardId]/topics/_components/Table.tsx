@@ -3,6 +3,7 @@
 import { Table as CommonTable } from 'common/components';
 import type { Topic } from 'common/types';
 import { getTopicColumns } from './Column';
+import { useLanguage } from 'common/utils';
 
 export interface TopicTableProps {
   boardId: string;
@@ -31,16 +32,17 @@ export function TopicTable({
   onRowClick,
   selectedRowId,
 }: TopicTableProps) {
+  const { t } = useLanguage();
   const columns = getTopicColumns(boardId, {
     previewMode: !!onRowClick,
     onDetailView: onRowClick ?? undefined,
-  });
+  }, t);
   return (
     <CommonTable<Topic>
       data={data}
       columns={columns}
       isLoading={isLoading}
-      emptyMessage="등록된 게시글이 없습니다."
+      emptyMessage={t('post.noPost')}
       pagination={
         pagination
           ? { ...pagination, sizeOptions: [10, 20, 50], onSizeChange: pagination.onSizeChange }

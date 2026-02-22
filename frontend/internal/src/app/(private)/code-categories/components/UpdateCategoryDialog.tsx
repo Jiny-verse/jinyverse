@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { AutoDialog } from 'common/components';
 import type { AutoDialogField } from 'common/components';
 import type { CodeCategory } from 'common/services';
+import { useLanguage } from 'common/utils';
 
 const schema = z.object({
   name: z.string().min(1).max(50),
@@ -21,14 +22,16 @@ interface UpdateCategoryDialogProps {
   onSubmit: (data: FormValues) => Promise<void>;
 }
 
-const fields: AutoDialogField[] = [
-  { key: 'name', label: '분류명', type: 'text' },
-  { key: 'isSealed', label: '잠금 (수정/추가 불가)', type: 'toggle', optional: true },
-  { key: 'description', label: '설명', type: 'textarea', optional: true },
-  { key: 'note', label: '비고', type: 'textarea', optional: true },
-];
-
 export function UpdateCategoryDialog({ open, target, onClose, onSubmit }: UpdateCategoryDialogProps) {
+  const { t } = useLanguage();
+
+  const fields: AutoDialogField[] = [
+    { key: 'name', label: t('form.label.categoryName'), type: 'text' },
+    { key: 'isSealed', label: t('form.label.isSealed'), type: 'toggle', optional: true },
+    { key: 'description', label: t('form.label.description'), type: 'textarea', optional: true },
+    { key: 'note', label: t('form.label.note'), type: 'textarea', optional: true },
+  ];
+
   const initialValues = target
     ? {
         name: target.name,
@@ -42,7 +45,7 @@ export function UpdateCategoryDialog({ open, target, onClose, onSubmit }: Update
     <AutoDialog
       open={open}
       onClose={onClose}
-      title="분류 수정"
+      title={t('admin.category.edit')}
       schema={schema}
       fields={fields}
       mode="edit"

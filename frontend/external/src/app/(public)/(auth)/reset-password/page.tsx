@@ -6,11 +6,13 @@ import { useEffect, useState } from 'react';
 import { Button, Input } from 'common/ui';
 import { useAuth, resetPassword as resetPasswordApi } from 'common';
 import { FormError, AuthLink } from '../_components';
+import { useLanguage } from 'common/utils';
 
 function ResetPasswordContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { baseUrl, user, isLoading } = useAuth();
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
@@ -28,7 +30,7 @@ function ResetPasswordContent() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-neutral-400">로딩 중...</p>
+        <p className="text-neutral-400">{t('common.loading')}</p>
       </div>
     );
   }
@@ -45,7 +47,7 @@ function ResetPasswordContent() {
       await resetPasswordApi(baseUrl, { email, code, newPassword });
       setDone(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '비밀번호 재설정에 실패했습니다.');
+      setError(err instanceof Error ? err.message : t('auth.reset.error'));
     } finally {
       setSubmitting(false);
     }
@@ -54,20 +56,20 @@ function ResetPasswordContent() {
   if (done) {
     return (
       <>
-        <h1 className="text-2xl font-bold text-white">비밀번호 재설정 완료</h1>
-        <p className="text-neutral-400 text-sm">비밀번호가 변경되었습니다. 새 비밀번호로 로그인해 주세요.</p>
-        <AuthLink href="/login">로그인</AuthLink>
+        <h1 className="text-2xl font-bold text-white">{t('auth.reset.doneTitle')}</h1>
+        <p className="text-neutral-400 text-sm">{t('auth.reset.doneDesc')}</p>
+        <AuthLink href="/login">{t('auth.login.title')}</AuthLink>
       </>
     );
   }
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-white">비밀번호 재설정</h1>
+      <h1 className="text-2xl font-bold text-white">{t('auth.reset.title')}</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <FormError message={error} />
         <Input
-          label="이메일"
+          label={t('form.label.email')}
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -76,15 +78,15 @@ function ResetPasswordContent() {
           autoComplete="email"
         />
         <Input
-          label="인증 코드"
+          label={t('auth.reset.verifyCode')}
           value={code}
           onChange={(e) => setCode(e.target.value)}
           required
           maxLength={50}
-          placeholder="이메일로 받은 코드"
+          placeholder={t('auth.reset.verifyCodePlaceholder')}
         />
         <Input
-          label="새 비밀번호"
+          label={t('auth.reset.newPassword')}
           type="password"
           value={newPassword}
           onChange={(e) => setNewPassword(e.target.value)}
@@ -92,14 +94,14 @@ function ResetPasswordContent() {
           minLength={8}
           maxLength={100}
           autoComplete="new-password"
-          placeholder="영문, 숫자, 특수문자 포함 8자 이상"
+          placeholder={t('auth.reset.passwordPlaceholder')}
         />
         <Button type="submit" disabled={submitting} className="w-full">
-          {submitting ? '재설정 중...' : '비밀번호 변경'}
+          {submitting ? t('auth.reset.submitting') : t('auth.reset.submit')}
         </Button>
       </form>
       <div className="flex justify-center pt-2">
-        <AuthLink href="/login">로그인</AuthLink>
+        <AuthLink href="/login">{t('auth.login.title')}</AuthLink>
       </div>
     </>
   );
@@ -110,7 +112,7 @@ export default function ResetPasswordPage() {
     <Suspense
       fallback={
         <div className="flex items-center justify-center py-12">
-          <p className="text-neutral-400">로딩 중...</p>
+          <p className="text-neutral-400">...</p>
         </div>
       }
     >

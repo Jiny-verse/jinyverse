@@ -6,6 +6,7 @@ const RELATIVE_THRESHOLD_MS = 7 * 24 * 60 * 60 * 1000; // 7일
 
 export function formatRelativeOrAbsolute(
   isoDateString: string,
+  t?: (key: string, options?: any) => string,
   now: Date = new Date()
 ): string {
   const date = new Date(isoDateString);
@@ -23,10 +24,17 @@ export function formatRelativeOrAbsolute(
   const hour = Math.floor(diffMs / (60 * 60 * 1000));
   const day = Math.floor(diffMs / (24 * 60 * 60 * 1000));
 
-  if (sec < 60) return `${sec}초 전`;
-  if (min < 60) return `${min}분 전`;
-  if (hour < 24) return `${hour}시간 전`;
-  return `${day}일 전`;
+  if (!t) {
+    if (sec < 60) return `${sec}초 전`;
+    if (min < 60) return `${min}분 전`;
+    if (hour < 24) return `${hour}시간 전`;
+    return `${day}일 전`;
+  }
+
+  if (sec < 60) return sec < 10 ? t('datetime.now', { defaultValue: '방금 전' }) : t('datetime.secondsAgo', { count: sec, defaultValue: `${sec}초 전` });
+  if (min < 60) return t('datetime.minutesAgo', { count: min, defaultValue: `${min}분 전` });
+  if (hour < 24) return t('datetime.hoursAgo', { count: hour, defaultValue: `${hour}시간 전` });
+  return t('datetime.daysAgo', { count: day, defaultValue: `${day}일 전` });
 }
 
 function formatAbsolute(date: Date): string {

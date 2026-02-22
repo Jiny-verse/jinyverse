@@ -7,15 +7,18 @@ import { Badge } from '../../ui/Badge';
 import { formatRelativeOrAbsolute } from '../../utils/formatDateTime';
 import { useImageUrlFromFileId } from '../../hooks/useImageUrlFromFileId';
 import { ImageSplitViewer } from '../ImageSplitView';
+import useLanguage from '../../utils/i18n/hooks/useLanguage';
 
 function GalleryImage({
   fileId,
   apiOptions,
   onClick,
+  ariaLabel,
 }: {
   fileId: string;
   apiOptions: ApiOptions;
   onClick: () => void;
+  ariaLabel: string;
 }) {
   const url = useImageUrlFromFileId(fileId, apiOptions);
   return (
@@ -23,7 +26,7 @@ function GalleryImage({
       type="button"
       onClick={onClick}
       className="block w-full cursor-zoom-in focus:outline-none"
-      aria-label="이미지 크게 보기"
+      aria-label={ariaLabel}
     >
       {url ? (
         <img src={url} alt="" className="w-full h-auto" />
@@ -41,6 +44,7 @@ interface GalleryPostDetailProps {
 
 export function GalleryPostDetail({ topic, apiOptions }: GalleryPostDetailProps) {
   const [splitViewIndex, setSplitViewIndex] = useState<number | null>(null);
+  const { t } = useLanguage();
 
   const sortedFiles = [...(topic.files ?? [])].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
 
@@ -60,15 +64,15 @@ export function GalleryPostDetail({ topic, apiOptions }: GalleryPostDetailProps)
             <span>·</span>
             <span>{formatRelativeOrAbsolute(topic.createdAt)}</span>
             <span>·</span>
-            <span>조회 {topic.viewCount ?? 0}</span>
+            <span>{t('post.viewCount', { count: topic.viewCount ?? 0 })}</span>
           </div>
         </header>
 
         {topic.tags?.length ? (
           <div className="flex flex-wrap gap-2 mb-6">
-            {topic.tags.map((t) => (
-              <Badge key={t.id} variant="info">
-                #{t.name}
+            {topic.tags.map((tag) => (
+              <Badge key={tag.id} variant="info">
+                #{tag.name}
               </Badge>
             ))}
           </div>
@@ -83,6 +87,7 @@ export function GalleryPostDetail({ topic, apiOptions }: GalleryPostDetailProps)
                 fileId={file.fileId}
                 apiOptions={apiOptions}
                 onClick={() => setSplitViewIndex(i)}
+                ariaLabel={t('post.zoomIn')}
               />
             ))}
           </div>

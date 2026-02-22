@@ -8,6 +8,7 @@ import { Badge } from '../../ui/Badge';
 import { formatRelativeOrAbsolute } from '../../utils/formatDateTime';
 import { getMainFileId } from '../../utils/post';
 import { useImageUrlFromFileId } from '../../hooks/useImageUrlFromFileId';
+import useLanguage from '../../utils/i18n/hooks/useLanguage';
 
 interface LightboxProps {
   fileIds: string[];
@@ -27,6 +28,7 @@ function LightboxImage({ fileId, apiOptions }: { fileId: string; apiOptions: Api
 
 function Lightbox({ fileIds, initialIndex, apiOptions, onClose }: LightboxProps) {
   const [index, setIndex] = useState(initialIndex);
+  const { t } = useLanguage();
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Escape') onClose();
@@ -44,7 +46,7 @@ function Lightbox({ fileIds, initialIndex, apiOptions, onClose }: LightboxProps)
       <button
         className="absolute top-4 right-4 text-white text-3xl leading-none hover:text-gray-300"
         onClick={onClose}
-        aria-label="닫기"
+        aria-label={t('post.close')}
       >
         ×
       </button>
@@ -52,7 +54,7 @@ function Lightbox({ fileIds, initialIndex, apiOptions, onClose }: LightboxProps)
         <button
           className="absolute left-4 text-white text-5xl leading-none hover:text-gray-300"
           onClick={(e) => { e.stopPropagation(); setIndex(index - 1); }}
-          aria-label="이전"
+          aria-label={t('post.prev')}
         >
           ‹
         </button>
@@ -62,7 +64,7 @@ function Lightbox({ fileIds, initialIndex, apiOptions, onClose }: LightboxProps)
         <button
           className="absolute right-4 text-white text-5xl leading-none hover:text-gray-300"
           onClick={(e) => { e.stopPropagation(); setIndex(index + 1); }}
-          aria-label="다음"
+          aria-label={t('post.next')}
         >
           ›
         </button>
@@ -115,6 +117,7 @@ interface ProjectPostDetailProps {
 
 export function ProjectPostDetail({ topic, apiOptions }: ProjectPostDetailProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
+  const { t } = useLanguage();
 
   const mainFileId = getMainFileId(topic);
   const coverUrl = useImageUrlFromFileId(mainFileId, apiOptions);
@@ -132,9 +135,9 @@ export function ProjectPostDetail({ topic, apiOptions }: ProjectPostDetailProps)
         <h1 className="text-2xl font-bold text-gray-900 mb-3">{topic.title}</h1>
         {topic.tags?.length ? (
           <div className="flex flex-wrap gap-2 mb-3">
-            {topic.tags.map((t) => (
-              <span key={t.id} className="text-sm text-blue-600">
-                #{t.name}
+            {topic.tags.map((tag) => (
+              <span key={tag.id} className="text-sm text-blue-600">
+                #{tag.name}
               </span>
             ))}
           </div>
@@ -152,7 +155,7 @@ export function ProjectPostDetail({ topic, apiOptions }: ProjectPostDetailProps)
 
       {editorImageFileIds.length > 0 && (
         <div className="mt-8 pt-6 border-t border-gray-200">
-          <h2 className="text-sm font-semibold text-gray-700 mb-3">이미지 모아보기</h2>
+          <h2 className="text-sm font-semibold text-gray-700 mb-3">{t('post.imageGallery')}</h2>
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
             {editorImageFileIds.map((id, i) => (
               <GridImage

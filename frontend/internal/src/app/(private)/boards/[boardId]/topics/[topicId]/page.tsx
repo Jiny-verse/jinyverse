@@ -7,9 +7,11 @@ import { getTopic, getComments, getBoard } from 'common/services';
 import { PostDetailRenderer } from 'common/components';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import type { Topic, Comment, Board } from 'common/types';
+import { useLanguage } from 'common/utils';
 import { CommentSection, CommentWriteForm } from './_components';
 
 export default function TopicDetailPage() {
+  const { t } = useLanguage();
   const params = useParams();
   const boardId = params.boardId as string;
   const topicId = params.topicId as string;
@@ -25,9 +27,9 @@ export default function TopicDetailPage() {
       getTopic(options, topicId),
       getComments(options, { topicId, size: 50 }),
     ])
-      .then(([b, t, res]) => {
+      .then(([b, topic, res]) => {
         setBoard(b);
-        setTopic(t);
+        setTopic(topic);
         setComments(res.content);
       })
       .catch((e) => setError(e instanceof Error ? e.message : String(e)));
@@ -45,7 +47,7 @@ export default function TopicDetailPage() {
           href={`/boards/${boardId}/topics`}
           className="mt-4 inline-block text-gray-400 hover:text-white"
         >
-          게시글 목록
+          {t('board.topic.title')}
         </Link>
       </div>
     );
@@ -54,7 +56,7 @@ export default function TopicDetailPage() {
   if (!topic || !board) {
     return (
       <div className="">
-        <p className="text-gray-400">로딩 중...</p>
+        <p className="text-gray-400">{t('common.loading')}</p>
       </div>
     );
   }
@@ -65,7 +67,7 @@ export default function TopicDetailPage() {
         href={`/boards/${boardId}/topics`}
         className="text-gray-400 hover:text-white mb-4 inline-block"
       >
-        ← 게시글 목록
+        ← {t('board.topic.title')}
       </Link>
 
       <div className="rounded-lg border border-gray-700 bg-gray-800/50 p-6 mb-8">

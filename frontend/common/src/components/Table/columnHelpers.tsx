@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { Eye, Pencil, Trash2 } from 'lucide-react';
 import type { ColumnDef } from './types';
 import { Tooltip } from '../../ui';
+import useLanguage from '../../utils/i18n/hooks/useLanguage';
 
 /**
  * 스키마(데이터)에서 자동으로 컬럼 생성
@@ -97,12 +98,13 @@ function RowActionButtons<T extends Record<string, unknown>>({
   onDelete,
   getId = (r) => String((r as { id?: unknown }).id ?? ''),
 }: RowActionButtonsProps<T>) {
+  const { t } = useLanguage();
   const id = getId(row);
 
   return (
     <div className="flex items-center gap-1">
       {onDetailView && (
-        <Tooltip content="상세보기" position="top">
+        <Tooltip content={t('common.detail')} position="top">
           <button
             type="button"
             onClick={(e) => {
@@ -110,14 +112,14 @@ function RowActionButtons<T extends Record<string, unknown>>({
               onDetailView(row);
             }}
             className={`${btnBase} border-gray-300 text-gray-600 hover:bg-gray-100 hover:border-gray-400`}
-            aria-label="상세보기"
+            aria-label={t('common.detail')}
           >
             <Eye className="w-4 h-4" />
           </button>
         </Tooltip>
       )}
       {onEdit && (
-        <Tooltip content="수정" position="top">
+        <Tooltip content={t('ui.button.edit')} position="top">
           <button
             type="button"
             onClick={(e) => {
@@ -125,14 +127,14 @@ function RowActionButtons<T extends Record<string, unknown>>({
               onEdit(row);
             }}
             className={`${btnBase} border-gray-300 text-gray-600 hover:bg-blue-50 hover:border-blue-300 hover:text-blue-600`}
-            aria-label="수정"
+            aria-label={t('ui.button.edit')}
           >
             <Pencil className="w-4 h-4" />
           </button>
         </Tooltip>
       )}
       {onDelete && (
-        <Tooltip content="삭제" position="top">
+        <Tooltip content={t('ui.button.delete')} position="top">
           <button
             type="button"
             onClick={(e) => {
@@ -140,7 +142,7 @@ function RowActionButtons<T extends Record<string, unknown>>({
               onDelete(id);
             }}
             className={`${btnBase} border-gray-300 text-gray-600 hover:bg-red-50 hover:border-red-300 hover:text-red-600`}
-            aria-label="삭제"
+            aria-label={t('ui.button.delete')}
           >
             <Trash2 className="w-4 h-4" />
           </button>

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { AuthProvider } from 'common';
+import { AuthProvider, I18nProvider } from 'common';
 
 export const metadata: Metadata = {
   title: 'Jinyverse',
@@ -17,9 +17,11 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="m-0 bg-black p-0 text-white">
-        <AuthProvider baseUrl={baseUrl} on401RedirectPath="/login">
-          {children}
-        </AuthProvider>
+        <I18nProvider>
+          <AuthProvider baseUrl={baseUrl} on401RedirectPath="/login">
+            {children}
+          </AuthProvider>
+        </I18nProvider>
       </body>
     </html>
   );

@@ -5,6 +5,7 @@ import type { RelTopicFile } from '../../schemas/file';
 import { FileDownloadLink } from './FileDownloadLink';
 import type { ApiOptions } from '../../types/api';
 import { useImageUrlFromFileId } from '../../hooks/useImageUrlFromFileId';
+import useLanguage from '../../utils/i18n/hooks/useLanguage';
 
 export type FileListItem = { id: string; originalName?: string; fileSize?: number } | CommonFile | RelTopicFile;
 
@@ -41,6 +42,7 @@ function FileListRow({ item, onRemove, readOnly, apiOptions }: FileListRowProps)
   const size = getFileSize(item);
   const showThumb = isImageFile(name);
   const thumbUrl = useImageUrlFromFileId(showThumb ? id : null, apiOptions);
+  const { t } = useLanguage();
 
   return (
     <li className="flex items-center justify-between gap-2 rounded border border-[#333] bg-[#1f1f1f] px-3 py-2 text-sm">
@@ -59,14 +61,14 @@ function FileListRow({ item, onRemove, readOnly, apiOptions }: FileListRowProps)
         </span>
       </div>
       {size != null && <span className="shrink-0 text-gray-500">{formatSize(size)}</span>}
-      <FileDownloadLink fileId={id} label="다운로드" apiOptions={apiOptions} className="shrink-0 text-blue-400 hover:underline" />
+      <FileDownloadLink fileId={id} label={t('file.download')} apiOptions={apiOptions} className="shrink-0 text-blue-400 hover:underline" />
       {!readOnly && onRemove && (
         <button
           type="button"
           onClick={() => onRemove(id)}
           className="shrink-0 text-red-400 hover:underline"
         >
-          삭제
+          {t('file.delete')}
         </button>
       )}
     </li>

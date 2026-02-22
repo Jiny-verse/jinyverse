@@ -7,6 +7,7 @@ import { Badge } from '../../ui/Badge';
 import { formatRelativeOrAbsolute } from '../../utils/formatDateTime';
 import { getMainFileId } from '../../utils/post';
 import { useImageUrlFromFileId } from '../../hooks/useImageUrlFromFileId';
+import useLanguage from '../../utils/i18n/hooks/useLanguage';
 
 interface BlogPostDetailProps {
   topic: Topic;
@@ -16,6 +17,7 @@ interface BlogPostDetailProps {
 export function BlogPostDetail({ topic, apiOptions }: BlogPostDetailProps) {
   const mainFileId = getMainFileId(topic);
   const coverUrl = useImageUrlFromFileId(mainFileId, apiOptions);
+  const { t } = useLanguage();
 
   return (
     <article className="max-w-3xl mx-auto">
@@ -32,7 +34,7 @@ export function BlogPostDetail({ topic, apiOptions }: BlogPostDetailProps) {
           <span>·</span>
           <span>{formatRelativeOrAbsolute(topic.createdAt)}</span>
           <span>·</span>
-          <span>조회 {topic.viewCount ?? 0}</span>
+          <span>{t('post.viewCount', { count: topic.viewCount ?? 0 })}</span>
         </div>
       </header>
 
@@ -42,9 +44,9 @@ export function BlogPostDetail({ topic, apiOptions }: BlogPostDetailProps) {
 
       {topic.tags?.length ? (
         <div className="mt-8 pt-6 border-t border-gray-200 flex flex-wrap gap-2">
-          {topic.tags.map((t) => (
-            <Badge key={t.id} variant="info">
-              #{t.name}
+          {topic.tags.map((tag) => (
+            <Badge key={tag.id} variant="info">
+              #{tag.name}
             </Badge>
           ))}
         </div>

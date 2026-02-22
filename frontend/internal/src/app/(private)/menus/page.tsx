@@ -8,29 +8,32 @@ import type { Menu } from 'common/types';
 import { CreateDialog, UpdateDialog, TreeList, DetailPanel } from './_components';
 import { MenuProvider, useMenuContext } from './_hooks/useMenuContext';
 import type { MenuTreeNode } from 'common';
-
-const CHANNEL_OPTIONS = [
-  { value: 'INTERNAL', label: '내부' },
-  { value: 'EXTERNAL', label: '외부' },
-  { value: 'PUBLIC', label: '공개' },
-];
-
-const PREVIEW_CHANNELS = [
-  { value: '', label: '전체' },
-  { value: 'INTERNAL', label: '내부' },
-  { value: 'EXTERNAL', label: '외부' },
-] as const;
+import { useLanguage } from 'common/utils';
 
 function MenusContent() {
   const options = useApiOptions();
   const domain = useMenuContext();
-  const noneOption = { value: '', label: '(없음)' };
+  const { t } = useLanguage();
+
+  const noneOption = { value: '', label: t('admin.none') };
   const [upperMenuOptions, setUpperMenuOptions] = useState<{ value: string; label: string }[]>([
     noneOption,
   ]);
   const [menuTree, setMenuTree] = useState<MenuTreeNode[]>([]);
   const [previewChannel, setPreviewChannel] = useState<string>('');
   const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
+
+  const CHANNEL_OPTIONS = [
+    { value: 'INTERNAL', label: t('admin.menu.internal') },
+    { value: 'EXTERNAL', label: t('admin.menu.external') },
+    { value: 'PUBLIC', label: t('admin.menu.public') },
+  ];
+
+  const PREVIEW_CHANNELS = [
+    { value: '', label: t('common.all') },
+    { value: 'INTERNAL', label: t('admin.menu.internal') },
+    { value: 'EXTERNAL', label: t('admin.menu.external') },
+  ] as const;
 
   const loadMenus = useCallback(
     (channel: string) => {
@@ -69,7 +72,7 @@ function MenusContent() {
 
   const handleDelete = useCallback(
     async (code: string) => {
-      if (!confirm('이 메뉴를 삭제할까요?')) return;
+      if (!confirm(t('admin.menu.deleteConfirm'))) return;
       await domain.crud.delete(code);
       if (selectedMenu?.code === code) setSelectedMenu(null);
     },
@@ -79,13 +82,13 @@ function MenusContent() {
   return (
     <div className="">
       <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">메뉴 관리</h1>
+        <h1 className="text-2xl font-bold">{t('admin.menu.title')}</h1>
         <button
           type="button"
           className="rounded border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
           onClick={() => domain.dialogs.create.onOpen()}
         >
-          메뉴 추가
+          {t('admin.menu.add')}
         </button>
       </div>
 
@@ -95,7 +98,7 @@ function MenusContent() {
       >
         <div className="min-h-[360px] min-w-0 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
           <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-gray-800">계층</h2>
+            <h2 className="text-sm font-semibold text-gray-800">{t('admin.menu.hierarchy')}</h2>
             <select
               value={previewChannel}
               onChange={(e) => setPreviewChannel(e.target.value)}

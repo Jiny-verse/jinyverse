@@ -3,6 +3,7 @@
 import { AutoDialog } from 'common/components';
 import type { AutoDialogField } from 'common/components';
 import { tagUpdateSchema } from 'common/schemas';
+import { useLanguage } from 'common/utils';
 import { useTagContext } from '../_hooks/useTagContext';
 
 export interface UpdateDialogProps {
@@ -10,6 +11,7 @@ export interface UpdateDialogProps {
 }
 
 export function UpdateDialog({ usageOptions }: UpdateDialogProps) {
+  const { t } = useLanguage();
   const domain = useTagContext();
   const { open, board: tag, onClose, onSubmit } = domain.dialogs.update;
   const optionsWithCurrent =
@@ -17,9 +19,9 @@ export function UpdateDialog({ usageOptions }: UpdateDialogProps) {
       ? [{ value: tag.usage, label: tag.usage }, ...usageOptions]
       : usageOptions;
   const fields: AutoDialogField[] = [
-    { key: 'name', label: '태그명', type: 'text' },
-    { key: 'description', label: '설명', type: 'textarea', optional: true },
-    { key: 'usage', label: '용도', type: 'select', options: optionsWithCurrent },
+    { key: 'name', label: t('form.label.tagName'), type: 'text' },
+    { key: 'description', label: t('form.label.description'), type: 'textarea', optional: true },
+    { key: 'usage', label: t('form.label.usage'), type: 'select', options: optionsWithCurrent },
   ];
 
   const initialValues = tag
@@ -34,7 +36,7 @@ export function UpdateDialog({ usageOptions }: UpdateDialogProps) {
     <AutoDialog
       open={open}
       onClose={onClose}
-      title="태그 수정"
+      title={t('admin.tag.edit')}
       schema={tagUpdateSchema}
       fields={fields}
       mode="edit"

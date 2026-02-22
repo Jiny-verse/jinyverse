@@ -5,6 +5,7 @@ import { DataTable, FilterSelect } from 'common/components';
 import type { ApiOptions } from 'common/types';
 import type { AuditLog } from 'common/schemas';
 import { getAuditLogs } from 'common/services';
+import { useLanguage } from 'common/utils';
 import { getColumns } from './Column';
 import { DetailPanel } from './DetailPanel';
 
@@ -13,6 +14,7 @@ export interface TableProps {
 }
 
 export function Table({ apiOptions }: TableProps) {
+  const { t } = useLanguage();
   const [data, setData] = useState<{
     content: AuditLog[];
     totalElements: number;
@@ -39,7 +41,7 @@ export function Table({ apiOptions }: TableProps) {
     load();
   }, [load]);
 
-  const columns = getColumns();
+  const columns = getColumns(t);
 
   return (
     <div className="flex gap-4">
@@ -48,7 +50,7 @@ export function Table({ apiOptions }: TableProps) {
           data={data?.content ?? []}
           columns={columns}
           isLoading={!data}
-          emptyMessage="감사 로그가 없습니다."
+          emptyMessage={t('common.noData')}
           pagination={{
             page,
             size,
@@ -66,19 +68,19 @@ export function Table({ apiOptions }: TableProps) {
               setSearch(v);
               setPage(0);
             },
-            placeholder: '대상유형·액션 검색',
+            placeholder: t('form.placeholder.search'),
           }}
           filterSlot={
             <FilterSelect
-              label="대상 유형"
+              label={t('form.label.targetType')}
               value={targetType}
               options={[
-                { value: '', label: '전체' },
+                { value: '', label: t('common.all') },
                 { value: 'USER', label: 'USER' },
                 { value: 'TOPIC', label: 'TOPIC' },
                 { value: 'CODE', label: 'CODE' },
               ]}
-              placeholder="전체"
+              placeholder={t('common.all')}
               onChange={(v) => {
                 setTargetType(v);
                 setPage(0);

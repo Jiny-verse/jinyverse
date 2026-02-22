@@ -6,6 +6,7 @@ import { createComment, updateComment, deleteComment } from 'common/services';
 import type { ApiOptions } from 'common/types';
 import type { Comment } from 'common/types';
 import { Button, Textarea } from 'common/ui';
+import { useLanguage } from 'common/utils';
 
 export type CommentSectionProps = {
   topicId: string;
@@ -39,6 +40,7 @@ function buildCommentTree(comments: Comment[]): { roots: Comment[]; repliesByPar
 
 export function CommentSection({ topicId, comments, apiOptions, onReload }: CommentSectionProps) {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -75,7 +77,7 @@ export function CommentSection({ topicId, comments, apiOptions, onReload }: Comm
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('댓글을 삭제하시겠습니까?')) return;
+    if (!confirm(t('post.deleteComment'))) return;
     await deleteComment(apiOptions, id);
     if (editingId === id) {
       setEditingId(null);
@@ -116,8 +118,8 @@ export function CommentSection({ topicId, comments, apiOptions, onReload }: Comm
               className="bg-gray-800 border-gray-600 text-gray-100 placeholder:text-gray-500 focus:ring-gray-500"
             />
             <div className="flex gap-2">
-              <Button size="sm" onClick={handleSaveEdit} disabled={submitting || !editContent.trim()}>저장</Button>
-              <Button size="sm" variant="secondary" onClick={handleCancelEdit} disabled={submitting}>취소</Button>
+              <Button size="sm" onClick={handleSaveEdit} disabled={submitting || !editContent.trim()}>{t('ui.button.save')}</Button>
+              <Button size="sm" variant="secondary" onClick={handleCancelEdit} disabled={submitting}>{t('ui.button.cancel')}</Button>
             </div>
           </>
         ) : (
@@ -129,12 +131,12 @@ export function CommentSection({ topicId, comments, apiOptions, onReload }: Comm
               </div>
               <div className="flex gap-2 shrink-0 ml-2">
                 {user?.userId && (
-                  <button type="button" onClick={() => { setReplyingToId((prev) => (prev === c.id ? null : c.id)); setReplyContent(''); }} className="text-gray-400 text-sm hover:text-white hover:underline">답글</button>
+                  <button type="button" onClick={() => { setReplyingToId((prev) => (prev === c.id ? null : c.id)); setReplyContent(''); }} className="text-gray-400 text-sm hover:text-white hover:underline">{t('post.reply')}</button>
                 )}
                 {canModify(c, currentUserId, role) && (
                   <>
-                    <button type="button" onClick={() => handleStartEdit(c)} className="text-gray-400 text-sm hover:text-white hover:underline">수정</button>
-                    <button type="button" onClick={() => handleDelete(c.id)} className="text-red-400 text-sm hover:underline">삭제</button>
+                    <button type="button" onClick={() => handleStartEdit(c)} className="text-gray-400 text-sm hover:text-white hover:underline">{t('ui.button.edit')}</button>
+                    <button type="button" onClick={() => handleDelete(c.id)} className="text-red-400 text-sm hover:underline">{t('ui.button.delete')}</button>
                   </>
                 )}
               </div>
@@ -144,15 +146,15 @@ export function CommentSection({ topicId, comments, apiOptions, onReload }: Comm
                 <Textarea
                   value={replyContent}
                   onChange={(e) => setReplyContent(e.target.value)}
-                  placeholder="답글을 입력하세요."
+                  placeholder={t('post.replyPlaceholder')}
                   rows={2}
                   className="bg-gray-800 border-gray-600 text-gray-100 placeholder:text-gray-500 focus:ring-gray-500 text-sm"
                 />
                 <div className="flex gap-2">
                   <Button size="sm" onClick={() => handleReplySubmit(c.id)} disabled={replySubmitting || !replyContent.trim()}>
-                    {replySubmitting ? '등록 중…' : '등록'}
+                    {replySubmitting ? t('post.submitting') : t('post.registerComment')}
                   </Button>
-                  <Button size="sm" variant="secondary" onClick={() => { setReplyingToId(null); setReplyContent(''); }} disabled={replySubmitting}>취소</Button>
+                  <Button size="sm" variant="secondary" onClick={() => { setReplyingToId(null); setReplyContent(''); }} disabled={replySubmitting}>{t('ui.button.cancel')}</Button>
                 </div>
               </div>
             )}
@@ -167,7 +169,7 @@ export function CommentSection({ topicId, comments, apiOptions, onReload }: Comm
 
   return (
     <section>
-      <h2 className="text-lg font-semibold mb-4">댓글 ({totalVisible})</h2>
+      <h2 className="text-lg font-semibold mb-4">{t('post.comments')} ({totalVisible})</h2>
       <ul className="space-y-3 list-none pl-0">
         {roots.map((c) => renderComment(c, false))}
       </ul>

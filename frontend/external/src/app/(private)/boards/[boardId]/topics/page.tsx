@@ -9,11 +9,13 @@ import { DetailPreviewPanel } from 'common/components';
 import { formatRelativeOrAbsolute } from 'common';
 import type { Topic, Comment } from 'common/types';
 import { TopicTable } from './_components/Table';
+import { useLanguage } from 'common/utils';
 
 export default function TopicsPage() {
   const params = useParams();
   const boardId = params.boardId as string;
   const options = useApiOptions();
+  const { t } = useLanguage();
   const [data, setData] = useState<{
     content: Topic[];
     totalElements: number;
@@ -54,9 +56,9 @@ export default function TopicsPage() {
       getTopic(options, selectedTopicId),
       getComments(options, { topicId: selectedTopicId, size: 50 }),
     ])
-      .then(([t, res]) => {
+      .then(([topic, res]) => {
         if (!cancelled) {
-          setPreviewTopic(t);
+          setPreviewTopic(topic);
           setPreviewComments(res.content);
         }
       })
@@ -76,7 +78,7 @@ export default function TopicsPage() {
       <div className="min-h-screen pt-[90px]">
         <p className="text-red-400">{error}</p>
         <Link href="/landing" className="mt-4 inline-block text-gray-400 hover:text-white">
-          게시판 목록
+          {t('board.title.main')} {t('common.list')}
         </Link>
       </div>
     );
@@ -87,9 +89,9 @@ export default function TopicsPage() {
   return (
     <div className="min-h-screen pt-[90px]">
       <Link href="/landing" className="text-gray-400 hover:text-white mb-4 inline-block">
-        ← 게시판 목록
+        ← {t('board.title.main')} {t('common.list')}
       </Link>
-      <h1 className="text-2xl font-bold mb-6">게시글</h1>
+      <h1 className="text-2xl font-bold mb-6">{t('board.topic.title')}</h1>
       <div className={hasPreview ? 'flex gap-0 h-[calc(100vh-12rem)] min-h-[400px]' : ''}>
         <div className={hasPreview ? 'w-1/2 min-w-0 pr-4 flex flex-col' : ''}>
           <TopicTable
@@ -127,7 +129,7 @@ export default function TopicsPage() {
                 <>
                   <article className="rounded-lg border border-gray-200 bg-white p-4 mb-4">
                     <p className="text-sm text-gray-500 mb-2">
-                      {previewTopic.author?.nickname ?? '-'} · {formatRelativeOrAbsolute(previewTopic.createdAt)} · 조회 {previewTopic.viewCount ?? 0}
+                      {previewTopic.author?.nickname ?? '-'} · {formatRelativeOrAbsolute(previewTopic.createdAt)} · {t('post.viewCount', { count: previewTopic.viewCount ?? 0 })}
                     </p>
                     <div className="prose prose-sm max-w-none whitespace-pre-wrap text-gray-900">
                       {previewTopic.content}
@@ -135,7 +137,7 @@ export default function TopicsPage() {
                   </article>
                   <section>
                     <h2 className="text-sm font-semibold text-gray-700 mb-2">
-                      댓글 ({previewComments.length})
+                      {t('post.comments')} ({previewComments.length})
                     </h2>
                     <ul className="space-y-2">
                       {previewComments

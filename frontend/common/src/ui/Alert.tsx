@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react';
 import { X } from 'lucide-react';
+import { useLanguage } from '../utils';
 
 export type AlertVariant = 'info' | 'success' | 'warning' | 'error';
 
@@ -28,6 +29,7 @@ const iconStyles: Record<AlertVariant, string> = {
 };
 
 export function Alert({ variant = 'info', title, children, onClose, className = '' }: AlertProps) {
+  const { t } = useLanguage();
   return (
     <div
       role="alert"
@@ -43,7 +45,7 @@ export function Alert({ variant = 'info', title, children, onClose, className = 
             type="button"
             onClick={onClose}
             className={`shrink-0 p-1 rounded hover:opacity-70 focus:outline-none focus:ring-2 focus:ring-offset-1 ${iconStyles[variant]}`}
-            aria-label="닫기"
+            aria-label={t('ui.button.close', { defaultValue: '닫기' })}
           >
             <X className="w-4 h-4" />
           </button>

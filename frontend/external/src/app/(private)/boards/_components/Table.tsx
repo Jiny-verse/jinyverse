@@ -3,6 +3,7 @@
 import { Table as CommonTable } from 'common/components';
 import type { Board } from 'common/types';
 import { getBoardColumns } from './Column';
+import { useLanguage } from 'common/utils';
 
 export interface BoardTableProps {
   data: Board[];
@@ -29,13 +30,14 @@ export function BoardTable({
   onRowClick,
   selectedRowId,
 }: BoardTableProps) {
-  const columns = getBoardColumns('/boards', { previewMode: !!onRowClick });
+  const { t } = useLanguage();
+  const columns = getBoardColumns('/boards', { previewMode: !!onRowClick }, t);
   return (
     <CommonTable<Board>
       data={data}
       columns={columns}
       isLoading={isLoading}
-      emptyMessage="등록된 게시판이 없습니다."
+      emptyMessage={t('common.noData')}
       pagination={
         pagination
           ? { ...pagination, sizeOptions: [10, 20, 50], onSizeChange: pagination.onSizeChange }

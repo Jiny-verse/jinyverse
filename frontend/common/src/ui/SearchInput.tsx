@@ -1,5 +1,7 @@
 'use client';
 
+import useLanguage from '../utils/i18n/hooks/useLanguage';
+
 export interface SearchInputProps {
   value: string;
   onChange: (value: string) => void;
@@ -13,17 +15,20 @@ const BASE_CLASS =
 export function SearchInput({
   value,
   onChange,
-  placeholder = '검색',
+  placeholder,
   className = '',
 }: SearchInputProps) {
+  const { t } = useLanguage();
+  const resolvedPlaceholder = placeholder ?? t('ui.input.search');
+
   return (
     <input
       type="search"
       value={value}
       onChange={(e) => onChange(e.target.value)}
-      placeholder={placeholder}
+      placeholder={resolvedPlaceholder}
       className={`${BASE_CLASS} ${className}`}
-      aria-label={placeholder}
+      aria-label={resolvedPlaceholder}
     />
   );
 }

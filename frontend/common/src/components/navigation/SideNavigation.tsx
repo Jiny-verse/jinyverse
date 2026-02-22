@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import type { NavigationItem } from '../../types/navigation';
+import useLanguage from '../../utils/i18n/hooks/useLanguage';
+import { LanguageSelector } from '../LanguageSelector';
 
 function collectIdsWithChildren(list: NavigationItem[]): Set<string> {
   const set = new Set<string>();
@@ -109,6 +111,7 @@ function NavItem({
 export function Navigation({ items, isLoading = false }: Props) {
   const pathname = usePathname();
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const { t } = useLanguage();
 
   useEffect(() => {
     if (items.length) setExpandedIds(collectIdsWithChildren(items));
@@ -129,11 +132,14 @@ export function Navigation({ items, isLoading = false }: Props) {
         <div className="border-b border-[#333] p-6">
           <h2 className="m-0 text-xl font-bold text-white">Jinyverse</h2>
           <p className="m-0 mt-1 text-sm text-gray-500">Admin Panel</p>
+          <div className="mt-3">
+            <LanguageSelector />
+          </div>
         </div>
 
         <nav className="p-4">
           {isLoading ? (
-            <p className="text-sm text-gray-500">로딩 중...</p>
+            <p className="text-sm text-gray-500">{t('common.loading')}</p>
           ) : (
             <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
               {items.map((item) => (

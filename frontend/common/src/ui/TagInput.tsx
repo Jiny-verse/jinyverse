@@ -2,6 +2,7 @@
 
 import React, { useState, KeyboardEvent, ChangeEvent } from 'react';
 import { X } from 'lucide-react';
+import useLanguage from '../utils/i18n/hooks/useLanguage';
 
 interface TagInputProps {
   selected: string[];
@@ -14,10 +15,12 @@ interface TagInputProps {
 export function TagInput({
   selected,
   onChange,
-  placeholder = '태그 입력...',
+  placeholder,
   maxTags = 10,
   className = '',
 }: TagInputProps) {
+  const { t } = useLanguage();
+  const resolvedPlaceholder = placeholder ?? t('form.placeholder.tagName');
   const [inputValue, setInputValue] = useState('');
 
   const addTag = (tag: string) => {
@@ -68,7 +71,7 @@ export function TagInput({
         value={inputValue}
         onChange={(e: ChangeEvent<HTMLInputElement>) => setInputValue(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder={selected.length === 0 ? placeholder : ''}
+        placeholder={selected.length === 0 ? resolvedPlaceholder : ''}
         className="flex-1 min-w-[120px] bg-transparent outline-none text-sm text-gray-900 dark:text-gray-100 placeholder-gray-400"
       />
       {maxTags && (

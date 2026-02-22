@@ -3,6 +3,7 @@
 import { AutoDialog } from 'common/components';
 import type { AutoDialogField } from 'common/components';
 import { boardCreateSchema } from 'common/schemas';
+import { useLanguage } from 'common/utils';
 import { useBoardContext } from '../_hooks/useBoardContext';
 
 export interface CreateDialogProps {
@@ -11,35 +12,36 @@ export interface CreateDialogProps {
 }
 
 export function CreateDialog({ typeOptions, menuOptions }: CreateDialogProps) {
+  const { t } = useLanguage();
   const domain = useBoardContext();
   const { open, onClose, onSubmit } = domain.dialogs.create;
   const fields: AutoDialogField[] = [
     {
       key: 'type',
-      label: '타입',
+      label: t('form.label.type'),
       type: 'select',
       options: typeOptions,
       defaultValue: 'project',
     },
-    { key: 'name', label: '이름', type: 'text' },
+    { key: 'name', label: t('form.label.name'), type: 'text' },
     {
       key: 'menuCode',
-      label: '연동 메뉴',
+      label: t('form.label.menuCode'),
       type: 'select',
       options: menuOptions,
       optional: true,
     },
-    { key: 'description', label: '설명', type: 'textarea', optional: true },
-    { key: 'note', label: '비고', type: 'textarea', optional: true },
-    { key: 'isPublic', label: '공개 여부', type: 'toggle', optional: true },
-    { key: 'order', label: '정렬 순서', type: 'number', optional: true },
+    { key: 'description', label: t('form.label.description'), type: 'textarea', optional: true },
+    { key: 'note', label: t('form.label.note'), type: 'textarea', optional: true },
+    { key: 'isPublic', label: t('form.label.isPublic'), type: 'toggle', optional: true },
+    { key: 'order', label: t('form.label.order'), type: 'number', optional: true },
   ];
 
   return (
     <AutoDialog
       open={open}
       onClose={onClose}
-      title="게시판 추가"
+      title={t('admin.board.create')}
       schema={boardCreateSchema}
       fields={fields}
       mode="create"

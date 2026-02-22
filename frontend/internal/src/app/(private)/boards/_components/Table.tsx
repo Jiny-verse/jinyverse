@@ -8,6 +8,7 @@ import type { ApiOptions } from 'common/types';
 import { getBoards } from 'common/services';
 import { getColumns } from './Column';
 import { useBoardContext } from '../_hooks/useBoardContext';
+import { useLanguage } from 'common/utils';
 
 export interface TableProps {
   apiOptions: ApiOptions;
@@ -21,6 +22,7 @@ export interface TableProps {
 export function Table({ apiOptions, boardIdPrefix = '/boards' }: TableProps) {
   const router = useRouter();
   const domain = useBoardContext();
+  const { t } = useLanguage();
   const [data, setData] = useState<{
     content: Board[];
     totalElements: number;
@@ -57,14 +59,14 @@ export function Table({ apiOptions, boardIdPrefix = '/boards' }: TableProps) {
     onEdit: domain.dialogs.update.onOpen,
     onDelete: domain.crud.delete,
     previewMode: false,
-  });
+  }, t);
 
   return (
     <DataTable<Board>
       data={data?.content ?? []}
       columns={columns}
       isLoading={!data}
-      emptyMessage="등록된 게시판이 없습니다."
+      emptyMessage={t('common.noData')}
       pagination={{
         page,
         size,
@@ -82,17 +84,17 @@ export function Table({ apiOptions, boardIdPrefix = '/boards' }: TableProps) {
           setSearch(v);
           setPage(0);
         },
-        placeholder: '이름·설명·타입 검색',
+        placeholder: t('form.placeholder.search'),
       }}
       filterSlot={
         <FilterSelect
-          label="공개 여부"
+          label={t('form.label.isPublic')}
           value={isPublic === undefined ? '' : isPublic ? 'true' : 'false'}
           options={[
-            { value: 'true', label: '공개' },
-            { value: 'false', label: '비공개' },
+            { value: 'true', label: t('form.label.isPublic') },
+            { value: 'false', label: t('form.label.isPrivate') },
           ]}
-          placeholder="전체"
+          placeholder={t('common.all')}
           onChange={(v) => {
             setIsPublic(v === '' ? undefined : v === 'true');
             setPage(0);
@@ -102,7 +104,7 @@ export function Table({ apiOptions, boardIdPrefix = '/boards' }: TableProps) {
       selection={{ selectedIds, onSelectionChange: setSelectedIds }}
       onBatchDelete={selectedIds.length ? handleBatchDelete : undefined}
       onAdd={domain.dialogs.create.onOpen}
-      addButtonLabel="게시판 추가"
+      addButtonLabel={`${t('ui.button.add')} ${t('admin.board.title')}`}
       onRowClick={goToTopics}
     />
   );

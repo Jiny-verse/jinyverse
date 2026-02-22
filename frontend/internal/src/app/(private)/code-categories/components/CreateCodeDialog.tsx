@@ -3,6 +3,7 @@
 import { z } from 'zod';
 import { AutoDialog } from 'common/components';
 import type { AutoDialogField } from 'common/components';
+import { useLanguage } from 'common/utils';
 
 const schema = z.object({
   code: z.string().min(1).max(40),
@@ -21,21 +22,23 @@ interface CreateCodeDialogProps {
   onSubmit: (data: FormValues) => Promise<void>;
 }
 
-const fields: AutoDialogField[] = [
-  { key: 'code', label: '코드', type: 'text', placeholder: 'e.g. active' },
-  { key: 'name', label: '이름', type: 'text' },
-  { key: 'value', label: '값', type: 'text', optional: true },
-  { key: 'order', label: '정렬 순서', type: 'number', optional: true },
-  { key: 'description', label: '설명', type: 'textarea', optional: true },
-  { key: 'note', label: '비고', type: 'textarea', optional: true },
-];
-
 export function CreateCodeDialog({ open, onClose, onSubmit }: CreateCodeDialogProps) {
+  const { t } = useLanguage();
+
+  const fields: AutoDialogField[] = [
+    { key: 'code', label: t('form.label.code'), type: 'text', placeholder: 'e.g. active' },
+    { key: 'name', label: t('form.label.name'), type: 'text' },
+    { key: 'value', label: t('form.label.value'), type: 'text', optional: true },
+    { key: 'order', label: t('form.label.sortOrder'), type: 'number', optional: true },
+    { key: 'description', label: t('form.label.description'), type: 'textarea', optional: true },
+    { key: 'note', label: t('form.label.note'), type: 'textarea', optional: true },
+  ];
+
   return (
     <AutoDialog
       open={open}
       onClose={onClose}
-      title="코드 추가"
+      title={t('admin.code.add')}
       schema={schema}
       fields={fields}
       mode="create"

@@ -6,6 +6,7 @@ import type { CommonFile, FileAttachmentItem } from '../../schemas/file';
 import { FileUpload } from './FileUpload';
 import { FileList } from './FileList';
 import { uploadFile } from '../../services/file';
+import useLanguage from '../../utils/i18n/hooks/useLanguage';
 
 export interface FileAttachmentFieldProps {
   apiOptions: ApiOptions;
@@ -20,6 +21,7 @@ export interface FileAttachmentFieldProps {
 export function FileAttachmentField({ apiOptions, value, onChange, fileMeta = {}, sessionId, onUploadError, multiple = true }: FileAttachmentFieldProps) {
   const [uploadedMeta, setUploadedMeta] = useState<Record<string, { originalName: string; fileSize?: number }>>({});
   const [uploadError, setUploadError] = useState<string | null>(null);
+  const { t } = useLanguage();
 
   const handleUpload = useCallback(
     (files: CommonFile[]) => {
@@ -106,12 +108,12 @@ export function FileAttachmentField({ apiOptions, value, onChange, fileMeta = {}
           onUpload={handleUpload}
           onError={handleError}
         >
-          파일 추가
+          {t('file.add')}
         </FileUpload>
       </div>
       {uploadError && (
         <p className="text-sm text-red-500" role="alert">
-          업로드 실패: {uploadError}
+          {t('file.uploadFailedMsg', { msg: uploadError })}
         </p>
       )}
       <FileList

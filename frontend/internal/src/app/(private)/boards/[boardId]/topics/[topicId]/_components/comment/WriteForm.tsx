@@ -5,6 +5,7 @@ import { useAuth } from 'common';
 import { createComment } from 'common/services';
 import type { ApiOptions } from 'common/types';
 import { Button, Textarea } from 'common/ui';
+import { useLanguage } from 'common/utils';
 
 export type CommentWriteFormProps = {
   topicId: string;
@@ -14,6 +15,7 @@ export type CommentWriteFormProps = {
 
 export function CommentWriteForm({ topicId, apiOptions, onSuccess }: CommentWriteFormProps) {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [content, setContent] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +25,7 @@ export function CommentWriteForm({ topicId, apiOptions, onSuccess }: CommentWrit
     const trimmed = content.trim();
     if (!trimmed) return;
     if (!user?.userId) {
-      setError('로그인이 필요합니다.');
+      setError(t('message.loginRequired'));
       return;
     }
     setError(null);
@@ -37,7 +39,7 @@ export function CommentWriteForm({ topicId, apiOptions, onSuccess }: CommentWrit
       setContent('');
       onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : '댓글 등록에 실패했습니다.');
+      setError(err instanceof Error ? err.message : t('message.commentFailed'));
     } finally {
       setSubmitting(false);
     }
@@ -48,7 +50,7 @@ export function CommentWriteForm({ topicId, apiOptions, onSuccess }: CommentWrit
       <Textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
-        placeholder="댓글을 입력하세요."
+        placeholder={t('post.commentPlaceholder')}
         rows={3}
         disabled={!user?.userId}
         className="bg-gray-800 border-gray-600 text-gray-100 placeholder:text-gray-500 focus:ring-gray-500"
@@ -56,7 +58,7 @@ export function CommentWriteForm({ topicId, apiOptions, onSuccess }: CommentWrit
       {error && <p className="mt-1 text-sm text-red-400">{error}</p>}
       <div className="mt-2">
         <Button type="submit" disabled={submitting || !content.trim() || !user?.userId}>
-          {submitting ? '등록 중…' : '댓글 등록'}
+          {submitting ? t('post.submitting') : t('post.registerComment')}
         </Button>
       </div>
     </form>

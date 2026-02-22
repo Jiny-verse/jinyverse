@@ -4,11 +4,13 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { getMenuResolve } from 'common/services';
 import { useApiOptions } from '@/app/providers/ApiProvider';
+import { useLanguage } from 'common/utils';
 
 export default function MenuResolvePage() {
   const params = useParams();
   const router = useRouter();
   const options = useApiOptions();
+  const { t } = useLanguage();
   const code = params.code as string;
 
   useEffect(() => {
@@ -41,7 +43,7 @@ export default function MenuResolvePage() {
 
   return (
     <div className="flex min-h-[200px] items-center justify-center">
-      <p className="text-neutral-400">이동 중...</p>
+      <p className="text-neutral-400">{t('common.redirecting')}</p>
     </div>
   );
 }

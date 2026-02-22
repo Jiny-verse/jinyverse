@@ -5,6 +5,7 @@ import type { ApiOptions } from '../../types/api';
 import type { CommonFile, FileAttachmentItem } from '../../schemas/file';
 import { uploadFile } from '../../services/file';
 import { useImageUrlFromFileId } from '../../hooks/useImageUrlFromFileId';
+import useLanguage from '../../utils/i18n/hooks/useLanguage';
 
 interface ImageGridItemProps {
   fileId: string;
@@ -20,6 +21,7 @@ interface ImageGridItemProps {
 
 function ImageGridItem({ fileId, apiOptions, isMain, onSetMain, onRemove, onDragStart, onDragOver, onDrop, isDragging }: ImageGridItemProps) {
   const url = useImageUrlFromFileId(fileId, apiOptions);
+  const { t } = useLanguage();
 
   return (
     <div
@@ -51,7 +53,7 @@ function ImageGridItem({ fileId, apiOptions, isMain, onSetMain, onRemove, onDrag
           e.stopPropagation();
           onRemove();
         }}
-        aria-label="삭제"
+        aria-label={t('file.delete')}
       >
         ×
       </button>
@@ -86,6 +88,7 @@ export function ImageGridField({
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const { t } = useLanguage();
 
   const canAdd = value.length < maxCount && !disabled && !uploading;
 
@@ -93,7 +96,7 @@ export function ImageGridField({
     async (files: File[]) => {
       const imageFiles = files.filter((f) => f.type.startsWith('image/'));
       if (!imageFiles.length) {
-        setUploadError('이미지 파일만 업로드 가능합니다');
+        setUploadError(t('file.imageOnly'));
         return;
       }
 
@@ -118,7 +121,7 @@ export function ImageGridField({
           onMainChange(updated[0].fileId);
         }
       } catch (err) {
-        setUploadError(err instanceof Error ? err.message : '업로드 실패');
+        setUploadError(err instanceof Error ? err.message : t('file.uploadFailed'));
       } finally {
         setUploading(false);
       }
@@ -179,7 +182,7 @@ export function ImageGridField({
             onClick={() => inputRef.current?.click()}
             disabled={uploading}
             className="aspect-square rounded border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 hover:border-gray-400 hover:text-gray-500 transition-colors disabled:opacity-50"
-            aria-label="이미지 추가"
+            aria-label={t('file.addImage')}
           >
             {uploading ? (
               <span className="text-xs">...</span>
@@ -203,8 +206,8 @@ export function ImageGridField({
       />
 
       <p className="text-xs text-gray-500">
-        클릭하여 대표 이미지(★) 변경 · 최대 {maxCount}장
-        {minCount ? ` (최소 ${minCount}장)` : ''}
+        {t('file.mainImageHint', { max: maxCount })}
+        {minCount ? ` ${t('file.mainImageHintMin', { min: minCount })}` : ''}
       </p>
 
       {uploadError && <p className="text-sm text-red-500">{uploadError}</p>}

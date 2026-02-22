@@ -1,16 +1,16 @@
 'use client';
 
-import { useTranslation } from 'react-i18next';
 import { Modal } from '../../../ui/Modal';
 import { Button } from '../../../ui/Button';
+import { useLanguage } from '../../../utils';
 
-const SPECIAL_CHARS = [
-  { group: '기호', chars: ['©', '®', '™', '°', '±', '×', '÷', '≠', '≈', '∞', '√', 'π', '∑', '∆', '∏'] },
-  { group: '화살표', chars: ['←', '→', '↑', '↓', '↔', '↕', '⇐', '⇒', '⇑', '⇓', '⇔', '⟵', '⟶', '⟷'] },
-  { group: '따옴표', chars: ['\u201C', '\u201D', '\u2018', '\u2019', '«', '»', '\u2039', '\u203A', '\u201E', '\u201F', '\u201A', '\u201B'] },
-  { group: '구두점', chars: ['—', '–', '…', '·', '•', '‣', '⁃', '※', '†', '‡', '§', '¶', '¿', '¡'] },
-  { group: '수학', chars: ['½', '¼', '¾', '⅓', '⅔', '⅛', '⅜', '⅝', '⅞', '∂', '∈', '∉', '∩', '∪', '⊂', '⊃'] },
-  { group: '통화', chars: ['€', '£', '¥', '¢', '₩', '₹', '₽', '₿', 'ƒ'] },
+const getSpecialChars = (t: any) => [
+  { group: t('editor.specialChar.symbol', { defaultValue: '기호' }), chars: ['©', '®', '™', '°', '±', '×', '÷', '≠', '≈', '∞', '√', 'π', '∑', '∆', '∏'] },
+  { group: t('editor.specialChar.arrow', { defaultValue: '화살표' }), chars: ['←', '→', '↑', '↓', '↔', '↕', '⇐', '⇒', '⇑', '⇓', '⇔', '⟵', '⟶', '⟷'] },
+  { group: t('editor.specialChar.quote', { defaultValue: '따옴표' }), chars: ['\u201C', '\u201D', '\u2018', '\u2019', '«', '»', '\u2039', '\u203A', '\u201E', '\u201F', '\u201A', '\u201B'] },
+  { group: t('editor.specialChar.punctuation', { defaultValue: '구두점' }), chars: ['—', '–', '…', '·', '•', '‣', '⁃', '※', '†', '‡', '§', '¶', '¿', '¡'] },
+  { group: t('editor.specialChar.math', { defaultValue: '수학' }), chars: ['½', '¼', '¾', '⅓', '⅔', '⅛', '⅜', '⅝', '⅞', '∂', '∈', '∉', '∩', '∪', '⊂', '⊃'] },
+  { group: t('editor.specialChar.currency', { defaultValue: '통화' }), chars: ['€', '£', '¥', '¢', '₩', '₹', '₽', '₿', 'ƒ'] },
 ];
 
 interface SpecialCharDialogProps {
@@ -20,7 +20,8 @@ interface SpecialCharDialogProps {
 }
 
 export function SpecialCharDialog({ isOpen, onClose, onSelect }: SpecialCharDialogProps) {
-  const { t } = useTranslation();
+  const { t } = useLanguage();
+  const SPECIAL_CHARS = getSpecialChars(t);
 
   const handleSelect = (char: string) => {
     onSelect(char);
@@ -31,12 +32,12 @@ export function SpecialCharDialog({ isOpen, onClose, onSelect }: SpecialCharDial
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={t('editor.toolbar.specialChar', '특수문자')}
+      title={t('editor.toolbar.specialChar', { defaultValue: '특수문자' })}
       size="sm"
       footer={
         <div className="flex justify-end">
           <Button type="button" variant="ghost" size="sm" onClick={onClose}>
-            {t('ui.button.close', '닫기')}
+            {t('ui.button.close', { defaultValue: '닫기' })}
           </Button>
         </div>
       }

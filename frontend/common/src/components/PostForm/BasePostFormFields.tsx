@@ -13,6 +13,7 @@ import type { PostFormState, PostFormHandlers } from './types';
 import type { ApiOptions } from '../../types/api';
 import { uploadFile } from '../../services/file';
 import { getPublicImageUrl } from '../../utils/file';
+import useLanguage from '../../utils/i18n/hooks/useLanguage';
 
 interface BasePostFormFieldsProps {
   boardType: BoardType;
@@ -23,6 +24,7 @@ interface BasePostFormFieldsProps {
 
 export function BasePostFormFields({ boardType, state, handlers, apiOptions }: BasePostFormFieldsProps) {
   const isGallery = boardType === 'gallery';
+  const { t } = useLanguage();
 
   const handleUploadImage = apiOptions
     ? async (file: File): Promise<string> => {
@@ -33,51 +35,51 @@ export function BasePostFormFields({ boardType, state, handlers, apiOptions }: B
 
   return (
     <>
-      <FormSection title="기본 정보" description="게시글의 제목과 내용을 입력하세요">
-        <FormField label="제목" name="title" required error={state.errors.title} description="게시글 제목 (최대 200자)">
+      <FormSection title={t('board.form.basicInfo')} description={t('board.form.basicInfoDesc')}>
+        <FormField label={t('form.label.title')} name="title" required error={state.errors.title} description={t('board.form.titleMaxLen')}>
           <Input
             value={state.title}
             onChange={(e) => handlers.setTitle(e.target.value)}
             maxLength={200}
-            placeholder="제목을 입력하세요"
+            placeholder={t('form.placeholder.title')}
             autoFocus
           />
         </FormField>
 
         {!isGallery && (
-          <FormField label="본문" name="content" required error={state.errors.content}>
+          <FormField label={t('board.form.body')} name="content" required error={state.errors.content}>
             <Editor
               defaultValue={state.content}
               onChange={handlers.setContent}
               defaultMode="text"
               minHeight="500px"
-              placeholder="내용을 입력하세요..."
+              placeholder={t('form.placeholder.content')}
               onUploadImage={handleUploadImage}
             />
           </FormField>
         )}
       </FormSection>
 
-      <FormSection title="추가 설정" description="태그를 관리하세요">
-        <FormField label="태그" name="tags" description="Enter 또는 콤마(,)로 추가">
+      <FormSection title={t('board.form.extraSettings')} description={t('board.form.tagDesc')}>
+        <FormField label={t('form.label.tags')} name="tags" description={t('board.form.tagDesc')}>
           <TagInput selected={state.tags} onChange={handlers.setTags} maxTags={10} />
         </FormField>
       </FormSection>
 
-      <FormSection title="게시 및 노출 설정">
+      <FormSection title={t('board.form.publishSettings')}>
         <FormFieldGroup columns={2} gap="lg">
-          <FormField label="게시 일시" name="publishedAt" description="예약 게시가 필요한 경우 설정하세요">
+          <FormField label={t('board.form.publishAt')} name="publishedAt" description={t('board.form.publishAtDesc')}>
             <DateTimePicker value={state.publishedAt} onChange={handlers.setPublishedAt} />
           </FormField>
 
           <div className="flex gap-6 pt-4">
-            <FormField label="공개" name="isPublic">
+            <FormField label={t('board.form.isPublic')} name="isPublic">
               <Switch checked={state.isPublic} onChange={(e) => handlers.setIsPublic(e.target.checked)} />
             </FormField>
-            <FormField label="공지" name="isNotice">
+            <FormField label={t('board.form.isNotice')} name="isNotice">
               <Switch checked={state.isNotice} onChange={(e) => handlers.setIsNotice(e.target.checked)} />
             </FormField>
-            <FormField label="상단 고정" name="isPinned">
+            <FormField label={t('board.form.isPinned')} name="isPinned">
               <Switch checked={state.isPinned} onChange={(e) => handlers.setIsPinned(e.target.checked)} />
             </FormField>
           </div>

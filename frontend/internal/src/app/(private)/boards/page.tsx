@@ -5,15 +5,16 @@ import { getCodes, getMenus } from 'common/services';
 import { buildMenuTree, menuTreeToSelectOptionsByCode } from 'common';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import { Table, CreateDialog, UpdateDialog } from './_components';
-import { BoardProvider, useBoardContext } from './_hooks/useBoardContext';
+import { BoardProvider } from './_hooks/useBoardContext';
+import { useLanguage } from 'common/utils';
 
 const BOARD_TYPE_CATEGORY = 'board_type';
-const MENU_NONE = { value: '', label: '(없음)' };
 
 function BoardsContent() {
   const [typeOptions, setTypeOptions] = useState<{ value: string; label: string }[]>([]);
-  const [menuOptions, setMenuOptions] = useState<{ value: string; label: string }[]>([MENU_NONE]);
+  const [menuOptions, setMenuOptions] = useState<{ value: string; label: string }[]>([]);
   const options = useApiOptions();
+  const { t } = useLanguage();
 
   useEffect(() => {
     getCodes(options, { categoryCode: BOARD_TYPE_CATEGORY })
@@ -22,17 +23,18 @@ function BoardsContent() {
   }, [options.baseUrl, options.channel]);
 
   useEffect(() => {
+    const menuNone = { value: '', label: t('admin.none') };
     getMenus(options, { size: 100 })
       .then((res) => {
         const tree = buildMenuTree(res.content);
-        setMenuOptions([MENU_NONE, ...menuTreeToSelectOptionsByCode(tree)]);
+        setMenuOptions([menuNone, ...menuTreeToSelectOptionsByCode(tree)]);
       })
-      .catch(() => setMenuOptions([MENU_NONE]));
+      .catch(() => setMenuOptions([menuNone]));
   }, [options.baseUrl, options.channel]);
 
   return (
     <div className="">
-      <h1 className="text-2xl font-bold mb-6">게시판 관리</h1>
+      <h1 className="text-2xl font-bold mb-6">{t('admin.board.title')}</h1>
       <Table apiOptions={options} />
       <CreateDialog typeOptions={typeOptions} menuOptions={menuOptions} />
       <UpdateDialog typeOptions={typeOptions} menuOptions={menuOptions} />

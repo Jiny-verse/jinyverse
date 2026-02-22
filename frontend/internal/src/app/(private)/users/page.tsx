@@ -5,6 +5,7 @@ import { getUsersForAdmin, updateUser } from 'common/services';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import type { User, PageResponse } from 'common/types';
 import { UsersTable, UserDetailPanel } from './_components';
+import { useLanguage } from 'common/utils';
 
 const EMPTY_PAGE: PageResponse<User> = {
   content: [],
@@ -18,6 +19,7 @@ const EMPTY_PAGE: PageResponse<User> = {
 
 function UsersContent() {
   const options = useApiOptions();
+  const { t } = useLanguage();
   const [data, setData] = useState<PageResponse<User>>(EMPTY_PAGE);
   const [page, setPage] = useState(0);
   const [size, setSize] = useState(20);
@@ -72,14 +74,14 @@ function UsersContent() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">유저 관리</h1>
+      <h1 className="text-2xl font-bold mb-6">{t('admin.user.title')}</h1>
       <div
         className="grid gap-6 transition-[grid-template-columns] duration-300 ease-out"
         style={{ gridTemplateColumns: selectedUser ? '1fr 1fr' : '1fr 0fr' }}
       >
         <div className="min-h-[420px] min-w-0 flex flex-col">
           {loading && (
-            <p className="text-sm text-gray-400 mb-2">불러오는 중...</p>
+            <p className="text-sm text-gray-400 mb-2">{t('common.loading')}</p>
           )}
           <UsersTable
             apiOptions={options}

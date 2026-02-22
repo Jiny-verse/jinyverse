@@ -5,6 +5,7 @@ import type { ApiOptions } from '../../types/api';
 import type { CommonFile, FileAttachmentItem } from '../../schemas/file';
 import { uploadFile } from '../../services/file';
 import { useImageUrlFromFileId } from '../../hooks/useImageUrlFromFileId';
+import useLanguage from '../../utils/i18n/hooks/useLanguage';
 
 const ASPECT_RATIO_CLASS: Record<string, string> = {
   '1:1': 'aspect-square',
@@ -38,6 +39,7 @@ export function ImagePreviewField({
   const [localPreviewUrl, setLocalPreviewUrl] = useState<string | null>(null);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const { t } = useLanguage();
 
   const serverUrl = useImageUrlFromFileId(value?.fileId ?? null, apiOptions);
   const previewUrl = localPreviewUrl ?? serverUrl;
@@ -45,7 +47,7 @@ export function ImagePreviewField({
   const handleFile = useCallback(
     async (file: File) => {
       if (!file.type.startsWith('image/')) {
-        setUploadError('이미지 파일만 업로드 가능합니다');
+        setUploadError(t('file.imageOnly'));
         return;
       }
 
@@ -58,7 +60,7 @@ export function ImagePreviewField({
         const result: CommonFile = await uploadFile(apiOptions, file);
         onChange({ fileId: result.id, order: 0, isMain: true });
       } catch (err) {
-        setUploadError(err instanceof Error ? err.message : '업로드 실패');
+        setUploadError(err instanceof Error ? err.message : t('file.uploadFailed'));
         setLocalPreviewUrl(null);
       } finally {
         URL.revokeObjectURL(objectUrl);
@@ -126,7 +128,7 @@ export function ImagePreviewField({
         onDrop={handleDrop}
       >
         {previewUrl ? (
-          <img src={previewUrl} alt="미리보기" className="w-full h-full object-cover" />
+          <img src={previewUrl} alt={t('file.mainImage')} className="w-full h-full object-cover" />
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center text-gray-400 gap-2">
             <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -138,13 +140,13 @@ export function ImagePreviewField({
               />
             </svg>
             <span className="text-sm">
-              {uploading ? '업로드 중...' : '이미지를 드래그하거나 클릭하세요'}
+              {uploading ? t('file.uploading') : t('file.dragOrClick')}
             </span>
           </div>
         )}
         {uploading && (
           <div className="absolute inset-0 bg-white/60 flex items-center justify-center">
-            <span className="text-sm text-gray-600">업로드 중...</span>
+            <span className="text-sm text-gray-600">{t('file.uploading')}</span>
           </div>
         )}
       </div>
@@ -166,7 +168,7 @@ export function ImagePreviewField({
             disabled={disabled || uploading}
             className="text-sm text-red-500 hover:underline disabled:opacity-50"
           >
-            제거
+            {t('file.remove')}
           </button>
         </div>
       )}

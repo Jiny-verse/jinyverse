@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Modal } from '../../../ui/Modal';
 import { Button } from '../../../ui/Button';
 import { Input } from '../../../ui/Input';
+import { useLanguage } from '../../../utils';
 
 interface TableDialogProps {
   isOpen: boolean;
@@ -13,7 +13,7 @@ interface TableDialogProps {
 }
 
 export function TableDialog({ isOpen, onClose, onConfirm }: TableDialogProps) {
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   const [rows, setRows] = useState('3');
   const [cols, setCols] = useState('3');
   const [hasHeader, setHasHeader] = useState(true);
@@ -29,7 +29,7 @@ export function TableDialog({ isOpen, onClose, onConfirm }: TableDialogProps) {
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={t('editor.dialog.table.title', '표 삽입')}
+      title={t('editorDialog.table.title', { defaultValue: '표 삽입' })}
       size="sm"
       footer={
         <div className="flex justify-end gap-2">
@@ -46,7 +46,7 @@ export function TableDialog({ isOpen, onClose, onConfirm }: TableDialogProps) {
         <div className="flex gap-3">
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('editor.dialog.table.rows', '행 수')}
+              {t('editorDialog.table.rows', { defaultValue: '행 수' })}
             </label>
             <Input
               type="number"
@@ -58,7 +58,7 @@ export function TableDialog({ isOpen, onClose, onConfirm }: TableDialogProps) {
           </div>
           <div className="flex-1">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('editor.dialog.table.cols', '열 수')}
+              {t('editorDialog.table.cols', { defaultValue: '열 수' })}
             </label>
             <Input
               type="number"
@@ -72,7 +72,7 @@ export function TableDialog({ isOpen, onClose, onConfirm }: TableDialogProps) {
 
         {/* Preview grid */}
         <div>
-          <p className="text-xs text-gray-500 mb-2">{t('editor.dialog.table.preview', '미리보기')}</p>
+          <p className="text-xs text-gray-500 mb-2">{t('editorDialog.table.preview', { defaultValue: '미리보기' })}</p>
           <div className="overflow-auto max-h-32">
             <table className="border-collapse text-xs w-full">
               {Array.from({ length: Math.max(1, Math.min(20, parseInt(rows) || 3)) }).map((_, r) => (
@@ -102,7 +102,7 @@ export function TableDialog({ isOpen, onClose, onConfirm }: TableDialogProps) {
             onChange={(e) => setHasHeader(e.target.checked)}
             className="rounded"
           />
-          {t('editor.dialog.table.hasHeader', '첫 행을 헤더로')}
+          {t('editorDialog.table.hasHeader', { defaultValue: '첫 행을 헤더로' })}
         </label>
       </div>
     </Modal>

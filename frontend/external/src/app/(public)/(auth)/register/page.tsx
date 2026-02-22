@@ -5,10 +5,12 @@ import { useState } from 'react';
 import { Button, Input, Checkbox } from 'common/ui';
 import { useAuth, register as registerApi } from 'common';
 import { FormError, AuthLink } from '../_components';
+import { useLanguage } from 'common/utils';
 
 export default function RegisterPage() {
   const router = useRouter();
   const { baseUrl, user, isLoading } = useAuth();
+  const { t } = useLanguage();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
@@ -22,7 +24,7 @@ export default function RegisterPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-neutral-400">로딩 중...</p>
+        <p className="text-neutral-400">{t('common.loading')}</p>
       </div>
     );
   }
@@ -34,7 +36,7 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!agreed) {
-      setError('이용 약관에 동의해야 가입할 수 있습니다.');
+      setError(t('auth.register.agreeError'));
       return;
     }
     setError('');
@@ -43,7 +45,7 @@ export default function RegisterPage() {
       await registerApi(baseUrl, { username, password, email, name, nickname });
       setDone(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '회원가입에 실패했습니다.');
+      setError(err instanceof Error ? err.message : t('auth.register.error'));
     } finally {
       setSubmitting(false);
     }
@@ -53,13 +55,13 @@ export default function RegisterPage() {
     const verifyHref = `/verify-email?email=${encodeURIComponent(email)}`;
     return (
       <>
-        <h1 className="text-2xl font-bold text-white">이메일 인증</h1>
+        <h1 className="text-2xl font-bold text-white">{t('auth.verify.title')}</h1>
         <p className="text-neutral-400 text-sm">
-          가입하신 이메일({email})로 인증 메일을 보냈습니다. 메일의 인증 코드를 입력해 주세요.
+          {t('auth.register.verifyEmailSent', { email })}
         </p>
         <div className="flex flex-col gap-2">
-          <AuthLink href={verifyHref}>이메일 인증하기</AuthLink>
-          <AuthLink href="/login">로그인</AuthLink>
+          <AuthLink href={verifyHref}>{t('auth.register.verifyEmailLink')}</AuthLink>
+          <AuthLink href="/login">{t('auth.login.title')}</AuthLink>
         </div>
       </>
     );
@@ -67,11 +69,11 @@ export default function RegisterPage() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-white">회원가입</h1>
+      <h1 className="text-2xl font-bold text-white">{t('auth.register.title')}</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <FormError message={error} />
         <Input
-          label="사용자명"
+          label={t('form.label.username')}
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
@@ -80,7 +82,7 @@ export default function RegisterPage() {
           autoComplete="username"
         />
         <Input
-          label="이메일"
+          label={t('form.label.email')}
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -89,7 +91,7 @@ export default function RegisterPage() {
           autoComplete="email"
         />
         <Input
-          label="비밀번호"
+          label={t('form.label.password')}
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -97,10 +99,10 @@ export default function RegisterPage() {
           minLength={8}
           maxLength={100}
           autoComplete="new-password"
-          placeholder="영문, 숫자, 특수문자 포함 8자 이상"
+          placeholder={t('auth.reset.passwordPlaceholder')}
         />
         <Input
-          label="이름"
+          label={t('form.label.name')}
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
@@ -108,7 +110,7 @@ export default function RegisterPage() {
           autoComplete="name"
         />
         <Input
-          label="닉네임"
+          label={t('form.label.nickname')}
           value={nickname}
           onChange={(e) => setNickname(e.target.value)}
           required
@@ -116,16 +118,16 @@ export default function RegisterPage() {
           autoComplete="nickname"
         />
         <Checkbox
-          label="이용 약관에 동의합니다"
+          label={t('auth.register.agreeLabel')}
           checked={agreed}
           onChange={(e) => setAgreed(e.target.checked)}
         />
         <Button type="submit" disabled={submitting} className="w-full">
-          {submitting ? '가입 중...' : '가입하기'}
+          {submitting ? t('auth.register.submitting') : t('auth.register.submit')}
         </Button>
       </form>
       <div className="flex justify-center gap-4 pt-2">
-        <AuthLink href="/login">로그인</AuthLink>
+        <AuthLink href="/login">{t('auth.login.title')}</AuthLink>
       </div>
     </>
   );

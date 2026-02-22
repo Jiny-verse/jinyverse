@@ -4,12 +4,14 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import ko from './locales/ko.json';
 import en from './locales/en.json';
+import ja from './locales/ja.json';
 
 // i18n 초기화
 i18n.use(initReactI18next).init({
   resources: {
     en: { translation: en },
     ko: { translation: ko },
+    ja: { translation: ja },
   },
   lng: 'ko', // 초기 언어
   fallbackLng: 'en', // 대체 언어

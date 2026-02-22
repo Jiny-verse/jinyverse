@@ -6,6 +6,7 @@ import { SideNavigation } from 'common/components';
 import { useNavigationItems } from 'common';
 import { ApiProvider, useApiOptions } from '@/app/providers/ApiProvider';
 import { useAuth } from 'common';
+import { useLanguage } from 'common/utils';
 
 function PrivateLayoutContent({
   children,
@@ -14,6 +15,7 @@ function PrivateLayoutContent({
   children: React.ReactNode;
   logout: () => void;
 }) {
+  const { t } = useLanguage();
   const router = useRouter();
   const { user } = useAuth();
   const options = useApiOptions();
@@ -33,7 +35,7 @@ function PrivateLayoutContent({
             }}
             className="text-sm text-neutral-400 hover:text-white"
           >
-            로그아웃
+            {t('ui.button.logout')}
           </button>
         </header>
         <main className="flex-1 px-[4%] py-6">{children}</main>
@@ -47,6 +49,7 @@ export default function PrivateLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const { t } = useLanguage();
   const router = useRouter();
   const { user, isLoading, baseUrl, on401, logout } = useAuth();
 
@@ -60,7 +63,7 @@ export default function PrivateLayout({
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-neutral-400">로딩 중...</p>
+        <p className="text-neutral-400">{t('common.loading')}</p>
       </div>
     );
   }

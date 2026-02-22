@@ -13,6 +13,7 @@ import {
 } from 'common/services';
 import type { CodeCategory, Code } from 'common/services';
 import { useApiOptions } from '@/app/providers/ApiProvider';
+import { useLanguage } from 'common/utils';
 import { CategoryTable } from './components/CategoryTable';
 import { CodeTable } from './components/CodeTable';
 import { CreateCategoryDialog } from './components/CreateCategoryDialog';
@@ -28,6 +29,7 @@ type PageData = {
 
 export default function CodeCategoriesPage() {
   const options = useApiOptions();
+  const { t } = useLanguage();
 
   const [categoryData, setCategoryData] = useState<PageData | null>(null);
   const [catPage, setCatPage] = useState(0);
@@ -147,7 +149,7 @@ export default function CodeCategoriesPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-bold">공통코드 관리</h1>
+      <h1 className="text-2xl font-bold">{t('admin.category.title')}</h1>
       <div className="flex gap-6">
         <div className="w-1/2 min-w-0">
           <CategoryTable

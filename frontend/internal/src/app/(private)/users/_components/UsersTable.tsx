@@ -2,15 +2,16 @@
 
 import { Avatar, Badge, PaginationFooter, SearchInput, FilterSelect } from 'common/ui';
 import type { ApiOptions, User, PageResponse } from 'common/types';
+import { useLanguage } from 'common/utils';
 
-const ACTIVE_OPTIONS = [
-  { value: 'true', label: '활성' },
-  { value: 'false', label: '비활성' },
+const getActiveOptions = (t: any) => [
+  { value: 'true', label: t('common.active', { defaultValue: '활성' }) },
+  { value: 'false', label: t('common.inactive', { defaultValue: '비활성' }) },
 ];
 
-const LOCKED_OPTIONS = [
-  { value: 'false', label: '정상' },
-  { value: 'true', label: '잠금' },
+const getLockedOptions = (t: any) => [
+  { value: 'false', label: t('common.normal', { defaultValue: '정상' }) },
+  { value: 'true', label: t('user.status.locked', { defaultValue: '잠금' }) },
 ];
 
 interface UsersTableProps {
@@ -46,6 +47,9 @@ export function UsersTable({
   onSizeChange,
   onSelectUser,
 }: UsersTableProps) {
+  const { t, language } = useLanguage();
+  const ACTIVE_OPTIONS = getActiveOptions(t);
+  const LOCKED_OPTIONS = getLockedOptions(t);
   return (
     <div className="flex flex-col h-full min-h-0 rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
       {/* 필터 헤더 */}
@@ -53,21 +57,21 @@ export function UsersTable({
         <SearchInput
           value={keyword}
           onChange={onKeywordChange}
-          placeholder="username / 이름 / 닉네임 / 이메일 검색"
+          placeholder={t('form.placeholder.search')}
         />
         <FilterSelect
-          label="활성"
+          label={t('common.active', { defaultValue: '활성' })}
           value={isActive}
           options={ACTIVE_OPTIONS}
           onChange={onActiveChange}
-          placeholder="전체"
+          placeholder={t('common.all')}
         />
         <FilterSelect
-          label="잠금"
+          label={t('user.status.locked', { defaultValue: '잠금' })}
           value={isLocked}
           options={LOCKED_OPTIONS}
           onChange={onLockedChange}
-          placeholder="전체"
+          placeholder={t('common.all')}
         />
       </div>
 
@@ -77,20 +81,20 @@ export function UsersTable({
           <thead className="sticky top-0 bg-gray-50 border-b border-gray-200">
             <tr>
               <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 w-10"></th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">사용자명</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">이름</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">닉네임</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">이메일</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">권한</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">상태</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">가입일</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">{t('form.label.username', { defaultValue: '사용자명' })}</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">{t('form.label.name')}</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">{t('form.label.nickname', { defaultValue: '닉네임' })}</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">{t('form.label.email', { defaultValue: '이메일' })}</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">{t('form.label.role', { defaultValue: '권한' })}</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">{t('form.label.status', { defaultValue: '상태' })}</th>
+              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">{t('form.label.createdAt', { defaultValue: '생성일' })}</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {data.content.length === 0 ? (
               <tr>
                 <td colSpan={8} className="px-4 py-8 text-center text-gray-400">
-                  유저가 없습니다.
+                  {t('common.noData', { defaultValue: '데이터가 없습니다' })}
                 </td>
               </tr>
             ) : (
@@ -121,15 +125,17 @@ export function UsersTable({
                   </td>
                   <td className="px-4 py-2">
                     <div className="flex gap-1">
-                      {user.isLocked && <Badge variant="warning">잠금</Badge>}
-                      {user.isActive === false && <Badge variant="error">비활성</Badge>}
+                      {user.isLocked && <Badge variant="warning">{t('user.status.locked', { defaultValue: '잠금' })}</Badge>}
+                      {user.isActive === false && <Badge variant="error">{t('common.inactive', { defaultValue: '비활성' })}</Badge>}
                       {!user.isLocked && user.isActive !== false && (
-                        <Badge variant="success">정상</Badge>
+                        <Badge variant="success">{t('common.normal', { defaultValue: '정상' })}</Badge>
                       )}
                     </div>
                   </td>
                   <td className="px-4 py-2 text-gray-400 text-xs">
-                    {user.createdAt ? new Date(user.createdAt).toLocaleDateString('ko-KR') : '-'}
+                    {user.createdAt ? new Date(user.createdAt).toLocaleDateString(
+                      language === 'ko' ? 'ko-KR' : language === 'ja' ? 'ja-JP' : 'en-US'
+                    ) : '-'}
                   </td>
                 </tr>
               ))

@@ -14,12 +14,17 @@ export interface TopicColumnOptions {
 }
 
 /** 게시글 목록 컬럼 */
-export function getTopicColumns(boardId: string, options?: TopicColumnOptions): ColumnDef<Topic>[] {
+export function getTopicColumns(
+  boardId: string,
+  options?: TopicColumnOptions,
+  t?: (key: string) => string
+): ColumnDef<Topic>[] {
   const previewMode = options?.previewMode ?? false;
+  const tr = t ?? ((k: string) => k);
   const cols: ColumnDef<Topic>[] = [
     {
       key: 'title',
-      header: '제목',
+      header: tr('form.label.title'),
       render: (row) =>
         previewMode ? (
           <span className="text-blue-400 hover:underline line-clamp-1 cursor-pointer">
@@ -34,13 +39,13 @@ export function getTopicColumns(boardId: string, options?: TopicColumnOptions): 
           </Link>
         ),
     },
-    { key: 'author', header: '작성자', render: (row) => row.author?.nickname ?? '-' },
-    { key: 'status', header: '상태' },
-    { key: 'viewCount', header: '조회', render: (row) => row.viewCount ?? 0 },
-    { key: 'isNotice', header: '공지', render: (row) => (row.isNotice ? 'Y' : 'N') },
+    { key: 'author', header: tr('form.label.author'), render: (row) => row.author?.nickname ?? '-' },
+    { key: 'status', header: tr('form.label.status') },
+    { key: 'viewCount', header: tr('form.label.viewCount'), render: (row) => row.viewCount ?? 0 },
+    { key: 'isNotice', header: tr('post.notice'), render: (row) => (row.isNotice ? 'Y' : 'N') },
     {
       key: 'createdAt',
-      header: '작성일',
+      header: tr('form.label.createdAt'),
       render: (row) => (row.createdAt ? formatRelativeOrAbsolute(row.createdAt) : '-'),
     },
   ];
@@ -48,6 +53,7 @@ export function getTopicColumns(boardId: string, options?: TopicColumnOptions): 
     cols.push(
       createActionColumn<Topic>({
         onDetailView: options.onDetailView,
+        header: tr('table.actions'),
       })
     );
   }

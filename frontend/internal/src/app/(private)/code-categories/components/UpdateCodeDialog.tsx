@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { AutoDialog } from 'common/components';
 import type { AutoDialogField } from 'common/components';
 import type { Code } from 'common/services';
+import { useLanguage } from 'common/utils';
 
 const schema = z.object({
   name: z.string().min(1).max(50),
@@ -22,15 +23,17 @@ interface UpdateCodeDialogProps {
   onSubmit: (data: FormValues) => Promise<void>;
 }
 
-const fields: AutoDialogField[] = [
-  { key: 'name', label: '이름', type: 'text' },
-  { key: 'value', label: '값', type: 'text', optional: true },
-  { key: 'order', label: '정렬 순서', type: 'number', optional: true },
-  { key: 'description', label: '설명', type: 'textarea', optional: true },
-  { key: 'note', label: '비고', type: 'textarea', optional: true },
-];
-
 export function UpdateCodeDialog({ open, target, onClose, onSubmit }: UpdateCodeDialogProps) {
+  const { t } = useLanguage();
+
+  const fields: AutoDialogField[] = [
+    { key: 'name', label: t('form.label.name'), type: 'text' },
+    { key: 'value', label: t('form.label.value'), type: 'text', optional: true },
+    { key: 'order', label: t('form.label.sortOrder'), type: 'number', optional: true },
+    { key: 'description', label: t('form.label.description'), type: 'textarea', optional: true },
+    { key: 'note', label: t('form.label.note'), type: 'textarea', optional: true },
+  ];
+
   const initialValues = target
     ? {
         name: target.name,
@@ -45,7 +48,7 @@ export function UpdateCodeDialog({ open, target, onClose, onSubmit }: UpdateCode
     <AutoDialog
       open={open}
       onClose={onClose}
-      title="코드 수정"
+      title={t('admin.code.edit')}
       schema={schema}
       fields={fields}
       mode="edit"

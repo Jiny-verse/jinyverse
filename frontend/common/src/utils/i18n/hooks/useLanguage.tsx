@@ -4,47 +4,47 @@ import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import i18n from '../i18n';
 import React from 'react';
+import type { Locale } from '../types';
+
+const SUPPORTED_LANGUAGES: Locale[] = ['ko', 'en', 'ja'];
+
+const LANGUAGE_LABELS: Record<Locale, string> = {
+  ko: '한국어',
+  en: 'English',
+  ja: '日本語',
+};
 
 // 다국어 전환을 지원하는 커스텀 훅
 const useLanguage = () => {
   const { t: rawT } = useTranslation();
 
   // 브라우저 또는 localStorage로부터 초기 언어 설정 가져오기
-  const getInitialLanguage = (): string => {
+  const getInitialLanguage = (): Locale => {
     if (typeof window === 'undefined') return 'ko'; // SSR 환경에서는 'ko' 기본
-    const stored = localStorage.getItem('language');
-    return stored ?? 'ko';
+    const stored = localStorage.getItem('language') as Locale | null;
+    if (stored && SUPPORTED_LANGUAGES.includes(stored)) return stored;
+    return 'ko';
   };
 
-  // 현재 언어 및 반대 언어 상태
-  const [language, setLanguage] = useState<string>('ko');
-  const [reverse, setReverse] = useState<string>('en');
+  // 현재 언어 상태
+  const [language, setLanguage] = useState<Locale>('ko');
 
   // 첫 렌더링 시 초기 언어 설정 적용
   useEffect(() => {
     const initialLang = getInitialLanguage();
     i18n.changeLanguage(initialLang); // i18n 설정 변경
     setLanguage(initialLang); // 현재 언어 저장
-    setReverse(initialLang === 'ko' ? 'en' : 'ko'); // 반대 언어 설정
   }, []);
 
   // 언어 전환 함수
-  const switchLanguage = (lng: string) => {
+  const switchLanguage = (lng: Locale) => {
     i18n.changeLanguage(lng); // i18n 언어 변경
     setLanguage(lng); // 현재 언어 상태 업데이트
-    setReverse(lng === 'ko' ? 'en' : 'ko'); // 반대 언어 상태 업데이트
     localStorage.setItem('language', lng); // localStorage에 저장
   };
 
-  // 언어 토글 함수 (ko <-> en)
-  const toggleLanguage = () => {
-    const newLang = language === 'ko' ? 'en' : 'ko';
-    switchLanguage(newLang);
-  };
-
-  // 현재 언어 및 반대 언어 라벨 (UI 표시용)
-  const languageLabel = language === 'ko' ? 'Korean' : 'English';
-  const reverseLabel = reverse === 'ko' ? 'Korean' : 'English';
+  // 현재 언어 라벨 (UI 표시용)
+  const languageLabel = LANGUAGE_LABELS[language];
 
   // 단순 번역 함수
   const t = (key: string, options: any = {}): any => rawT(key, options);
@@ -89,14 +89,12 @@ const useLanguage = () => {
 
   // 외부로 상태 및 함수 반환
   return {
-    language, // 현재 언어 (ko/en)
+    language, // 현재 언어 (ko/en/ja)
     languageLabel, // 현재 언어 라벨
-    reverse, // 반대 언어 (en/ko)
-    reverseLabel, // 반대 언어 라벨
+    supportedLanguages: SUPPORTED_LANGUAGES, // 지원 언어 목록
     t, // 번역 함수 (단순)
     o, // 번역 함수 (개행 처리)
     switchLanguage, // 언어 설정
-    toggleLanguage, // 언어 토글
   };
 };
 

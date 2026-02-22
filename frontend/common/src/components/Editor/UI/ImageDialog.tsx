@@ -1,10 +1,10 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Modal } from '../../../ui/Modal';
 import { Button } from '../../../ui/Button';
 import { Input } from '../../../ui/Input';
+import { useLanguage } from '../../../utils';
 
 interface ImageDialogProps {
   isOpen: boolean;
@@ -14,7 +14,7 @@ interface ImageDialogProps {
 }
 
 export function ImageDialog({ isOpen, onClose, onConfirm, onUpload }: ImageDialogProps) {
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   const [url, setUrl] = useState('');
   const [alt, setAlt] = useState('');
   const [uploading, setUploading] = useState(false);
@@ -51,7 +51,7 @@ export function ImageDialog({ isOpen, onClose, onConfirm, onUpload }: ImageDialo
       reset();
       onClose();
     } catch {
-      setError(t('editor.dialog.image.uploadError', '업로드에 실패했습니다.'));
+      setError(t('editorDialog.image.uploadError', { defaultValue: '업로드에 실패했습니다.' }));
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -64,7 +64,7 @@ export function ImageDialog({ isOpen, onClose, onConfirm, onUpload }: ImageDialo
       <Modal
         isOpen={isOpen}
         onClose={handleClose}
-        title={t('editor.dialog.image.title', '이미지 삽입')}
+        title={t('editorDialog.image.title', { defaultValue: '이미지 삽입' })}
         size="sm"
         footer={
           <div className="flex justify-end gap-2">
@@ -77,7 +77,7 @@ export function ImageDialog({ isOpen, onClose, onConfirm, onUpload }: ImageDialo
         <div className="flex flex-col gap-3">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('editor.dialog.image.upload', '파일 업로드')}
+              {t('editorDialog.image.upload', { defaultValue: '파일 업로드' })}
             </label>
             <div className="flex items-center gap-2">
               <Button
@@ -87,7 +87,7 @@ export function ImageDialog({ isOpen, onClose, onConfirm, onUpload }: ImageDialo
                 onClick={() => fileInputRef.current?.click()}
                 isLoading={uploading}
               >
-                {t('editor.dialog.image.selectFile', '파일 선택')}
+                {t('editorDialog.image.selectFile', { defaultValue: '파일 선택' })}
               </Button>
               <input
                 ref={fileInputRef}
@@ -109,7 +109,7 @@ export function ImageDialog({ isOpen, onClose, onConfirm, onUpload }: ImageDialo
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      title={t('editor.dialog.image.title', '이미지 삽입')}
+      title={t('editorDialog.image.title', { defaultValue: '이미지 삽입' })}
       size="sm"
       footer={
         <div className="flex justify-end gap-2">
@@ -143,12 +143,12 @@ export function ImageDialog({ isOpen, onClose, onConfirm, onUpload }: ImageDialo
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t('editor.dialog.image.alt', '대체 텍스트 (alt)')}
+            {t('editorDialog.image.alt', { defaultValue: '대체 텍스트 (alt)' })}
           </label>
           <Input
             value={alt}
             onChange={(e) => setAlt(e.target.value)}
-            placeholder={t('editor.dialog.image.altPlaceholder', '이미지 설명 (선택)')}
+            placeholder={t('editorDialog.image.altPlaceholder', { defaultValue: '이미지 설명 (선택)' })}
           />
         </div>
       </div>

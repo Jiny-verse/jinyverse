@@ -5,6 +5,7 @@ import type { ApiOptions } from '../../types/api';
 import type { CommonFile } from '../../schemas/file';
 import { FileUpload } from './FileUpload';
 import { FileDownloadLink } from './FileDownloadLink';
+import useLanguage from '../../utils/i18n/hooks/useLanguage';
 
 export interface SingleImageFieldProps {
   apiOptions: ApiOptions;
@@ -22,13 +23,15 @@ export function SingleImageField({
   apiOptions,
   value,
   onChange,
-  uploadLabel = '이미지 선택',
+  uploadLabel,
   accept = 'image/*',
   showRemove = true,
   onError,
   disabled = false,
   className = '',
 }: SingleImageFieldProps) {
+  const { t } = useLanguage();
+  const resolvedLabel = uploadLabel ?? t('file.imageSelect');
   const handleUpload = useCallback(
     (files: CommonFile[]) => {
       if (files.length > 0) {
@@ -48,12 +51,12 @@ export function SingleImageField({
         onError={onError}
         disabled={disabled}
       >
-        {uploadLabel}
+        {resolvedLabel}
       </FileUpload>
       {value && (
         <>
           <span className="text-sm text-neutral-400">
-            현재: <FileDownloadLink fileId={value} label="다운로드" apiOptions={apiOptions} />
+            {t('file.current')} <FileDownloadLink fileId={value} label={t('file.download')} apiOptions={apiOptions} />
           </span>
           {showRemove && (
             <button
@@ -62,7 +65,7 @@ export function SingleImageField({
               disabled={disabled}
               className="text-sm text-red-400 hover:underline disabled:opacity-50"
             >
-              제거
+              {t('file.remove')}
             </button>
           )}
         </>

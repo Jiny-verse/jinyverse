@@ -1,5 +1,7 @@
 'use client';
 
+import useLanguage from '../utils/i18n/hooks/useLanguage';
+
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
@@ -13,6 +15,7 @@ export function Pagination({
   onPageChange,
   showPageNumbers = true,
 }: PaginationProps) {
+  const { t } = useLanguage();
   const effectiveTotalPages = Math.max(1, totalPages);
 
   const getPageNumbers = () => {
@@ -63,7 +66,7 @@ export function Pagination({
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
       >
-        이전
+        {t('common.previous')}
       </button>
 
       {showPageNumbers &&
@@ -98,7 +101,7 @@ export function Pagination({
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === effectiveTotalPages}
       >
-        다음
+        {t('common.next')}
       </button>
     </div>
   );

@@ -3,6 +3,7 @@
 import { ReactNode } from 'react';
 import Link from 'next/link';
 import { Spinner } from '../ui';
+import useLanguage from '../utils/i18n/hooks/useLanguage';
 
 export interface DetailPreviewPanelProps {
   /** 패널 본문 (상세 내용) */
@@ -28,6 +29,7 @@ export function DetailPreviewPanel({
   isLoading = false,
   title,
 }: DetailPreviewPanelProps) {
+  const { t } = useLanguage();
   return (
     <div className="flex flex-col h-full min-w-0 border-l border-gray-200 bg-gray-50">
       <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-gray-200 bg-white shrink-0">
@@ -38,16 +40,16 @@ export function DetailPreviewPanel({
               href={expandHref}
               className="rounded px-3 py-1.5 text-sm font-medium text-(--btn-primary,#374151) hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-(--focus-ring,#6b7280)"
             >
-              확장
+              {t('common.detail')}
             </Link>
           )}
           <button
             type="button"
             onClick={onClose}
             className="rounded px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400"
-            aria-label="닫기"
+            aria-label={t('ui.button.close')}
           >
-            닫기
+            {t('ui.button.close')}
           </button>
         </div>
       </div>
@@ -55,7 +57,7 @@ export function DetailPreviewPanel({
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-12">
             <Spinner size="lg" />
-            <span className="mt-2 text-sm text-gray-500">로딩 중...</span>
+            <span className="mt-2 text-sm text-gray-500">{t('common.loading')}</span>
           </div>
         ) : (
           children

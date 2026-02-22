@@ -1,5 +1,7 @@
 'use client';
 
+import useLanguage from '../utils/i18n/hooks/useLanguage';
+
 export interface FilterSelectOption {
   value: string;
   label: string;
@@ -20,10 +22,12 @@ export function FilterSelect({
   value,
   options,
   onChange,
-  placeholder = '전체',
+  placeholder,
   'aria-label': ariaLabel,
 }: FilterSelectProps) {
-  const allOptions = placeholder ? [{ value: '', label: placeholder }, ...options] : options;
+  const { t } = useLanguage();
+  const resolvedPlaceholder = placeholder ?? t('common.all');
+  const allOptions = resolvedPlaceholder ? [{ value: '', label: resolvedPlaceholder }, ...options] : options;
 
   return (
     <div className="flex items-center gap-1.5" role="group" aria-label={ariaLabel ?? label}>

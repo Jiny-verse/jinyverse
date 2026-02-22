@@ -16,6 +16,7 @@ import { useAuth } from 'common';
 import type { Topic, TopicCreateInput, FileAttachmentItem, Board } from 'common/schemas';
 import type { PostFormState, PostFormHandlers } from 'common/components';
 import type { BoardType } from 'common/constants';
+import { useLanguage } from 'common/utils';
 
 interface TopicFormProps {
   mode: 'create' | 'edit';
@@ -37,6 +38,7 @@ export function TopicForm({
   const router = useRouter();
   const apiOptions = useApiOptions();
   const { user } = useAuth();
+  const { t } = useLanguage();
   const boardType = (board.type ?? 'normal') as BoardType;
 
   // Form state
@@ -116,17 +118,17 @@ export function TopicForm({
     const newErrors: Record<string, string> = {};
 
     if (!title.trim()) {
-      newErrors.title = '제목을 입력하세요';
+      newErrors.title = t('validation.required');
     } else if (title.length > 200) {
-      newErrors.title = '제목은 최대 200자까지 입력 가능합니다';
+      newErrors.title = t('validation.maxLength', { max: 200 });
     }
 
     if (boardType !== 'gallery' && !content.trim()) {
-      newErrors.content = '내용을 입력하세요';
+      newErrors.content = t('validation.required');
     }
 
     if ((boardType === 'project' || boardType === 'gallery') && additionalFiles.length === 0) {
-      newErrors.images = '이미지를 최소 1장 등록하세요';
+      newErrors.images = t('validation.minLength', { min: 1 });
     }
 
     setErrors(newErrors);
@@ -158,7 +160,7 @@ export function TopicForm({
     for (const name of tagNames) {
       const result = await getTags(apiOptions, { q: name, size: 20 });
       const existing = result.content.find(
-        (t) => t.name.toLowerCase() === name.toLowerCase()
+        (tag) => tag.name.toLowerCase() === name.toLowerCase()
       );
       if (existing) {
         ids.push(existing.id);
@@ -212,7 +214,7 @@ export function TopicForm({
       }
     } catch (error: any) {
       console.error('Failed to save topic:', error);
-      setErrors({ submit: error.message || '저장에 실패했습니다. 다시 시도해주세요.' });
+      setErrors({ submit: error.message || t('message.error') });
     } finally {
       setIsSaving(false);
       setIsDraftSaving(false);
@@ -239,8 +241,8 @@ export function TopicForm({
         <PostFormRenderer board={board} state={state} handlers={handlers} apiOptions={apiOptions} />
 
         {boardType === 'normal' && (
-          <FormSection title="파일 첨부" description="파일을 첨부하세요">
-            <FormField label="파일" name="files" description="드래그 앤 드롭 지원">
+          <FormSection title={t('file.attachFile')} description="파일을 첨부하세요">
+            <FormField label={t('form.label.file')} name="files" description="드래그 앤 드롭 지원">
               <FileAttachmentField
                 apiOptions={apiOptions}
                 value={files}
@@ -258,7 +260,7 @@ export function TopicForm({
         )}
 
         <FormActions
-          submitLabel={mode === 'create' ? '게시' : '수정 완료'}
+          submitLabel={mode === 'create' ? t('post.create') : t('post.edit')}
           onCancel={handleCancel}
           isSubmitting={isSaving}
           extraActions={
@@ -269,7 +271,7 @@ export function TopicForm({
                 disabled={isSaving || isDraftSaving}
                 className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
               >
-                {isDraftSaving ? '저장 중...' : '임시저장'}
+                {isDraftSaving ? t('common.saving') : t('post.saveDraft')}
               </button>
             ) : undefined
           }

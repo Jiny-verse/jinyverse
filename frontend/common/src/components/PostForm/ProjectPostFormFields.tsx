@@ -5,6 +5,7 @@ import type { FileAttachmentItem } from '../../schemas/file';
 import { ImageGridField } from '../File/ImageGridField';
 import { FormSection } from '../Form/FormSection';
 import { FormField } from '../Form/FormField';
+import useLanguage from '../../utils/i18n/hooks/useLanguage';
 
 interface ProjectPostFormFieldsProps {
   apiOptions: ApiOptions;
@@ -23,12 +24,13 @@ export function ProjectPostFormFields({
   onMainChange,
   imagesError,
 }: ProjectPostFormFieldsProps) {
+  const { t } = useLanguage();
   return (
     <FormSection
-      title="이미지"
-      description="프로젝트 이미지를 업로드하세요. 클릭하여 커버(★)를 지정하세요 (필수, 최소 1장, 최대 10장)"
+      title={t('board.form.images')}
+      description={t('board.form.projectImagesDesc')}
     >
-      <FormField label="이미지" name="images" required error={imagesError}>
+      <FormField label={t('board.form.images')} name="images" required error={imagesError}>
         <ImageGridField
           apiOptions={apiOptions}
           value={images}

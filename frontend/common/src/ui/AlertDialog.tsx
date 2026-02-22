@@ -2,6 +2,7 @@
 
 import { Modal } from './Modal';
 import { Button } from './Button';
+import useLanguage from '../utils/i18n/hooks/useLanguage';
 
 export interface AlertDialogProps {
   isOpen: boolean;
@@ -17,19 +18,23 @@ export interface AlertDialogProps {
 export function AlertDialog({
   isOpen,
   onClose,
-  title = '알림',
+  title,
   message,
-  buttonText = '확인',
+  buttonText,
 }: AlertDialogProps) {
+  const { t } = useLanguage();
+  const resolvedTitle = title ?? t('ui.dialog.alert');
+  const resolvedButtonText = buttonText ?? t('ui.button.confirm');
+
   return (
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={title}
+      title={resolvedTitle}
       footer={
         <div className="flex justify-end">
           <Button type="button" variant="primary" onClick={onClose}>
-            {buttonText}
+            {resolvedButtonText}
           </Button>
         </div>
       }

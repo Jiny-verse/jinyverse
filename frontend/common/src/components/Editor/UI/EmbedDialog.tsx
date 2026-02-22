@@ -1,10 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Modal } from '../../../ui/Modal';
 import { Button } from '../../../ui/Button';
 import { Input } from '../../../ui/Input';
+import { useLanguage } from '../../../utils';
 import { toEmbedUrl } from '../Utils/astUtils';
 
 interface EmbedDialogProps {
@@ -14,7 +14,7 @@ interface EmbedDialogProps {
 }
 
 export function EmbedDialog({ isOpen, onClose, onConfirm }: EmbedDialogProps) {
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   const [url, setUrl] = useState('');
 
   const embedUrl = url.trim() ? toEmbedUrl(url.trim()) : null;
@@ -35,7 +35,7 @@ export function EmbedDialog({ isOpen, onClose, onConfirm }: EmbedDialogProps) {
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      title={t('editor.dialog.embed.title', '임베드 삽입')}
+      title={t('editorDialog.embed.title', { defaultValue: '임베드 삽입' })}
       size="sm"
       footer={
         <div className="flex justify-end gap-2">
@@ -56,7 +56,7 @@ export function EmbedDialog({ isOpen, onClose, onConfirm }: EmbedDialogProps) {
           <Input
             value={url}
             onChange={(e) => setUrl(e.target.value)}
-            placeholder={t('editor.dialog.embed.placeholder', 'YouTube, Vimeo URL을 입력하세요')}
+            placeholder={t('editorDialog.embed.placeholder', { defaultValue: 'YouTube, Vimeo URL을 입력하세요' })}
             onKeyDown={(e) => e.key === 'Enter' && handleConfirm()}
             autoFocus
           />
@@ -64,8 +64,8 @@ export function EmbedDialog({ isOpen, onClose, onConfirm }: EmbedDialogProps) {
         {url.trim() && (
           <p className="text-xs text-gray-500">
             {embedUrl
-              ? t('editor.dialog.embed.supported', '✅ 지원되는 형식입니다 (YouTube / Vimeo)')
-              : t('editor.dialog.embed.unsupported', '⚠️ YouTube/Vimeo URL이 아닙니다. 링크 카드로 삽입됩니다.')}
+              ? t('editorDialog.embed.supported', { defaultValue: '✅ 지원되는 형식입니다 (YouTube / Vimeo)' })
+              : t('editorDialog.embed.unsupported', { defaultValue: '⚠️ YouTube/Vimeo URL이 아닙니다. 링크 카드로 삽입됩니다.' })}
           </p>
         )}
       </div>

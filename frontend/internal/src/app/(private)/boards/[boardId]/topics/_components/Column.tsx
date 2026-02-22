@@ -17,13 +17,15 @@ export function getColumns(
     onEdit?: (row: Topic) => void;
     onDelete?: (id: string) => void;
     previewMode?: boolean;
-  }
+  },
+  t?: (key: string) => string
 ): ColumnDef<Topic>[] {
   const previewMode = options?.previewMode ?? false;
+  const tr = t ?? ((k: string) => k);
   const titleCell = (row: Topic) => {
     const noticeBadge = row.isNotice ? (
       <Badge variant="warning" className="mr-2 shrink-0">
-        공지
+        {tr('post.notice')}
       </Badge>
     ) : null;
     const titleEl = previewMode ? (
@@ -44,18 +46,18 @@ export function getColumns(
   const cols: ColumnDef<Topic>[] = [
     {
       key: 'title',
-      header: '제목',
+      header: tr('form.label.title'),
       render: titleCell,
     },
     {
       key: 'tags',
-      header: '태그',
+      header: tr('form.label.tags'),
       render: (row) =>
         row.tags?.length ? (
           <span className="flex flex-wrap gap-1">
-            {row.tags.map((t) => (
-              <Badge key={t.id} variant="default" className="text-xs">
-                {t.name}
+            {row.tags.map((tag) => (
+              <Badge key={tag.id} variant="default" className="text-xs">
+                {tag.name}
               </Badge>
             ))}
           </span>
@@ -63,23 +65,24 @@ export function getColumns(
           '-'
         ),
     },
-    { key: 'author', header: '작성자', render: (row) => row.author?.nickname ?? '-' },
-    { key: 'status', header: '상태' },
-    { key: 'viewCount', header: '조회', render: (row) => row.viewCount ?? 0 },
-    { key: 'isNotice', header: '공지', render: (row) => (row.isNotice ? 'Y' : 'N') },
-    { key: 'isPinned', header: '고정', render: (row) => (row.isPinned ? 'Y' : 'N') },
+    { key: 'author', header: tr('form.label.author'), render: (row) => row.author?.nickname ?? '-' },
+    { key: 'status', header: tr('form.label.status') },
+    { key: 'viewCount', header: tr('form.label.viewCount'), render: (row) => row.viewCount ?? 0 },
+    { key: 'isNotice', header: tr('post.notice'), render: (row) => (row.isNotice ? 'Y' : 'N') },
+    { key: 'isPinned', header: tr('post.pinned'), render: (row) => (row.isPinned ? 'Y' : 'N') },
     {
       key: 'createdAt',
-      header: '작성일',
+      header: tr('form.label.createdAt'),
       render: (row) => (row.createdAt ? formatRelativeOrAbsolute(row.createdAt) : '-'),
     },
   ];
   if (options?.onDetailView || options?.onEdit || options?.onDelete) {
     cols.push(
       createActionColumn<Topic>({
-        onDetailView: options.onDetailView,
-        onEdit: options.onEdit,
-        onDelete: options.onDelete,
+        onDetailView: options?.onDetailView,
+        onEdit: options?.onEdit,
+        onDelete: options?.onDelete,
+        header: tr('table.actions'),
       })
     );
   }

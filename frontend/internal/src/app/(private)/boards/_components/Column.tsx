@@ -5,20 +5,6 @@ import { createActionColumn } from 'common/components';
 import type { Board } from 'common/types';
 import Link from 'next/link';
 
-const BOARD_LABELS: Record<string, string> = {
-  id: 'ID',
-  menuCode: '메뉴 코드',
-  typeCategoryCode: '타입 분류',
-  type: '타입',
-  name: '이름',
-  description: '설명',
-  note: '비고',
-  isPublic: '공개',
-  order: '순서',
-  createdAt: '생성일',
-  updatedAt: '수정일',
-};
-
 /**
  * 목록 컬럼 정의 (데이터 키 기준 + 라벨)
  */
@@ -29,13 +15,15 @@ export function getColumns(
     onEdit?: (row: Board) => void;
     onDelete?: (id: string) => void;
     previewMode?: boolean;
-  }
+  },
+  t?: (key: string) => string
 ): ColumnDef<Board>[] {
   const previewMode = options?.previewMode ?? false;
+  const tr = t ?? ((k: string) => k);
   const cols: ColumnDef<Board>[] = [
     {
       key: 'name',
-      header: BOARD_LABELS.name,
+      header: tr('form.label.name'),
       render: (row) =>
         previewMode ? (
           <span className="line-clamp-1 cursor-pointer">{row.name}</span>
@@ -45,25 +33,26 @@ export function getColumns(
           </Link>
         ),
     },
-    { key: 'typeCategoryCode', header: BOARD_LABELS.typeCategoryCode },
-    { key: 'type', header: BOARD_LABELS.type },
+    { key: 'typeCategoryCode', header: tr('form.label.typeCategory') },
+    { key: 'type', header: tr('form.label.type') },
     {
       key: 'description',
-      header: BOARD_LABELS.description,
+      header: tr('form.label.description'),
       render: (row) =>
         row.description
           ? String(row.description).slice(0, 50) + (String(row.description).length > 50 ? '…' : '')
           : '-',
     },
-    { key: 'isPublic', header: BOARD_LABELS.isPublic, render: (row) => (row.isPublic ? 'Y' : 'N') },
-    { key: 'order', header: BOARD_LABELS.order },
+    { key: 'isPublic', header: tr('form.label.isPublic'), render: (row) => (row.isPublic ? 'Y' : 'N') },
+    { key: 'order', header: tr('form.label.order') },
   ];
   if (options?.onDetailView || options?.onEdit || options?.onDelete) {
     cols.push(
       createActionColumn<Board>({
-        onDetailView: options.onDetailView,
-        onEdit: options.onEdit,
-        onDelete: options.onDelete,
+        onDetailView: options?.onDetailView,
+        onEdit: options?.onEdit,
+        onDelete: options?.onDelete,
+        header: tr('table.actions'),
       })
     );
   }

@@ -6,10 +6,11 @@ import { Avatar, Badge, Switch } from 'common/ui';
 import { ConfirmDialog } from 'common/components';
 import { updateUser } from 'common/services';
 import type { ApiOptions, User } from 'common/types';
+import { useLanguage } from 'common/utils';
 
-const ROLE_OPTIONS = [
-  { value: 'user', label: '일반 (user)' },
-  { value: 'admin', label: '관리자 (admin)' },
+const getRoleOptions = (t: (key: string, options?: any) => string) => [
+  { value: 'user', label: t('user.role.user', { defaultValue: '일반 (user)' }) },
+  { value: 'admin', label: t('user.role.admin', { defaultValue: '관리자 (admin)' }) },
 ];
 
 interface UserDetailPanelProps {
@@ -20,6 +21,7 @@ interface UserDetailPanelProps {
 }
 
 export function UserDetailPanel({ user, apiOptions, onClose, onUpdated }: UserDetailPanelProps) {
+  const { t } = useLanguage();
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ type: 'ok' | 'error'; text: string } | null>(null);
   const [confirmAction, setConfirmAction] = useState<null | {
@@ -28,15 +30,17 @@ export function UserDetailPanel({ user, apiOptions, onClose, onUpdated }: UserDe
     onConfirm: () => void;
   }>(null);
 
+  const ROLE_OPTIONS = getRoleOptions(t);
+
   const handleUpdate = async (body: Parameters<typeof updateUser>[2]) => {
     setMessage(null);
     setSaving(true);
     try {
       const updated = await updateUser(apiOptions, user.id, body);
       onUpdated(updated);
-      setMessage({ type: 'ok', text: '변경되었습니다.' });
+      setMessage({ type: 'ok', text: t('message.success', { defaultValue: '변경되었습니다.' }) });
     } catch (err) {
-      setMessage({ type: 'error', text: err instanceof Error ? err.message : '변경에 실패했습니다.' });
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : t('message.error', { defaultValue: '오류가 발생했습니다' }) });
     } finally {
       setSaving(false);
     }
@@ -73,9 +77,9 @@ export function UserDetailPanel({ user, apiOptions, onClose, onUpdated }: UserDe
             {user.role && (
               <Badge variant={user.role === 'admin' ? 'error' : 'default'}>{user.role}</Badge>
             )}
-            {user.isLocked && <Badge variant="warning">잠금</Badge>}
-            {user.isActive === false && <Badge variant="error">비활성</Badge>}
-            {!user.isLocked && user.isActive !== false && <Badge variant="success">정상</Badge>}
+            {user.isLocked && <Badge variant="warning">{t('user.status.locked', { defaultValue: '잠금' })}</Badge>}
+            {user.isActive === false && <Badge variant="error">{t('user.status.inactive', { defaultValue: '비활성' })}</Badge>}
+            {!user.isLocked && user.isActive !== false && <Badge variant="success">{t('user.status.active', { defaultValue: '정상' })}</Badge>}
           </div>
 
           {message && (
@@ -88,34 +92,34 @@ export function UserDetailPanel({ user, apiOptions, onClose, onUpdated }: UserDe
             {/* 잠금 해제 */}
             {user.isLocked && (
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-700">계정 잠금 해제</span>
+                <span className="text-sm text-gray-700">{t('user.action.unlockAccount', { defaultValue: '계정 잠금 해제' })}</span>
                 <button
                   type="button"
                   disabled={saving}
                   onClick={() =>
-                    confirmThen('잠금 해제', '이 계정의 잠금을 해제하시겠습니까?', () =>
+                    confirmThen(t('user.action.unlock', { defaultValue: '잠금 해제' }), t('user.action.unlockConfirm', { defaultValue: '이 계정의 잠금을 해제하시겠습니까?' }), () =>
                       handleUpdate({ isLocked: false })
                     )
                   }
                   className="rounded border border-yellow-300 bg-yellow-50 px-3 py-1 text-xs font-medium text-yellow-800 hover:bg-yellow-100 disabled:opacity-50"
                 >
-                  잠금 해제
+                  {t('user.action.unlock', { defaultValue: '잠금 해제' })}
                 </button>
               </div>
             )}
 
             {/* 활성/비활성 토글 */}
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-700">계정 활성화</span>
+              <span className="text-sm text-gray-700">{t('user.action.activateAccount', { defaultValue: '계정 활성화' })}</span>
               <Switch
                 checked={user.isActive !== false}
                 disabled={saving}
                 onChange={(e) => {
                   const next = e.target.checked;
                   const msg = next
-                    ? '이 계정을 활성화하시겠습니까?'
-                    : '이 계정을 비활성화하시겠습니까?';
-                  confirmThen(next ? '계정 활성화' : '계정 비활성화', msg, () =>
+                    ? t('user.action.activateConfirm', { defaultValue: '이 계정을 활성화하시겠습니까?' })
+                    : t('user.action.deactivateConfirm', { defaultValue: '이 계정을 비활성화하시겠습니까?' });
+                  confirmThen(next ? t('user.action.activate', { defaultValue: '계정 활성화' }) : t('user.action.deactivate', { defaultValue: '계정 비활성화' }), msg, () =>
                     handleUpdate({ isActive: next })
                   );
                 }}
@@ -124,15 +128,15 @@ export function UserDetailPanel({ user, apiOptions, onClose, onUpdated }: UserDe
 
             {/* 권한 변경 */}
             <div className="flex items-center justify-between gap-2">
-              <span className="text-sm text-gray-700">권한</span>
+              <span className="text-sm text-gray-700">{t('user.action.role', { defaultValue: '권한' })}</span>
               <select
                 value={user.role ?? 'user'}
                 disabled={saving}
                 onChange={(e) => {
                   const next = e.target.value;
                   confirmThen(
-                    '권한 변경',
-                    `이 계정의 권한을 '${next}'으로 변경하시겠습니까?`,
+                    t('user.action.changeRole', { defaultValue: '권한 변경' }),
+                    t('user.action.changeRoleConfirm', { defaultValue: `이 계정의 권한을 '{{role}}'으로 변경하시겠습니까?`, role: next }),
                     () => handleUpdate({ role: next })
                   );
                 }}
@@ -150,7 +154,7 @@ export function UserDetailPanel({ user, apiOptions, onClose, onUpdated }: UserDe
           {/* 메타 정보 */}
           {user.createdAt && (
             <p className="text-xs text-gray-400">
-              가입일: {new Date(user.createdAt).toLocaleDateString('ko-KR')}
+              {t('user.profile.joinedAt', { defaultValue: '가입일: {{date}}', date: new Date(user.createdAt).toLocaleDateString() })}
             </p>
           )}
         </div>

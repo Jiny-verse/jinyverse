@@ -3,6 +3,7 @@
 import { AutoDialog } from 'common/components';
 import type { AutoDialogField } from 'common/components';
 import { tagCreateSchema } from 'common/schemas';
+import { useLanguage } from 'common/utils';
 import { useTagContext } from '../_hooks/useTagContext';
 
 export interface CreateDialogProps {
@@ -10,14 +11,15 @@ export interface CreateDialogProps {
 }
 
 export function CreateDialog({ usageOptions }: CreateDialogProps) {
+  const { t } = useLanguage();
   const domain = useTagContext();
   const { open, onClose, onSubmit } = domain.dialogs.create;
   const fields: AutoDialogField[] = [
-    { key: 'name', label: '태그명', type: 'text' },
-    { key: 'description', label: '설명', type: 'textarea', optional: true },
+    { key: 'name', label: t('form.label.tagName'), type: 'text' },
+    { key: 'description', label: t('form.label.description'), type: 'textarea', optional: true },
     {
       key: 'usage',
-      label: '용도',
+      label: t('form.label.usage'),
       type: 'select',
       options: usageOptions,
       defaultValue: 'topic',
@@ -28,7 +30,7 @@ export function CreateDialog({ usageOptions }: CreateDialogProps) {
     <AutoDialog
       open={open}
       onClose={onClose}
-      title="태그 추가"
+      title={t('admin.tag.create')}
       schema={tagCreateSchema}
       fields={fields}
       mode="create"

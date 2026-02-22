@@ -1,10 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Modal } from '../../../ui/Modal';
 import { Button } from '../../../ui/Button';
 import { Input } from '../../../ui/Input';
+import { useLanguage } from '../../../utils';
 
 interface LinkDialogProps {
   isOpen: boolean;
@@ -14,7 +14,7 @@ interface LinkDialogProps {
 }
 
 export function LinkDialog({ isOpen, onClose, onConfirm, initialText }: LinkDialogProps) {
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   const [url, setUrl] = useState('');
   const [text, setText] = useState('');
 
@@ -44,7 +44,7 @@ export function LinkDialog({ isOpen, onClose, onConfirm, initialText }: LinkDial
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      title={t('editor.dialog.link.title', '링크 삽입')}
+      title={t('editorDialog.link.title', { defaultValue: '링크 삽입' })}
       size="sm"
       footer={
         <div className="flex justify-end gap-2">
@@ -72,12 +72,12 @@ export function LinkDialog({ isOpen, onClose, onConfirm, initialText }: LinkDial
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            {t('editor.dialog.link.text', '표시 텍스트')}
+            {t('editorDialog.link.text', { defaultValue: '표시 텍스트' })}
           </label>
           <Input
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder={t('editor.dialog.link.textPlaceholder', '링크 텍스트 (선택)')}
+            placeholder={t('editorDialog.link.textPlaceholder', { defaultValue: '링크 텍스트 (선택)' })}
             onKeyDown={(e) => e.key === 'Enter' && handleConfirm()}
           />
         </div>

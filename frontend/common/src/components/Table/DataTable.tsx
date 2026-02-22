@@ -5,6 +5,7 @@ import { Table } from './Table';
 import { ActionToolbar } from './ActionToolbar';
 import { Button } from '../../ui';
 import type { ColumnDef, PaginationConfig, SearchConfig } from './types';
+import useLanguage from '../../utils/i18n/hooks/useLanguage';
 
 export interface DataTableProps<T extends Record<string, unknown>> {
   data: T[];
@@ -37,19 +38,22 @@ export function DataTable<T extends Record<string, unknown>>({
   data,
   columns,
   isLoading = false,
-  emptyMessage = '데이터가 없습니다.',
+  emptyMessage,
   pagination,
   search,
   filterSlot,
   selection,
   onBatchDelete,
   onAdd,
-  addButtonLabel = '추가',
+  addButtonLabel,
   onRowClick,
   selectedRowId,
   getRowId,
   getRowClassName,
 }: DataTableProps<T>) {
+  const { t } = useLanguage();
+  const resolvedEmptyMessage = emptyMessage ?? t('common.noData');
+  const resolvedAddButtonLabel = addButtonLabel ?? t('ui.button.add');
   const paginationWithDefaults = pagination
     ? { ...pagination, sizeOptions: pagination.sizeOptions ?? [10, 20, 50] }
     : undefined;
@@ -62,7 +66,7 @@ export function DataTable<T extends Record<string, unknown>>({
 
   const toolbarActionSlot = onAdd ? (
     <Button type="button" size="sm" onClick={onAdd}>
-      {addButtonLabel}
+      {resolvedAddButtonLabel}
     </Button>
   ) : null;
 
@@ -71,7 +75,7 @@ export function DataTable<T extends Record<string, unknown>>({
       data={data}
       columns={columns}
       isLoading={isLoading}
-      emptyMessage={emptyMessage}
+      emptyMessage={resolvedEmptyMessage}
       pagination={paginationWithDefaults}
       search={search}
       filterSlot={filterSlot}

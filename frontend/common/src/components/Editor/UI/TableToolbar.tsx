@@ -10,9 +10,9 @@ import {
   PaintBucket,
   Baseline,
 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { Button } from '../../../ui/Button';
 import { Tooltip } from '../../../ui/Tooltip';
+import { useLanguage } from '../../../utils';
 
 const TABLE_BG_COLORS = [
   'transparent', '#ffffff', '#fef3c7', '#dcfce7',
@@ -106,7 +106,7 @@ export function TableToolbar({
   onSetCellTextColor,
   onDeleteTable,
 }: TableToolbarProps) {
-  const { t } = useTranslation();
+  const { t } = useLanguage();
 
   return (
     <div className="flex items-center gap-0.5 px-2 py-1 border-b border-blue-200 bg-blue-50 flex-wrap">
@@ -115,17 +115,17 @@ export function TableToolbar({
       <div className="w-px h-4 bg-blue-200 mx-0.5" />
 
       {/* Row operations */}
-      <Tooltip content={t('editor.table.addRowAbove', '위에 행 추가')} position="bottom">
+      <Tooltip content={t('editorTable.addRowAbove', { defaultValue: '위에 행 추가' })} position="bottom">
         <Button type="button" variant="ghost" size="sm" className="p-1.5 h-7 w-7 hover:bg-blue-100" onClick={onAddRowAbove}>
           <ArrowUpFromLine size={14} />
         </Button>
       </Tooltip>
-      <Tooltip content={t('editor.table.addRowBelow', '아래에 행 추가')} position="bottom">
+      <Tooltip content={t('editorTable.addRowBelow', { defaultValue: '아래에 행 추가' })} position="bottom">
         <Button type="button" variant="ghost" size="sm" className="p-1.5 h-7 w-7 hover:bg-blue-100" onClick={onAddRowBelow}>
           <ArrowDownFromLine size={14} />
         </Button>
       </Tooltip>
-      <Tooltip content={t('editor.table.deleteRow', '행 삭제')} position="bottom">
+      <Tooltip content={t('editorTable.deleteRow', { defaultValue: '행 삭제' })} position="bottom">
         <Button type="button" variant="ghost" size="sm" className="p-1.5 h-7 w-7 hover:bg-red-100 text-red-500" onClick={onDeleteRow}>
           <Trash2 size={14} />
         </Button>
@@ -134,17 +134,17 @@ export function TableToolbar({
       <div className="w-px h-4 bg-blue-200 mx-0.5" />
 
       {/* Column operations */}
-      <Tooltip content={t('editor.table.addColLeft', '왼쪽에 열 추가')} position="bottom">
+      <Tooltip content={t('editorTable.addColLeft', { defaultValue: '왼쪽에 열 추가' })} position="bottom">
         <Button type="button" variant="ghost" size="sm" className="p-1.5 h-7 w-7 hover:bg-blue-100" onClick={onAddColLeft}>
           <ArrowLeftFromLine size={14} />
         </Button>
       </Tooltip>
-      <Tooltip content={t('editor.table.addColRight', '오른쪽에 열 추가')} position="bottom">
+      <Tooltip content={t('editorTable.addColRight', { defaultValue: '오른쪽에 열 추가' })} position="bottom">
         <Button type="button" variant="ghost" size="sm" className="p-1.5 h-7 w-7 hover:bg-blue-100" onClick={onAddColRight}>
           <ArrowRightFromLine size={14} />
         </Button>
       </Tooltip>
-      <Tooltip content={t('editor.table.deleteCol', '열 삭제')} position="bottom">
+      <Tooltip content={t('editorTable.deleteCol', { defaultValue: '열 삭제' })} position="bottom">
         <Button type="button" variant="ghost" size="sm" className="p-1.5 h-7 w-7 hover:bg-red-100 text-red-500" onClick={onDeleteCol}>
           <ArrowLeftFromLine size={14} className="opacity-0 absolute" />
           <Trash2 size={14} style={{ transform: 'rotate(90deg)' }} />
@@ -157,20 +157,20 @@ export function TableToolbar({
       <MiniColorPicker
         colors={TABLE_BG_COLORS}
         onSelect={onSetCellBgColor}
-        label={t('editor.table.cellBgColor', '셀 배경색')}
+        label={t('editorTable.cellBgColor', { defaultValue: '셀 배경색' })}
         icon={PaintBucket}
       />
       <MiniColorPicker
         colors={TABLE_TEXT_COLORS}
         onSelect={onSetCellTextColor}
-        label={t('editor.table.cellTextColor', '셀 글자색')}
+        label={t('editorTable.cellTextColor', { defaultValue: '셀 글자색' })}
         icon={Baseline}
       />
 
       <div className="flex-1" />
 
       {/* Delete table */}
-      <Tooltip content={t('editor.table.deleteTable', '표 삭제')} position="bottom">
+      <Tooltip content={t('editorTable.deleteTable', { defaultValue: '표 삭제' })} position="bottom">
         <Button
           type="button"
           variant="ghost"
@@ -179,7 +179,7 @@ export function TableToolbar({
           onClick={onDeleteTable}
         >
           <Trash2 size={12} />
-          <span className="hidden sm:inline">{t('editor.table.deleteTable', '표 삭제')}</span>
+          <span className="hidden sm:inline">{t('editorTable.deleteTable', { defaultValue: '표 삭제' })}</span>
         </Button>
       </Tooltip>
     </div>

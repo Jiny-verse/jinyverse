@@ -5,6 +5,7 @@ import type { FileAttachmentItem } from '../../schemas/file';
 import { ImagePreviewField } from '../File/ImagePreviewField';
 import { FormSection } from '../Form/FormSection';
 import { FormField } from '../Form/FormField';
+import useLanguage from '../../utils/i18n/hooks/useLanguage';
 
 interface BlogPostFormFieldsProps {
   apiOptions: ApiOptions;
@@ -14,9 +15,10 @@ interface BlogPostFormFieldsProps {
 }
 
 export function BlogPostFormFields({ apiOptions, thumbnailFile, onThumbnailChange, error }: BlogPostFormFieldsProps) {
+  const { t } = useLanguage();
   return (
-    <FormSection title="커버 이미지" description="목록에 표시될 대표 이미지를 업로드하세요 (선택)">
-      <FormField label="커버 이미지" name="thumbnailFile" error={error}>
+    <FormSection title={t('board.form.coverImage')} description={t('board.form.coverImageDesc')}>
+      <FormField label={t('board.form.coverImage')} name="thumbnailFile" error={error}>
         <ImagePreviewField
           apiOptions={apiOptions}
           value={thumbnailFile}

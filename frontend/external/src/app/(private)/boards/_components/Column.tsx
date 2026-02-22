@@ -12,13 +12,15 @@ export interface BoardColumnOptions {
 /** 게시판 목록 컬럼 */
 export function getBoardColumns(
   boardIdPrefix: string,
-  options?: BoardColumnOptions
+  options?: BoardColumnOptions,
+  t?: (key: string) => string
 ): ColumnDef<Board>[] {
   const previewMode = options?.previewMode ?? false;
+  const tr = t ?? ((k: string) => k);
   return [
     {
       key: 'name',
-      header: '이름',
+      header: tr('form.label.name'),
       render: (row) =>
         previewMode ? (
           <span className="text-blue-400 hover:underline cursor-pointer">{row.name}</span>
@@ -31,15 +33,15 @@ export function getBoardColumns(
           </Link>
         ),
     },
-    { key: 'type', header: '타입' },
+    { key: 'type', header: tr('form.label.type') },
     {
       key: 'description',
-      header: '설명',
+      header: tr('form.label.description'),
       render: (row) =>
         row.description
           ? String(row.description).slice(0, 60) + (String(row.description).length > 60 ? '…' : '')
           : '-',
     },
-    { key: 'isPublic', header: '공개', render: (row) => (row.isPublic ? 'Y' : 'N') },
+    { key: 'isPublic', header: tr('form.label.isPublic'), render: (row) => (row.isPublic ? 'Y' : 'N') },
   ];
 }

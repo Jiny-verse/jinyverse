@@ -31,9 +31,9 @@ import {
   Table,
   LucideIcon,
 } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 import { Button } from '../../../ui/Button';
 import { Tooltip } from '../../../ui/Tooltip';
+import { useLanguage } from '../../../utils';
 import type { IEditorCore, ToolbarItem } from '../Types';
 
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -197,7 +197,7 @@ export function Toolbar({
   canUndo,
   canRedo,
 }: ToolbarProps) {
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   const [formatActive, setFormatActive] = useState<FormatActive>({
     bold: false,
     italic: false,
@@ -218,7 +218,7 @@ export function Toolbar({
       onMouseDown={(e) => e.preventDefault()}
     >
       {/* Undo */}
-      <Tooltip content={t('editor.toolbar.undo', '실행 취소')} position="bottom">
+      <Tooltip content={t('editor.toolbar.undo', { defaultValue: '실행 취소' })} position="bottom">
         <Button
           type="button"
           variant="ghost"
@@ -226,7 +226,7 @@ export function Toolbar({
           disabled={!canUndo}
           onClick={() => core?.undo()}
           className="p-1.5 h-8 w-8"
-          aria-label={t('editor.toolbar.undo', '실행 취소')}
+          aria-label={t('editor.toolbar.undo', { defaultValue: '실행 취소' })}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M3 7v6h6"/>
@@ -236,7 +236,7 @@ export function Toolbar({
       </Tooltip>
 
       {/* Redo */}
-      <Tooltip content={t('editor.toolbar.redo', '다시 실행')} position="bottom">
+      <Tooltip content={t('editor.toolbar.redo', { defaultValue: '다시 실행' })} position="bottom">
         <Button
           type="button"
           variant="ghost"
@@ -244,7 +244,7 @@ export function Toolbar({
           disabled={!canRedo}
           onClick={() => core?.redo()}
           className="p-1.5 h-8 w-8"
-          aria-label={t('editor.toolbar.redo', '다시 실행')}
+          aria-label={t('editor.toolbar.redo', { defaultValue: '다시 실행' })}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
             <path d="M21 7v6h-6"/>
@@ -261,7 +261,7 @@ export function Toolbar({
           return <div key={item.id} className="w-px h-5 bg-gray-300 mx-1" />;
         }
 
-        const label = t(item.labelKey, item.labelKey);
+        const label = t(item.labelKey, { defaultValue: item.labelKey });
 
         if (item.type === 'color-picker') {
           return <ColorPickerButton key={item.id} item={item} core={core} label={label} />;
@@ -300,8 +300,8 @@ export function Toolbar({
       <Tooltip
         content={
           currentMode === 'text'
-            ? t('editor.mode.markdown', '마크다운')
-            : t('editor.mode.text', '리치 텍스트')
+            ? t('editor.mode.markdown', { defaultValue: '마크다운' })
+            : t('editor.mode.text', { defaultValue: '리치 텍스트' })
         }
         position="bottom"
       >
@@ -311,7 +311,7 @@ export function Toolbar({
           size="sm"
           onClick={onModeToggle}
           className="flex items-center gap-1 px-2 h-8 text-xs font-medium"
-          aria-label={t('editor.toolbar.switchMode', '모드 전환')}
+          aria-label={t('editor.toolbar.switchMode', { defaultValue: '모드 전환' })}
         >
           {currentMode === 'text' ? (
             <>

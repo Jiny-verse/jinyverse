@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react';
 import { SearchInput } from './SearchInput';
+import { useLanguage } from '../utils';
 
 export interface SearchConfig {
   value: string;
@@ -17,6 +18,7 @@ export interface ToolbarProps {
 
 /** 목록 상단 툴바 (검색 + 필터 + 액션) */
 export function Toolbar({ search, filterSlot, rightSlot }: ToolbarProps) {
+  const { t } = useLanguage();
   const hasLeft = search || filterSlot;
   if (!hasLeft && !rightSlot) return null;
 
@@ -27,7 +29,7 @@ export function Toolbar({ search, filterSlot, rightSlot }: ToolbarProps) {
           <SearchInput
             value={search.value}
             onChange={search.onChange}
-            placeholder={search.placeholder ?? '검색'}
+            placeholder={search.placeholder ?? t('common.search', { defaultValue: '검색' })}
           />
         )}
         {filterSlot}

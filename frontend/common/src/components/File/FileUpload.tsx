@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import type { ApiOptions } from '../../types/api';
 import type { CommonFile } from '../../schemas/file';
 import { uploadFile } from '../../services/file';
+import useLanguage from '../../utils/i18n/hooks/useLanguage';
 
 export interface FileUploadProps {
   apiOptions: ApiOptions;
@@ -28,6 +29,7 @@ export function FileUpload({
 }: FileUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const { t } = useLanguage();
 
   const handleFiles = async (fileList: FileList | File[]) => {
     if (!fileList.length) return;
@@ -79,7 +81,7 @@ export function FileUpload({
         onChange={handleChange}
         disabled={disabled || uploading}
         className="hidden"
-        aria-label="파일 선택"
+        aria-label={t('file.selectFile')}
       />
       <button
         type="button"
@@ -87,7 +89,7 @@ export function FileUpload({
         disabled={disabled || uploading}
         className="rounded border border-[#555] bg-[#333] px-3 py-1.5 text-sm text-white hover:bg-[#444] disabled:opacity-50"
       >
-        {uploading ? '업로드 중...' : (children ?? '파일 추가')}
+        {uploading ? t('file.uploading') : (children ?? t('file.add'))}
       </button>
     </div>
   );

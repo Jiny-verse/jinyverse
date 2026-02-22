@@ -11,6 +11,7 @@ import {
   getBoard,
 } from 'common/services';
 import { formatRelativeOrAbsolute } from 'common';
+import { useLanguage } from 'common/utils';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import {
   DetailPreviewPanel,
@@ -27,6 +28,7 @@ export default function TopicsPage() {
   const router = useRouter();
   const boardId = params.boardId as string;
   const options = useApiOptions();
+  const { t } = useLanguage();
 
   const [board, setBoard] = useState<Board | null>(null);
   const [data, setData] = useState<{
@@ -100,13 +102,13 @@ export default function TopicsPage() {
   }, [options.baseUrl, options.channel, selectedTopicId]);
 
   const handleDelete = async (id: string) => {
-    if (!confirm('삭제하시겠습니까?')) return;
+    if (!confirm(t('message.confirmDelete', { defaultValue: '삭제하시겠습니까?' }))) return;
     await deleteTopic(options, id);
     load();
   };
 
   const handleBatchDelete = async () => {
-    if (!confirm(`선택한 ${selectedIds.length}개를 삭제하시겠습니까?`)) return;
+    if (!confirm(t('message.confirmBatchDelete', { defaultValue: '선택한 {{count}}개를 삭제하시겠습니까?', count: selectedIds.length }))) return;
     for (const id of selectedIds) {
       await deleteTopic(options, id);
     }
@@ -119,7 +121,7 @@ export default function TopicsPage() {
       <div className="">
         <p className="text-red-400">{error}</p>
         <Link href="/boards" className="mt-4 inline-block text-gray-400 hover:text-white">
-          게시판 목록
+          {t('board.list.title', { defaultValue: '게시판 목록' })}
         </Link>
       </div>
     );
@@ -132,9 +134,9 @@ export default function TopicsPage() {
   return (
     <div className="">
       <Link href="/boards" className="text-gray-400 hover:text-white mb-4 inline-block">
-        ← 게시판 목록
+        ← {t('board.list.title', { defaultValue: '게시판 목록' })}
       </Link>
-      <h1 className="text-2xl font-bold mb-6">게시글 관리</h1>
+      <h1 className="text-2xl font-bold mb-6">{t('board.topic.manage', { defaultValue: '게시글 관리' })}</h1>
       <div className={hasPreview ? 'flex gap-0 h-[calc(100vh-10rem)] min-h-[400px]' : ''}>
         <div className={hasPreview ? 'w-1/2 min-w-0 pr-4 flex flex-col' : ''}>
           {isNormal ? (
@@ -163,17 +165,17 @@ export default function TopicsPage() {
                   setSearch(v);
                   setPage(0);
                 },
-                placeholder: '제목·내용 검색',
+                placeholder: t('form.placeholder.search_title_content', { defaultValue: '제목·내용 검색' }),
               }}
               filterSlot={
                 <FilterSelect
-                  label="공개 여부"
+                  label={t('form.label.isPublic', { defaultValue: '공개 여부' })}
                   value={isPublic === undefined ? '' : isPublic ? 'true' : 'false'}
                   options={[
-                    { value: 'true', label: '공개' },
-                    { value: 'false', label: '비공개' },
+                    { value: 'true', label: t('common.public', { defaultValue: '공개' }) },
+                    { value: 'false', label: t('common.private', { defaultValue: '비공개' }) },
                   ]}
-                  placeholder="전체"
+                  placeholder={t('common.all', { defaultValue: '전체' })}
                   onChange={(v) => {
                     setIsPublic(v === '' ? undefined : v === 'true');
                     setPage(0);
@@ -197,17 +199,17 @@ export default function TopicsPage() {
                     type="text"
                     value={search}
                     onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-                    placeholder="제목·내용 검색"
+                    placeholder={t('form.placeholder.search_title_content', { defaultValue: '제목·내용 검색' })}
                     className="border border-gray-300 rounded px-3 py-1.5 text-sm w-60"
                   />
                   <FilterSelect
-                    label="공개 여부"
+                    label={t('form.label.isPublic', { defaultValue: '공개 여부' })}
                     value={isPublic === undefined ? '' : isPublic ? 'true' : 'false'}
                     options={[
-                      { value: 'true', label: '공개' },
-                      { value: 'false', label: '비공개' },
+                      { value: 'true', label: t('common.public', { defaultValue: '공개' }) },
+                      { value: 'false', label: t('common.private', { defaultValue: '비공개' }) },
                     ]}
-                    placeholder="전체"
+                    placeholder={t('common.all', { defaultValue: '전체' })}
                     onChange={(v) => {
                       setIsPublic(v === '' ? undefined : v === 'true');
                       setPage(0);
@@ -220,14 +222,14 @@ export default function TopicsPage() {
                       onClick={handleBatchDelete}
                       className="px-3 py-1.5 text-sm text-red-600 border border-red-200 rounded hover:bg-red-50"
                     >
-                      선택 삭제 ({selectedIds.length})
+                      {t('ui.button.deleteSelected', { defaultValue: '선택 삭제 ({{count}})', count: selectedIds.length })}
                     </button>
                   )}
                   <button
                     onClick={() => router.push(`/boards/${boardId}/topics/create`)}
                     className="px-3 py-1.5 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
                   >
-                    + 추가
+                    + {t('ui.button.add', { defaultValue: '추가' })}
                   </button>
                 </div>
               </div>
@@ -241,7 +243,7 @@ export default function TopicsPage() {
                   onTopicClick={(topic) => setSelectedTopicId(topic.id)}
                 />
               ) : (
-                <div className="py-8 text-center text-gray-400">로딩 중...</div>
+                <div className="py-8 text-center text-gray-400">{t('common.loading', { defaultValue: '로딩 중...' })}</div>
               )}
 
               {/* 페이지네이션 */}
@@ -278,7 +280,7 @@ export default function TopicsPage() {
                   </div>
                   <section>
                     <h2 className="text-sm font-semibold text-gray-700 mb-2">
-                      댓글 ({previewComments.length})
+                      {t('board.comment.title', { defaultValue: '댓글 ({{count}})', count: previewComments.length })}
                     </h2>
                     <ul className="space-y-2">
                       {previewComments
@@ -290,7 +292,7 @@ export default function TopicsPage() {
                           >
                             <p className="text-gray-500 text-xs">
                               {c.author?.nickname ?? '-'} ·{' '}
-                              {formatRelativeOrAbsolute(c.createdAt)}
+                              {formatRelativeOrAbsolute(c.createdAt, t)}
                             </p>
                             <p className="mt-0.5 text-gray-900">{c.content}</p>
                           </li>

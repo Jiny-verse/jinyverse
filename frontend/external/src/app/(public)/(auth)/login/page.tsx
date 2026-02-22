@@ -5,10 +5,12 @@ import { useEffect, useState } from 'react';
 import { Button, Input } from 'common/ui';
 import { useAuth, type LoginRequest } from 'common';
 import { FormError, AuthLink } from '../_components';
+import { useLanguage } from 'common/utils';
 
 export default function LoginPage() {
   const router = useRouter();
   const { user, isLoading, login } = useAuth();
+  const { t } = useLanguage();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -30,7 +32,7 @@ export default function LoginPage() {
       await login({ username, password } as LoginRequest);
       router.replace('/');
     } catch (err) {
-      setError(err instanceof Error ? err.message : '로그인에 실패했습니다.');
+      setError(err instanceof Error ? err.message : t('auth.login.error'));
     } finally {
       setSubmitting(false);
     }
@@ -39,18 +41,18 @@ export default function LoginPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <p className="text-neutral-400">로딩 중...</p>
+        <p className="text-neutral-400">{t('common.loading')}</p>
       </div>
     );
   }
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-white">로그인</h1>
+      <h1 className="text-2xl font-bold text-white">{t('auth.login.title')}</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <FormError message={error} />
         <Input
-          label="사용자명"
+          label={t('form.label.username')}
           value={username}
           onChange={(e) => setUsername(e.target.value)}
           required
@@ -59,7 +61,7 @@ export default function LoginPage() {
           autoComplete="username"
         />
         <Input
-          label="비밀번호"
+          label={t('form.label.password')}
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
@@ -68,12 +70,12 @@ export default function LoginPage() {
           autoComplete="current-password"
         />
         <Button type="submit" disabled={submitting} className="w-full">
-          {submitting ? '로그인 중...' : '로그인'}
+          {submitting ? t('auth.login.submitting') : t('auth.login.title')}
         </Button>
       </form>
       <div className="flex justify-center gap-4 pt-2">
-        <AuthLink href="/forgot-password">비밀번호 찾기</AuthLink>
-        <AuthLink href="/register">회원가입</AuthLink>
+        <AuthLink href="/forgot-password">{t('auth.login.forgot')}</AuthLink>
+        <AuthLink href="/register">{t('auth.login.register')}</AuthLink>
       </div>
     </>
   );

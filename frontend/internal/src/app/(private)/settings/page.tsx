@@ -11,9 +11,11 @@ import {
 import { SingleImageField } from 'common/components';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import type { User } from 'common/types';
+import { useLanguage } from 'common/utils';
 
 export default function SettingsPage() {
   const options = useApiOptions();
+  const { t } = useLanguage();
   const [basePath, setBasePath] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -36,7 +38,7 @@ export default function SettingsPage() {
         }
       })
       .catch(() => {
-        if (!done) setMessage({ type: 'error', text: '설정을 불러오지 못했습니다.' });
+        if (!done) setMessage({ type: 'error', text: t('admin.setting.loadFailed') });
       })
       .finally(() => {
         if (!done) setLoading(false);
@@ -52,9 +54,9 @@ export default function SettingsPage() {
     setSaving(true);
     try {
       await updateFileStorageSetting(options, { basePath: basePath.trim() || null });
-      setMessage({ type: 'ok', text: '저장했습니다.' });
+      setMessage({ type: 'ok', text: t('admin.setting.saved') });
     } catch {
-      setMessage({ type: 'error', text: '저장에 실패했습니다. 관리자 권한을 확인하세요.' });
+      setMessage({ type: 'error', text: t('admin.setting.saveFailed') });
     } finally {
       setSaving(false);
     }
@@ -62,19 +64,19 @@ export default function SettingsPage() {
 
   return (
     <div>
-      <h1 className="mb-6 text-2xl font-bold">설정</h1>
+      <h1 className="mb-6 text-2xl font-bold">{t('admin.setting.title')}</h1>
 
       <section className="max-w-xl rounded-lg border border-[#333] bg-[#1f1f1f] p-6">
-        <h2 className="mb-4 text-lg font-semibold text-white">파일 저장소</h2>
+        <h2 className="mb-4 text-lg font-semibold text-white">{t('admin.setting.fileStorage')}</h2>
         <p className="mb-4 text-sm text-neutral-400">
-          업로드된 파일을 저장할 서버 디렉터리 경로입니다. 비우면 application.yml 또는 환경변수 기본값을 사용합니다.
+          {t('admin.setting.fileStorageDesc')}
         </p>
         {loading ? (
-          <p className="text-sm text-neutral-400">로딩 중...</p>
+          <p className="text-sm text-neutral-400">{t('common.loading')}</p>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium text-gray-300">저장 경로</span>
+              <span className="text-sm font-medium text-gray-300">{t('admin.setting.savePath')}</span>
               <input
                 type="text"
                 value={basePath}
@@ -96,19 +98,19 @@ export default function SettingsPage() {
               disabled={saving}
               className="self-start rounded border border-[#555] bg-[#333] px-4 py-2 text-sm font-medium text-white hover:bg-[#444] disabled:opacity-50"
             >
-              {saving ? '저장 중...' : '저장'}
+              {saving ? t('common.saving') : t('ui.button.save')}
             </button>
           </form>
         )}
       </section>
 
       <section className="mt-8 max-w-xl rounded-lg border border-[#333] bg-[#1f1f1f] p-6">
-        <h2 className="mb-4 text-lg font-semibold text-white">프로필 이미지</h2>
+        <h2 className="mb-4 text-lg font-semibold text-white">{t('admin.setting.profileImage')}</h2>
         <p className="mb-4 text-sm text-neutral-400">
-          프로필 이미지를 업로드하면 내 계정에 연결됩니다. (로그인한 사용자만 사용 가능)
+          {t('admin.setting.profileImageDesc')}
         </p>
         {loading ? (
-          <p className="text-sm text-neutral-400">로딩 중...</p>
+          <p className="text-sm text-neutral-400">{t('common.loading')}</p>
         ) : (
           <SingleImageField
             apiOptions={options}
@@ -122,9 +124,9 @@ export default function SettingsPage() {
                 loadMe();
               }
             }}
-            uploadLabel="업로드"
+            uploadLabel={t('ui.button.upload')}
             showRemove={true}
-            onError={(e) => setMessage({ type: 'error', text: `프로필 이미지 설정 실패: ${e.message}` })}
+            onError={(e) => setMessage({ type: 'error', text: t('admin.setting.profileImageSetFailed', { msg: e.message }) })}
           />
         )}
       </section>
