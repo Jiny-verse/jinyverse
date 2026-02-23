@@ -41,7 +41,7 @@ export default function MenuResolvePage() {
 
   return (
     <div className="flex min-h-[200px] items-center justify-center">
-      <p className="text-neutral-400">이동 중...</p>
+      <p className="text-muted-foreground">이동 중...</p>
     </div>
   );
 }

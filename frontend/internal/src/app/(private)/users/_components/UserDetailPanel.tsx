@@ -66,9 +66,9 @@ export function UserDetailPanel({ user, apiOptions, onClose, onUpdated }: UserDe
               size="lg"
             />
             <div>
-              <p className="font-semibold text-gray-900">{user.name}</p>
-              <p className="text-sm text-gray-500">@{user.username}</p>
-              <p className="text-xs text-gray-400">{user.email}</p>
+              <p className="font-semibold text-foreground">{user.name}</p>
+              <p className="text-sm text-muted-foreground">@{user.username}</p>
+              <p className="text-xs text-muted-foreground">{user.email}</p>
             </div>
           </div>
 
@@ -88,11 +88,11 @@ export function UserDetailPanel({ user, apiOptions, onClose, onUpdated }: UserDe
             </p>
           )}
 
-          <div className="border-t border-gray-100 pt-4 space-y-4">
+          <div className="border-t border-border pt-4 space-y-4">
             {/* 잠금 해제 */}
             {user.isLocked && (
               <div className="flex items-center justify-between">
-                <span className="text-sm text-gray-700">{t('user.action.unlockAccount', { defaultValue: '계정 잠금 해제' })}</span>
+                <span className="text-sm text-foreground">{t('user.action.unlockAccount', { defaultValue: '계정 잠금 해제' })}</span>
                 <button
                   type="button"
                   disabled={saving}
@@ -110,7 +110,7 @@ export function UserDetailPanel({ user, apiOptions, onClose, onUpdated }: UserDe
 
             {/* 활성/비활성 토글 */}
             <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-700">{t('user.action.activateAccount', { defaultValue: '계정 활성화' })}</span>
+              <span className="text-sm text-foreground">{t('user.action.activateAccount', { defaultValue: '계정 활성화' })}</span>
               <Switch
                 checked={user.isActive !== false}
                 disabled={saving}
@@ -128,7 +128,7 @@ export function UserDetailPanel({ user, apiOptions, onClose, onUpdated }: UserDe
 
             {/* 권한 변경 */}
             <div className="flex items-center justify-between gap-2">
-              <span className="text-sm text-gray-700">{t('user.action.role', { defaultValue: '권한' })}</span>
+              <span className="text-sm text-foreground">{t('user.action.role', { defaultValue: '권한' })}</span>
               <select
                 value={user.role ?? 'user'}
                 disabled={saving}
@@ -140,7 +140,7 @@ export function UserDetailPanel({ user, apiOptions, onClose, onUpdated }: UserDe
                     () => handleUpdate({ role: next })
                   );
                 }}
-                className="rounded border border-gray-300 bg-white px-2 py-1 text-sm text-gray-800 focus:outline-none focus:ring-1 focus:ring-gray-400 disabled:opacity-50"
+                className="rounded border border-input bg-background px-2 py-1 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50"
               >
                 {ROLE_OPTIONS.map((o) => (
                   <option key={o.value} value={o.value}>
@@ -153,7 +153,7 @@ export function UserDetailPanel({ user, apiOptions, onClose, onUpdated }: UserDe
 
           {/* 메타 정보 */}
           {user.createdAt && (
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-muted-foreground">
               {t('user.profile.joinedAt', { defaultValue: '가입일: {{date}}', date: new Date(user.createdAt).toLocaleDateString() })}
             </p>
           )}

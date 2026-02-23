@@ -23,7 +23,7 @@ export function Toolbar({ search, filterSlot, rightSlot }: ToolbarProps) {
   if (!hasLeft && !rightSlot) return null;
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 bg-gray-50/80 border-b border-gray-100">
+    <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 bg-muted/40 border-b border-border">
       <div className="flex flex-wrap items-center gap-3">
         {search && (
           <SearchInput

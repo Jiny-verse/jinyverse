@@ -88,7 +88,7 @@ export function CodeTable({
     return (
       <div>
         <h2 className="mb-3 text-lg font-semibold">{t('admin.code.title')}</h2>
-        <div className="flex h-48 items-center justify-center rounded-lg border border-dashed border-gray-300 text-sm text-gray-400">
+        <div className="flex h-48 items-center justify-center rounded-lg border border-dashed border-gray-300 text-sm text-muted-foreground">
           {t('admin.audit.selectCategory')}
         </div>
       </div>

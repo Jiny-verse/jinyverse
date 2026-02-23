@@ -12,7 +12,7 @@ export function AuthLink({ href, children, className = '' }: AuthLinkProps) {
   return (
     <Link
       href={href}
-      className={`text-sm text-neutral-400 hover:text-white transition-colors ${className}`}
+      className={`text-sm text-muted-foreground hover:text-foreground transition-colors ${className}`}
     >
       {children}
     </Link>

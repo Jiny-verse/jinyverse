@@ -7,6 +7,7 @@ import { useNavigationItems } from 'common';
 import { ApiProvider, useApiOptions } from '@/app/providers/ApiProvider';
 import { useAuth } from 'common';
 import { useLanguage } from 'common/utils';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 function PrivateLayoutContent({
   children,
@@ -23,22 +24,25 @@ function PrivateLayoutContent({
 
   return (
     <div className="flex min-h-screen">
-      <SideNavigation items={items} isLoading={isLoading} />
+      <SideNavigation items={items} isLoading={isLoading} bottomActions={<ThemeToggle />} />
       <div className="ml-64 flex-1 flex flex-col">
-        <header className="flex items-center justify-end gap-4 border-b border-[#333] px-[4%] py-3">
-          <span className="text-sm text-neutral-400">{user?.username}</span>
-          <button
-            type="button"
-            onClick={() => {
-              logout();
-              router.replace('/login');
-            }}
-            className="text-sm text-neutral-400 hover:text-white"
-          >
-            {t('ui.button.logout')}
-          </button>
+        <header className="flex flex-row items-center justify-end gap-4 border-b border-border bg-background px-[4%] py-3">
+          <span className="text-sm font-medium text-muted-foreground">{user?.username}</span>
+          
+          <div className="flex items-center space-x-2">
+            <button
+              type="button"
+              onClick={() => {
+                logout();
+                router.replace('/login');
+              }}
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {t('ui.button.logout')}
+            </button>
+          </div>
         </header>
-        <main className="flex-1 px-[4%] py-6">{children}</main>
+        <main className="flex-1 bg-background px-[4%] py-6">{children}</main>
       </div>
     </div>
   );
@@ -62,8 +66,8 @@ export default function PrivateLayout({
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
-        <p className="text-neutral-400">{t('common.loading')}</p>
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <p className="text-muted-foreground">{t('common.loading')}</p>
       </div>
     );
   }

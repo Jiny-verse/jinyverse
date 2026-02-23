@@ -39,14 +39,14 @@ export default function LoginPage() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-neutral-400">로딩 중...</p>
+        <p className="text-muted-foreground">로딩 중...</p>
       </div>
     );
   }
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-white">로그인</h1>
+      <h1 className="text-2xl font-bold text-foreground">로그인</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <FormError message={error} />
         <Input

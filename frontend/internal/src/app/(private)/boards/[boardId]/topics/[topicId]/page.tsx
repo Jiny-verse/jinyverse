@@ -45,7 +45,7 @@ export default function TopicDetailPage() {
         <p className="text-red-400">{error}</p>
         <Link
           href={`/boards/${boardId}/topics`}
-          className="mt-4 inline-block text-gray-400 hover:text-white"
+          className="mt-4 inline-block text-muted-foreground hover:text-foreground"
         >
           {t('board.topic.title')}
         </Link>
@@ -56,7 +56,7 @@ export default function TopicDetailPage() {
   if (!topic || !board) {
     return (
       <div className="">
-        <p className="text-gray-400">{t('common.loading')}</p>
+        <p className="text-muted-foreground">{t('common.loading')}</p>
       </div>
     );
   }
@@ -65,12 +65,12 @@ export default function TopicDetailPage() {
     <div className="">
       <Link
         href={`/boards/${boardId}/topics`}
-        className="text-gray-400 hover:text-white mb-4 inline-block"
+        className="text-muted-foreground hover:text-foreground mb-4 inline-block"
       >
         ← {t('board.topic.title')}
       </Link>
 
-      <div className="rounded-lg border border-gray-700 bg-gray-800/50 p-6 mb-8">
+      <div className="rounded-lg border border-gray-700 bg-muted/50 p-6 mb-8">
         <PostDetailRenderer board={board} topic={topic} apiOptions={options} />
       </div>
 

@@ -34,7 +34,7 @@ export function DetailPanel({ log, onClose }: DetailPanelProps) {
               [t('form.label.createdAt'), log.createdAt],
             ].map(([label, value]) => (
               <tr key={label} className="border-b border-gray-100">
-                <th className="py-2 pr-4 font-medium text-gray-500 whitespace-nowrap w-28">
+                <th className="py-2 pr-4 font-medium text-muted-foreground whitespace-nowrap w-28">
                   {label}
                 </th>
                 <td className="py-2 text-gray-800 break-all">{value}</td>
@@ -44,14 +44,14 @@ export function DetailPanel({ log, onClose }: DetailPanelProps) {
         </table>
 
         <div>
-          <p className="mb-1 font-medium text-gray-500">{t('admin.audit.before')}</p>
+          <p className="mb-1 font-medium text-muted-foreground">{t('admin.audit.before')}</p>
           <pre className="rounded bg-gray-100 p-3 text-xs overflow-auto whitespace-pre-wrap break-all">
             {parseJson(log.beforeData)}
           </pre>
         </div>
 
         <div>
-          <p className="mb-1 font-medium text-gray-500">{t('admin.audit.after')}</p>
+          <p className="mb-1 font-medium text-muted-foreground">{t('admin.audit.after')}</p>
           <pre className="rounded bg-gray-100 p-3 text-xs overflow-auto whitespace-pre-wrap break-all">
             {parseJson(log.afterData)}
           </pre>

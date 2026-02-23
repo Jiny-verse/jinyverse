@@ -66,23 +66,23 @@ export default function SettingsPage() {
     <div>
       <h1 className="mb-6 text-2xl font-bold">{t('admin.setting.title')}</h1>
 
-      <section className="max-w-xl rounded-lg border border-[#333] bg-[#1f1f1f] p-6">
-        <h2 className="mb-4 text-lg font-semibold text-white">{t('admin.setting.fileStorage')}</h2>
-        <p className="mb-4 text-sm text-neutral-400">
+      <section className="max-w-xl rounded-lg border border-border bg-card p-6">
+        <h2 className="mb-4 text-lg font-semibold text-foreground">{t('admin.setting.fileStorage')}</h2>
+        <p className="mb-4 text-sm text-muted-foreground">
           {t('admin.setting.fileStorageDesc')}
         </p>
         {loading ? (
-          <p className="text-sm text-neutral-400">{t('common.loading')}</p>
+          <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <label className="flex flex-col gap-1">
-              <span className="text-sm font-medium text-gray-300">{t('admin.setting.savePath')}</span>
+              <span className="text-sm font-medium text-foreground">{t('admin.setting.savePath')}</span>
               <input
                 type="text"
                 value={basePath}
                 onChange={(e) => setBasePath(e.target.value)}
                 placeholder="/var/jinyverse/uploads"
-                className="rounded border border-[#444] bg-[#181818] px-3 py-2 text-white placeholder:text-gray-500 focus:border-[#666] focus:outline-none"
+                className="rounded border border-input bg-background px-3 py-2 text-foreground placeholder:text-muted-foreground focus:border-ring focus:outline-none focus:ring-1 focus:ring-ring"
                 maxLength={500}
               />
             </label>
@@ -96,7 +96,7 @@ export default function SettingsPage() {
             <button
               type="submit"
               disabled={saving}
-              className="self-start rounded border border-[#555] bg-[#333] px-4 py-2 text-sm font-medium text-white hover:bg-[#444] disabled:opacity-50"
+              className="self-start rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50 transition-colors"
             >
               {saving ? t('common.saving') : t('ui.button.save')}
             </button>
@@ -104,13 +104,13 @@ export default function SettingsPage() {
         )}
       </section>
 
-      <section className="mt-8 max-w-xl rounded-lg border border-[#333] bg-[#1f1f1f] p-6">
-        <h2 className="mb-4 text-lg font-semibold text-white">{t('admin.setting.profileImage')}</h2>
-        <p className="mb-4 text-sm text-neutral-400">
+      <section className="mt-8 max-w-xl rounded-lg border border-border bg-card p-6">
+        <h2 className="mb-4 text-lg font-semibold text-foreground">{t('admin.setting.profileImage')}</h2>
+        <p className="mb-4 text-sm text-muted-foreground">
           {t('admin.setting.profileImageDesc')}
         </p>
         {loading ? (
-          <p className="text-sm text-neutral-400">{t('common.loading')}</p>
+          <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
         ) : (
           <SingleImageField
             apiOptions={options}

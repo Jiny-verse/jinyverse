@@ -10,7 +10,7 @@ export interface SearchInputProps {
 }
 
 const BASE_CLASS =
-  'h-8 px-2.5 border border-gray-300 rounded text-sm text-gray-900 bg-white placeholder:text-gray-400 focus:outline-none focus:ring-1.5 focus:ring-(--focus-ring,#6b7280) focus:border-gray-400 min-w-[180px]';
+  'h-8 px-2.5 border border-input rounded text-sm text-foreground bg-background placeholder:text-muted-foreground focus:outline-none focus:ring-1.5 focus:ring-ring focus:border-ring min-w-[180px]';
 
 export function SearchInput({
   value,

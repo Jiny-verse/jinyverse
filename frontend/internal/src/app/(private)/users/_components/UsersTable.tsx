@@ -1,6 +1,7 @@
 'use client';
 
-import { Avatar, Badge, PaginationFooter, SearchInput, FilterSelect } from 'common/ui';
+import { Avatar, Badge, FilterSelect } from 'common/ui';
+import { DataTable, type ColumnDef } from 'common/components';
 import type { ApiOptions, User, PageResponse } from 'common/types';
 import { useLanguage } from 'common/utils';
 
@@ -50,108 +51,120 @@ export function UsersTable({
   const { t, language } = useLanguage();
   const ACTIVE_OPTIONS = getActiveOptions(t);
   const LOCKED_OPTIONS = getLockedOptions(t);
+
+  const columns: ColumnDef<User>[] = [
+    {
+      key: 'avatar',
+      header: '',
+      width: '3rem',
+      render: (user) => (
+        <Avatar
+          fileId={user.profileImageFileId}
+          apiOptions={apiOptions}
+          alt={user.nickname}
+          size="sm"
+        />
+      ),
+    },
+    {
+      key: 'username',
+      header: t('form.label.username', { defaultValue: '사용자명' }),
+      render: (row) => <span className="font-medium text-foreground">{row.username}</span>,
+    },
+    {
+      key: 'name',
+      header: t('form.label.name'),
+      render: (row) => <span className="text-foreground/80">{row.name}</span>,
+    },
+    {
+      key: 'nickname',
+      header: t('form.label.nickname', { defaultValue: '닉네임' }),
+      render: (row) => <span className="text-foreground/80">{row.nickname}</span>,
+    },
+    {
+      key: 'email',
+      header: t('form.label.email', { defaultValue: '이메일' }),
+      render: (row) => <span className="text-muted-foreground text-xs">{row.email}</span>,
+    },
+    {
+      key: 'role',
+      header: t('form.label.role', { defaultValue: '권한' }),
+      render: (user) => (
+        <Badge variant={user.role === 'admin' ? 'error' : 'default'}>
+          {user.role ?? '-'}
+        </Badge>
+      ),
+    },
+    {
+      key: 'status',
+      header: t('form.label.status', { defaultValue: '상태' }),
+      render: (user) => (
+        <div className="flex gap-1">
+          {user.isLocked && <Badge variant="warning">{t('user.status.locked', { defaultValue: '잠금' })}</Badge>}
+          {user.isActive === false && <Badge variant="error">{t('common.inactive', { defaultValue: '비활성' })}</Badge>}
+          {!user.isLocked && user.isActive !== false && (
+            <Badge variant="success">{t('common.normal', { defaultValue: '정상' })}</Badge>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'createdAt',
+      header: t('form.label.createdAt', { defaultValue: '생성일' }),
+      render: (user) => (
+        <span className="text-muted-foreground text-xs">
+          {user.createdAt
+            ? new Date(user.createdAt).toLocaleString(
+                language === 'ko' ? 'ko-KR' : language === 'ja' ? 'ja-JP' : 'en-US',
+                { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }
+              )
+            : '-'}
+        </span>
+      ),
+    },
+  ];
+
   return (
-    <div className="flex flex-col h-full min-h-0 rounded-lg border border-gray-200 bg-white shadow-sm overflow-hidden">
-      {/* 필터 헤더 */}
-      <div className="flex flex-wrap items-center gap-3 px-4 py-3 border-b border-gray-200 bg-gray-50/80">
-        <SearchInput
-          value={keyword}
-          onChange={onKeywordChange}
-          placeholder={t('form.placeholder.search')}
-        />
-        <FilterSelect
-          label={t('common.active', { defaultValue: '활성' })}
-          value={isActive}
-          options={ACTIVE_OPTIONS}
-          onChange={onActiveChange}
-          placeholder={t('common.all')}
-        />
-        <FilterSelect
-          label={t('user.status.locked', { defaultValue: '잠금' })}
-          value={isLocked}
-          options={LOCKED_OPTIONS}
-          onChange={onLockedChange}
-          placeholder={t('common.all')}
-        />
-      </div>
-
-      {/* 테이블 */}
-      <div className="flex-1 overflow-auto">
-        <table className="w-full text-sm">
-          <thead className="sticky top-0 bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600 w-10"></th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">{t('form.label.username', { defaultValue: '사용자명' })}</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">{t('form.label.name')}</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">{t('form.label.nickname', { defaultValue: '닉네임' })}</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">{t('form.label.email', { defaultValue: '이메일' })}</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">{t('form.label.role', { defaultValue: '권한' })}</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">{t('form.label.status', { defaultValue: '상태' })}</th>
-              <th className="px-4 py-2 text-left text-xs font-semibold text-gray-600">{t('form.label.createdAt', { defaultValue: '생성일' })}</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {data.content.length === 0 ? (
-              <tr>
-                <td colSpan={8} className="px-4 py-8 text-center text-gray-400">
-                  {t('common.noData', { defaultValue: '데이터가 없습니다' })}
-                </td>
-              </tr>
-            ) : (
-              data.content.map((user) => (
-                <tr
-                  key={user.id}
-                  onClick={() => onSelectUser(user)}
-                  className={`cursor-pointer hover:bg-blue-50 transition-colors ${
-                    selectedUserId === user.id ? 'bg-blue-50 border-l-2 border-l-blue-500' : ''
-                  }`}
-                >
-                  <td className="px-4 py-2">
-                    <Avatar
-                      fileId={user.profileImageFileId}
-                      apiOptions={apiOptions}
-                      alt={user.nickname}
-                      size="sm"
-                    />
-                  </td>
-                  <td className="px-4 py-2 text-gray-900 font-medium">{user.username}</td>
-                  <td className="px-4 py-2 text-gray-700">{user.name}</td>
-                  <td className="px-4 py-2 text-gray-700">{user.nickname}</td>
-                  <td className="px-4 py-2 text-gray-500 text-xs">{user.email}</td>
-                  <td className="px-4 py-2">
-                    <Badge variant={user.role === 'admin' ? 'error' : 'default'}>
-                      {user.role ?? '-'}
-                    </Badge>
-                  </td>
-                  <td className="px-4 py-2">
-                    <div className="flex gap-1">
-                      {user.isLocked && <Badge variant="warning">{t('user.status.locked', { defaultValue: '잠금' })}</Badge>}
-                      {user.isActive === false && <Badge variant="error">{t('common.inactive', { defaultValue: '비활성' })}</Badge>}
-                      {!user.isLocked && user.isActive !== false && (
-                        <Badge variant="success">{t('common.normal', { defaultValue: '정상' })}</Badge>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-4 py-2 text-gray-400 text-xs">
-                    {user.createdAt ? new Date(user.createdAt).toLocaleDateString(
-                      language === 'ko' ? 'ko-KR' : language === 'ja' ? 'ja-JP' : 'en-US'
-                    ) : '-'}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
-
-      <PaginationFooter
-        page={page}
-        size={size}
-        totalElements={data.totalElements}
-        totalPages={data.totalPages}
-        currentCount={data.content.length}
-        onPageChange={onPageChange}
-        onSizeChange={onSizeChange}
+    <div className="h-full flex flex-col min-h-0">
+      <DataTable<User>
+        data={data.content ?? []}
+        columns={columns}
+        isLoading={false}
+        emptyMessage={t('common.noData')}
+        pagination={{
+          page,
+          size,
+          totalElements: data.totalElements,
+          totalPages: data.totalPages,
+          onPageChange,
+          onSizeChange,
+        }}
+        search={{
+          value: keyword,
+          onChange: onKeywordChange,
+          placeholder: t('form.placeholder.search'),
+        }}
+        filterSlot={
+          <div className="flex items-center gap-3">
+            <FilterSelect
+              label={t('common.active', { defaultValue: '활성' })}
+              value={isActive}
+              options={ACTIVE_OPTIONS}
+              onChange={onActiveChange}
+              placeholder={t('common.all')}
+            />
+            <FilterSelect
+              label={t('user.status.locked', { defaultValue: '잠금' })}
+              value={isLocked}
+              options={LOCKED_OPTIONS}
+              onChange={onLockedChange}
+              placeholder={t('common.all')}
+            />
+          </div>
+        }
+        onRowClick={onSelectUser}
+        selectedRowId={selectedUserId}
+        getRowId={(row) => row.id}
       />
     </div>
   );

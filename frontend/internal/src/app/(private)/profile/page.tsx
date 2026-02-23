@@ -105,13 +105,13 @@ export default function ProfilePage() {
       )}
 
       {loading ? (
-        <p className="text-sm text-neutral-400">{t('common.loading')}</p>
+        <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
       ) : !me ? (
-        <p className="text-sm text-neutral-400">{t('user.profile.notFound')}</p>
+        <p className="text-sm text-muted-foreground">{t('user.profile.notFound')}</p>
       ) : (
         <>
           {/* 기본 정보 */}
-          <section className="max-w-xl rounded-lg border border-[#333] bg-[#1f1f1f] p-6 mb-6">
+          <section className="max-w-xl rounded-lg border border-border bg-card p-6 mb-6">
             <div className="flex items-center gap-4 mb-4">
               <Avatar
                 fileId={me.profileImageFileId}
@@ -120,9 +120,9 @@ export default function ProfilePage() {
                 size="lg"
               />
               <div>
-                <p className="text-white font-semibold">{me.name}</p>
-                <p className="text-neutral-400 text-sm">@{me.username}</p>
-                <p className="text-neutral-400 text-sm">{me.email}</p>
+                <p className="text-foreground font-semibold">{me.name}</p>
+                <p className="text-muted-foreground text-sm">@{me.username}</p>
+                <p className="text-muted-foreground text-sm">{me.email}</p>
                 {me.role && (
                   <div className="mt-1">
                     <Badge variant={roleVariant(me.role)}>{me.role}</Badge>
@@ -133,8 +133,8 @@ export default function ProfilePage() {
           </section>
 
           {/* 이름 / 닉네임 수정 */}
-          <section className="max-w-xl rounded-lg border border-[#333] bg-[#1f1f1f] p-6 mb-6">
-            <h2 className="mb-4 text-lg font-semibold text-white">{t('user.profile.basicInfo')}</h2>
+          <section className="max-w-xl rounded-lg border border-border bg-card p-6 mb-6">
+            <h2 className="mb-4 text-lg font-semibold text-foreground">{t('user.profile.basicInfo')}</h2>
             <form onSubmit={handleSaveInfo} className="flex flex-col gap-3">
               <label className="flex flex-col gap-1">
                 <span className="text-sm font-medium text-gray-300">{t('form.label.name')}</span>
@@ -144,7 +144,7 @@ export default function ProfilePage() {
                   onChange={(e) => setName(e.target.value)}
                   required
                   maxLength={20}
-                  className="rounded border border-[#444] bg-[#181818] px-3 py-2 text-white focus:border-[#666] focus:outline-none"
+                  className="rounded border border-[#444] bg-[#181818] px-3 py-2 text-foreground focus:border-[#666] focus:outline-none"
                 />
               </label>
               <label className="flex flex-col gap-1">
@@ -155,13 +155,13 @@ export default function ProfilePage() {
                   onChange={(e) => setNickname(e.target.value)}
                   required
                   maxLength={20}
-                  className="rounded border border-[#444] bg-[#181818] px-3 py-2 text-white focus:border-[#666] focus:outline-none"
+                  className="rounded border border-[#444] bg-[#181818] px-3 py-2 text-foreground focus:border-[#666] focus:outline-none"
                 />
               </label>
               <button
                 type="submit"
                 disabled={savingInfo}
-                className="self-start rounded border border-[#555] bg-[#333] px-4 py-2 text-sm font-medium text-white hover:bg-[#444] disabled:opacity-50"
+                className="self-start rounded border border-[#555] bg-[#333] px-4 py-2 text-sm font-medium text-foreground hover:bg-[#444] disabled:opacity-50"
               >
                 {savingInfo ? t('common.saving') : t('ui.button.save')}
               </button>
@@ -169,8 +169,8 @@ export default function ProfilePage() {
           </section>
 
           {/* 프로필 이미지 */}
-          <section className="max-w-xl rounded-lg border border-[#333] bg-[#1f1f1f] p-6 mb-6">
-            <h2 className="mb-3 text-lg font-semibold text-white">{t('user.profile.image')}</h2>
+          <section className="max-w-xl rounded-lg border border-border bg-card p-6 mb-6">
+            <h2 className="mb-3 text-lg font-semibold text-foreground">{t('user.profile.image')}</h2>
             <SingleImageField
               apiOptions={options}
               value={me.profileImageFileId ?? null}
@@ -194,8 +194,8 @@ export default function ProfilePage() {
           </section>
 
           {/* 비밀번호 변경 */}
-          <section className="max-w-xl rounded-lg border border-[#333] bg-[#1f1f1f] p-6">
-            <h2 className="mb-4 text-lg font-semibold text-white">{t('user.profile.changePassword')}</h2>
+          <section className="max-w-xl rounded-lg border border-border bg-card p-6">
+            <h2 className="mb-4 text-lg font-semibold text-foreground">{t('user.profile.changePassword')}</h2>
             <form onSubmit={handleChangePassword} className="flex flex-col gap-3">
               <label className="flex flex-col gap-1">
                 <span className="text-sm font-medium text-gray-300">{t('user.profile.currentPassword')}</span>
@@ -205,7 +205,7 @@ export default function ProfilePage() {
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   required
                   autoComplete="current-password"
-                  className="rounded border border-[#444] bg-[#181818] px-3 py-2 text-white focus:border-[#666] focus:outline-none"
+                  className="rounded border border-[#444] bg-[#181818] px-3 py-2 text-foreground focus:border-[#666] focus:outline-none"
                 />
               </label>
               <label className="flex flex-col gap-1">
@@ -219,13 +219,13 @@ export default function ProfilePage() {
                   maxLength={100}
                   autoComplete="new-password"
                   placeholder={t('auth.reset.passwordPlaceholder')}
-                  className="rounded border border-[#444] bg-[#181818] px-3 py-2 text-white placeholder:text-gray-500 focus:border-[#666] focus:outline-none"
+                  className="rounded border border-[#444] bg-[#181818] px-3 py-2 text-foreground placeholder:text-muted-foreground focus:border-[#666] focus:outline-none"
                 />
               </label>
               <button
                 type="submit"
                 disabled={savingPassword}
-                className="self-start rounded border border-[#555] bg-[#333] px-4 py-2 text-sm font-medium text-white hover:bg-[#444] disabled:opacity-50"
+                className="self-start rounded border border-[#555] bg-[#333] px-4 py-2 text-sm font-medium text-foreground hover:bg-[#444] disabled:opacity-50"
               >
                 {savingPassword ? t('user.profile.changingPassword') : t('user.profile.changePassword')}
               </button>

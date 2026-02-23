@@ -96,7 +96,7 @@ function MenusContent() {
         className="grid gap-6 transition-[grid-template-columns] duration-300 ease-out"
         style={{ gridTemplateColumns: selectedMenu ? '1fr 1fr' : '1fr 0fr' }}
       >
-        <div className="min-h-[360px] min-w-0 rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="min-h-[360px] min-w-0 rounded-lg border border-border bg-white p-4 shadow-sm">
           <div className="mb-3 flex items-center justify-between">
             <h2 className="text-sm font-semibold text-gray-800">{t('admin.menu.hierarchy')}</h2>
             <select

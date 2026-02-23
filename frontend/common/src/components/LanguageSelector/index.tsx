@@ -30,7 +30,7 @@ export function LanguageSelector() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1 border-0 bg-transparent px-2 py-1 text-xs text-[#e5e5e5] hover:text-white cursor-pointer transition-colors"
+        className="flex items-center gap-1 border-0 bg-transparent px-2 py-1 text-xs text-muted-foreground hover:text-foreground cursor-pointer transition-colors"
         aria-haspopup="listbox"
         aria-expanded={open}
       >
@@ -43,7 +43,7 @@ export function LanguageSelector() {
       {open && (
         <ul
           role="listbox"
-          className="absolute right-0 top-full z-50 mt-1 min-w-[110px] list-none rounded bg-[#2a2a2a] py-1 shadow-lg"
+          className="absolute left-0 bottom-full z-50 mb-1 min-w-[110px] list-none rounded bg-popover py-1 shadow-lg border border-border"
         >
           {supportedLanguages.map((lang) => (
             <li key={lang} role="option" aria-selected={lang === language} className="list-none">
@@ -55,8 +55,8 @@ export function LanguageSelector() {
                 }}
                 className={`w-full px-4 py-2 text-left text-sm transition-colors cursor-pointer border-0 bg-transparent ${
                   lang === language
-                    ? 'font-medium text-white'
-                    : 'text-[#e5e5e5] hover:bg-[#333] hover:text-white'
+                    ? 'font-medium text-foreground bg-accent'
+                    : 'text-muted-foreground hover:bg-accent hover:text-foreground'
                 }`}
               >
                 {LANGUAGE_LABELS[lang]}

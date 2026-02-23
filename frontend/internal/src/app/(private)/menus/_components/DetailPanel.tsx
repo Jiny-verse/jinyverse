@@ -132,7 +132,7 @@ export function DetailPanel({
 
   return (
     <div
-      className={`min-h-full rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-300 ease-out ${
+      className={`min-h-full rounded-lg border border-border bg-white shadow-sm transition-all duration-300 ease-out ${
         showDetail ? 'translate-x-0 opacity-100' : 'translate-x-4 opacity-0'
       }`}
       role="region"
@@ -143,7 +143,7 @@ export function DetailPanel({
         <div className="flex gap-2">
           <button
             type="button"
-            className="inline-flex items-center gap-1.5 rounded-md bg-gray-900 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-gray-800"
+            className="inline-flex items-center gap-1.5 rounded-md bg-card px-3 py-1.5 text-xs font-medium text-foreground transition hover:bg-muted"
             onClick={() => onEdit(menu)}
           >
             <Pencil className="h-3.5 w-3.5" />
@@ -160,19 +160,19 @@ export function DetailPanel({
         </div>
       </div>
       <dl className="grid grid-cols-[100px_1fr] gap-x-4 gap-y-3 px-4 py-4 text-sm">
-        <dt className="text-gray-500">{t('form.label.code', { defaultValue: '코드' })}</dt>
+        <dt className="text-muted-foreground">{t('form.label.code', { defaultValue: '코드' })}</dt>
         <dd className="font-mono text-gray-900">{menu.code}</dd>
-        <dt className="text-gray-500">{t('form.label.name', { defaultValue: '이름' })}</dt>
+        <dt className="text-muted-foreground">{t('form.label.name', { defaultValue: '이름' })}</dt>
         <dd className="text-gray-900">{menu.name ?? '—'}</dd>
-        <dt className="text-gray-500">{t('form.label.description', { defaultValue: '설명' })}</dt>
+        <dt className="text-muted-foreground">{t('form.label.description', { defaultValue: '설명' })}</dt>
         <dd className="text-gray-700">{menu.description || '—'}</dd>
-        <dt className="text-gray-500">{t('form.label.channel', { defaultValue: '채널' })}</dt>
+        <dt className="text-muted-foreground">{t('form.label.channel', { defaultValue: '채널' })}</dt>
         <dd className="text-gray-900">{CHANNEL_LABELS[menu.channel ?? ''] ?? menu.channel ?? '—'}</dd>
-        <dt className="text-gray-500">{t('form.label.path', { defaultValue: '경로' })}</dt>
+        <dt className="text-muted-foreground">{t('form.label.path', { defaultValue: '경로' })}</dt>
         <dd className="break-all text-gray-700">{menu.path || '—'}</dd>
-        <dt className="text-gray-500">{t('form.label.order', { defaultValue: '순서' })}</dt>
+        <dt className="text-muted-foreground">{t('form.label.order', { defaultValue: '순서' })}</dt>
         <dd className="text-gray-900">{menu.order ?? '—'}</dd>
-        <dt className="text-gray-500">{t('form.label.isActive', { defaultValue: '활성' })}</dt>
+        <dt className="text-muted-foreground">{t('form.label.isActive', { defaultValue: '활성' })}</dt>
         <dd>
           <span
             className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -182,7 +182,7 @@ export function DetailPanel({
             {menu.isActive ? t('common.yes', { defaultValue: 'Y' }) : t('common.no', { defaultValue: 'N' })}
           </span>
         </dd>
-        <dt className="text-gray-500">{t('form.label.isAdmin', { defaultValue: '관리자 전용' })}</dt>
+        <dt className="text-muted-foreground">{t('form.label.isAdmin', { defaultValue: '관리자 전용' })}</dt>
         <dd>
           <span
             className={`inline-flex rounded-full px-2 py-0.5 text-xs font-medium ${
@@ -199,7 +199,7 @@ export function DetailPanel({
           <Link2 className="h-3.5 w-3.5" />
           {t('menu.link.title', { defaultValue: '연동 (클릭 시 이동)' })}
         </h3>
-        <p className="mb-3 text-xs text-gray-500">
+        <p className="mb-3 text-xs text-muted-foreground">
           {t('menu.link.description', { defaultValue: '게시판 연동 시 리스트로, 게시글 연동 시 해당 글로 이동합니다. 우선순위: 게시판 → 게시글 → 경로.' })}
         </p>
 
@@ -211,7 +211,7 @@ export function DetailPanel({
                 <span className="text-sm text-gray-800">{linkedBoard.name}</span>
                 <button
                   type="button"
-                  className="inline-flex items-center gap-1 rounded border border-gray-200 px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-50"
+                  className="inline-flex items-center gap-1 rounded border border-border px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-50"
                   onClick={handleUnlinkBoard}
                   disabled={linking}
                 >
@@ -234,7 +234,7 @@ export function DetailPanel({
                 </select>
                 <button
                   type="button"
-                  className="inline-flex items-center gap-1 rounded bg-gray-800 px-2 py-1 text-xs text-white hover:bg-gray-700 disabled:opacity-50"
+                  className="inline-flex items-center gap-1 rounded bg-muted px-2 py-1 text-xs text-foreground hover:bg-gray-700 disabled:opacity-50"
                   onClick={handleLinkBoard}
                   disabled={!linkBoardId || linking}
                 >
@@ -250,7 +250,7 @@ export function DetailPanel({
                 <span className="truncate text-sm text-gray-800">{linkedTopic.title}</span>
                 <button
                   type="button"
-                  className="inline-flex shrink-0 items-center gap-1 rounded border border-gray-200 px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-50"
+                  className="inline-flex shrink-0 items-center gap-1 rounded border border-border px-2 py-0.5 text-xs text-gray-600 hover:bg-gray-50"
                   onClick={handleUnlinkTopic}
                   disabled={linking}
                 >
@@ -273,7 +273,7 @@ export function DetailPanel({
                 </select>
                 <button
                   type="button"
-                  className="inline-flex shrink-0 items-center gap-1 rounded bg-gray-800 px-2 py-1 text-xs text-white hover:bg-gray-700 disabled:opacity-50"
+                  className="inline-flex shrink-0 items-center gap-1 rounded bg-muted px-2 py-1 text-xs text-foreground hover:bg-gray-700 disabled:opacity-50"
                   onClick={handleLinkTopic}
                   disabled={!linkTopicId || linking}
                 >

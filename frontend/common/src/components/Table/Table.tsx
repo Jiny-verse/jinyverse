@@ -66,7 +66,7 @@ export function Table<T extends Record<string, unknown>>({
   const emptyAreaMinHeight = data.length === 0 ? pageSize * 48 : undefined;
 
   return (
-    <div className="w-full rounded-lg border border-gray-200 bg-white shadow-md overflow-hidden">
+    <div className="w-full rounded-lg border border-border bg-card text-card-foreground shadow-sm overflow-hidden">
       <Toolbar
         search={search}
         filterSlot={filterSlot}
@@ -80,8 +80,8 @@ export function Table<T extends Record<string, unknown>>({
 
       {/* 중간: 목록 테이블 (카드 내부 여백) */}
       <div className="overflow-x-auto p-4">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="border-t border-gray-200 bg-gray-50">
+        <table className="min-w-full divide-y divide-border">
+          <thead className="border-t border-border bg-muted/60">
             <tr>
               {selection && (
                 <th className="px-4 py-3 text-left w-10">
@@ -91,7 +91,7 @@ export function Table<T extends Record<string, unknown>>({
               {columns.map((col) => (
                 <th
                   key={col.key}
-                  className={`px-4 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${
+                  className={`px-4 py-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider ${
                     col.align === 'right'
                       ? 'text-right'
                       : col.align === 'center'
@@ -105,10 +105,10 @@ export function Table<T extends Record<string, unknown>>({
               ))}
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-card divide-y divide-border">
             {isLoading ? (
               <tr>
-                <td colSpan={colSpanTotal} className="px-4 py-12 text-center text-gray-500">
+                <td colSpan={colSpanTotal} className="px-4 py-12 text-center text-muted-foreground">
                   <div className="flex justify-center items-center gap-2">
                     <Spinner size="sm" />
                     <span>{t('common.loading')}</span>
@@ -122,7 +122,7 @@ export function Table<T extends Record<string, unknown>>({
                   className="px-4 py-12 text-center align-middle"
                   style={emptyAreaMinHeight != null ? { minHeight: emptyAreaMinHeight } : undefined}
                 >
-                  <div className="flex flex-col items-center justify-center gap-3 text-gray-400">
+                  <div className="flex flex-col items-center justify-center gap-3 text-muted-foreground">
                     <svg
                       className="h-12 w-12 shrink-0"
                       fill="none"
@@ -137,7 +137,7 @@ export function Table<T extends Record<string, unknown>>({
                         d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                       />
                     </svg>
-                    <p className="text-sm font-medium text-gray-500">{resolvedEmptyMessage}</p>
+                    <p className="text-sm font-medium text-muted-foreground">{resolvedEmptyMessage}</p>
                   </div>
                 </td>
               </tr>
@@ -151,7 +151,7 @@ export function Table<T extends Record<string, unknown>>({
                     if ((e.target as HTMLElement).closest('input[type="checkbox"]')) return;
                     onRowClick?.(row);
                   };
-                  const baseRowClass = isSelected ? 'bg-blue-50 hover:bg-blue-100' : 'hover:bg-gray-50';
+                  const baseRowClass = isSelected ? 'bg-accent border-l-2 border-l-primary' : 'hover:bg-accent/50';
                   const rowClass = [baseRowClass, getRowClassName?.(row)].filter(Boolean).join(' ');
                   return (
                     <tr
@@ -176,7 +176,7 @@ export function Table<T extends Record<string, unknown>>({
                       {columns.map((col) => (
                         <td
                           key={col.key}
-                          className={`px-4 py-3 text-sm text-gray-900 whitespace-nowrap ${
+                          className={`px-4 py-3 text-sm text-foreground whitespace-nowrap ${
                             col.align === 'right'
                               ? 'text-right'
                               : col.align === 'center'
@@ -192,7 +192,7 @@ export function Table<T extends Record<string, unknown>>({
                 })}
                 {Array.from({ length: emptyRowCount }).map((_, i) => (
                   <tr key={`empty-${i}`}>
-                    <td colSpan={colSpanTotal} className="px-4 py-3 text-sm text-gray-400">
+                    <td colSpan={colSpanTotal} className="px-4 py-3 text-sm text-muted-foreground">
                       &nbsp;
                     </td>
                   </tr>

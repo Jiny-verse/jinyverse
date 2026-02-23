@@ -22,7 +22,7 @@ function UsersContent() {
   const { t } = useLanguage();
   const [data, setData] = useState<PageResponse<User>>(EMPTY_PAGE);
   const [page, setPage] = useState(0);
-  const [size, setSize] = useState(20);
+  const [size, setSize] = useState(10);
   const [keyword, setKeyword] = useState('');
   const [isActive, setIsActive] = useState('');
   const [isLocked, setIsLocked] = useState('');
@@ -81,7 +81,7 @@ function UsersContent() {
       >
         <div className="min-h-[420px] min-w-0 flex flex-col">
           {loading && (
-            <p className="text-sm text-gray-400 mb-2">{t('common.loading')}</p>
+            <p className="text-sm text-muted-foreground mb-2">{t('common.loading')}</p>
           )}
           <UsersTable
             apiOptions={options}

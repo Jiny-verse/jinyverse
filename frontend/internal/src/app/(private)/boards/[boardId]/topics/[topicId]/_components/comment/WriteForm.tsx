@@ -53,7 +53,7 @@ export function CommentWriteForm({ topicId, apiOptions, onSuccess }: CommentWrit
         placeholder={t('post.commentPlaceholder')}
         rows={3}
         disabled={!user?.userId}
-        className="bg-gray-800 border-gray-600 text-gray-100 placeholder:text-gray-500 focus:ring-gray-500"
+        className="bg-muted border-border text-foreground placeholder:text-muted-foreground focus:ring-ring"
       />
       {error && <p className="mt-1 text-sm text-red-400">{error}</p>}
       <div className="mt-2">

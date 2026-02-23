@@ -19,6 +19,16 @@ export function getColumns(t?: (key: string) => string): ColumnDef<AuditLog>[] {
       header: tr('admin.audit.ipAddress'),
       render: (row) => (row.ipAddress ? String(row.ipAddress) : '-'),
     },
-    { key: 'createdAt', header: tr('form.label.createdAt') },
+    {
+      key: 'createdAt',
+      header: tr('form.label.createdAt'),
+      render: (row) =>
+        row.createdAt
+          ? new Date(row.createdAt as string | number).toLocaleString(
+              tr('ko') === 'ko' ? 'ko-KR' : 'en-US',
+              { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }
+            )
+          : '-',
+    },
   ];
 }

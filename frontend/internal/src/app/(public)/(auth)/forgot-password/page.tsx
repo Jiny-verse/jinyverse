@@ -19,7 +19,7 @@ export default function ForgotPasswordPage() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-neutral-400">{t('common.loading', { defaultValue: '로딩 중...' })}</p>
+        <p className="text-muted-foreground">{t('common.loading', { defaultValue: '로딩 중...' })}</p>
       </div>
     );
   }
@@ -46,8 +46,8 @@ export default function ForgotPasswordPage() {
     const resetHref = `/reset-password?email=${encodeURIComponent(email)}`;
     return (
       <>
-        <h1 className="text-2xl font-bold text-white">{t('auth.forgot.done.title', { defaultValue: '비밀번호 재설정 메일 발송' })}</h1>
-        <p className="text-neutral-400 text-sm">
+        <h1 className="text-2xl font-bold text-foreground">{t('auth.forgot.done.title', { defaultValue: '비밀번호 재설정 메일 발송' })}</h1>
+        <p className="text-muted-foreground text-sm">
           {t('auth.forgot.done.desc', { defaultValue: '{{email}}로 비밀번호 재설정 메일을 보냈습니다. 메일의 링크 또는 코드로 새 비밀번호를 설정해 주세요.', email })}
         </p>
         <div className="flex flex-col gap-2 pt-2">
@@ -60,8 +60,8 @@ export default function ForgotPasswordPage() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-white">{t('auth.forgot.title', { defaultValue: '비밀번호 찾기' })}</h1>
-      <p className="text-neutral-400 text-sm">{t('auth.forgot.desc', { defaultValue: '가입 시 사용한 이메일을 입력하면 재설정 링크를 보내드립니다.' })}</p>
+      <h1 className="text-2xl font-bold text-foreground">{t('auth.forgot.title', { defaultValue: '비밀번호 찾기' })}</h1>
+      <p className="text-muted-foreground text-sm">{t('auth.forgot.desc', { defaultValue: '가입 시 사용한 이메일을 입력하면 재설정 링크를 보내드립니다.' })}</p>
       <form onSubmit={handleSubmit} className="space-y-4 pt-2">
         <FormError message={error} />
         <Input

@@ -120,7 +120,7 @@ export default function TopicsPage() {
     return (
       <div className="">
         <p className="text-red-400">{error}</p>
-        <Link href="/boards" className="mt-4 inline-block text-gray-400 hover:text-white">
+        <Link href="/boards" className="mt-4 inline-block text-muted-foreground hover:text-foreground">
           {t('board.list.title', { defaultValue: '게시판 목록' })}
         </Link>
       </div>
@@ -133,7 +133,7 @@ export default function TopicsPage() {
 
   return (
     <div className="">
-      <Link href="/boards" className="text-gray-400 hover:text-white mb-4 inline-block">
+      <Link href="/boards" className="text-muted-foreground hover:text-foreground mb-4 inline-block">
         ← {t('board.list.title', { defaultValue: '게시판 목록' })}
       </Link>
       <h1 className="text-2xl font-bold mb-6">{t('board.topic.manage', { defaultValue: '게시글 관리' })}</h1>
@@ -227,7 +227,7 @@ export default function TopicsPage() {
                   )}
                   <button
                     onClick={() => router.push(`/boards/${boardId}/topics/create`)}
-                    className="px-3 py-1.5 text-sm text-white bg-blue-600 rounded hover:bg-blue-700"
+                    className="px-3 py-1.5 text-sm text-foreground bg-blue-600 rounded hover:bg-blue-700"
                   >
                     + {t('ui.button.add', { defaultValue: '추가' })}
                   </button>
@@ -243,7 +243,7 @@ export default function TopicsPage() {
                   onTopicClick={(topic) => setSelectedTopicId(topic.id)}
                 />
               ) : (
-                <div className="py-8 text-center text-gray-400">{t('common.loading', { defaultValue: '로딩 중...' })}</div>
+                <div className="py-8 text-center text-muted-foreground">{t('common.loading', { defaultValue: '로딩 중...' })}</div>
               )}
 
               {/* 페이지네이션 */}
@@ -288,9 +288,9 @@ export default function TopicsPage() {
                         .map((c) => (
                           <li
                             key={c.id}
-                            className="rounded border border-gray-200 p-2 bg-white text-sm"
+                            className="rounded border border-border p-2 bg-white text-sm"
                           >
-                            <p className="text-gray-500 text-xs">
+                            <p className="text-muted-foreground text-xs">
                               {c.author?.nickname ?? '-'} ·{' '}
                               {formatRelativeOrAbsolute(c.createdAt, t)}
                             </p>

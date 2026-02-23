@@ -44,8 +44,8 @@ export function Table({ apiOptions }: TableProps) {
   const columns = getColumns(t);
 
   return (
-    <div className="flex gap-4">
-      <div className="flex-1 min-w-0">
+    <div className="flex gap-6 h-[calc(100vh-10rem)] min-h-[400px]">
+      <div className="flex-1 min-w-0 flex flex-col h-full">
         <DataTable<AuditLog>
           data={data?.content ?? []}
           columns={columns}
@@ -93,7 +93,7 @@ export function Table({ apiOptions }: TableProps) {
         />
       </div>
       {selectedLog && (
-        <div className="w-96 shrink-0">
+        <div className="w-96 shrink-0 h-full overflow-hidden">
           <DetailPanel log={selectedLog} onClose={() => setSelectedLog(null)} />
         </div>
       )}

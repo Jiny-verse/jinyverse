@@ -42,7 +42,7 @@ export default function CreateTopicPage() {
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-gray-100">
+      <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-foreground">
         새 게시글 작성
       </h1>
       <TopicForm

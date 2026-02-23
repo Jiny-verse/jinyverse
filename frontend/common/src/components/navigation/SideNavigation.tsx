@@ -25,6 +25,7 @@ function collectIdsWithChildren(list: NavigationItem[]): Set<string> {
 interface Props {
   items: NavigationItem[];
   isLoading?: boolean;
+  bottomActions?: React.ReactNode;
 }
 
 function NavItem({
@@ -51,7 +52,7 @@ function NavItem({
           <button
             type="button"
             aria-expanded={isExpanded}
-            className="shrink-0 p-1 text-gray-500 hover:text-white"
+            className="shrink-0 p-1 text-muted-foreground hover:text-foreground"
             onClick={() => onToggle(item.id)}
           >
             {isExpanded ? (
@@ -68,8 +69,8 @@ function NavItem({
             type="button"
             className={`min-w-0 flex-1 rounded px-3 py-2.5 text-left text-sm transition-all duration-150 ${
               isActive
-                ? 'font-medium text-white bg-[#333]'
-                : 'font-normal text-[#b3b3b3] hover:bg-[#2a2a2a] hover:text-white'
+                ? 'font-medium text-foreground bg-accent'
+                : 'font-normal text-muted-foreground hover:bg-muted hover:text-foreground'
             }`}
             style={{ paddingLeft: level > 0 ? 8 + level * 12 : undefined }}
             onClick={() => onToggle(item.id)}
@@ -81,8 +82,8 @@ function NavItem({
             href={item.href}
             className={`min-w-0 flex-1 rounded px-3 py-2.5 text-sm no-underline transition-all duration-150 ${
               isActive
-                ? 'font-medium text-white bg-[#333]'
-                : 'font-normal text-[#b3b3b3] hover:bg-[#2a2a2a] hover:text-white'
+                ? 'font-medium text-foreground bg-accent'
+                : 'font-normal text-muted-foreground hover:bg-muted hover:text-foreground'
             }`}
             style={{ paddingLeft: level > 0 ? 8 + level * 12 : undefined }}
           >
@@ -91,7 +92,7 @@ function NavItem({
         )}
       </div>
       {hasChildren && isExpanded && (
-        <ul className="m-0 mt-0.5 flex list-none flex-col gap-0.5 border-l border-[#333] pl-2">
+        <ul className="m-0 mt-0.5 flex list-none flex-col gap-0.5 border-l border-border pl-2">
           {item.children!.map((child) => (
             <NavItem
               key={child.id}
@@ -108,7 +109,7 @@ function NavItem({
   );
 }
 
-export function Navigation({ items, isLoading = false }: Props) {
+export function Navigation({ items, isLoading = false, bottomActions }: Props) {
   const pathname = usePathname();
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
   const { t } = useLanguage();
@@ -127,19 +128,16 @@ export function Navigation({ items, isLoading = false }: Props) {
   }, []);
 
   return (
-    <aside className="fixed left-0 top-0 z-10 h-screen w-64 shrink-0 overflow-y-auto border-r border-[#333] bg-[#181818]">
-      <div className="h-screen overflow-y-auto">
-        <div className="border-b border-[#333] p-6">
-          <h2 className="m-0 text-xl font-bold text-white">Jinyverse</h2>
-          <p className="m-0 mt-1 text-sm text-gray-500">Admin Panel</p>
-          <div className="mt-3">
-            <LanguageSelector />
-          </div>
+    <aside className="fixed left-0 top-0 z-10 h-screen w-64 shrink-0 border-r border-border bg-background flex flex-col">
+      <div className="flex-1 overflow-y-auto">
+        <div className="border-b border-border p-6">
+          <h2 className="m-0 text-xl font-bold text-foreground">Jinyverse</h2>
+          <p className="m-0 mt-1 text-sm text-muted-foreground">Admin Panel</p>
         </div>
 
         <nav className="p-4">
           {isLoading ? (
-            <p className="text-sm text-gray-500">{t('common.loading')}</p>
+            <p className="text-sm text-muted-foreground">{t('common.loading')}</p>
           ) : (
             <ul className="m-0 flex list-none flex-col gap-0.5 p-0">
               {items.map((item) => (
@@ -155,6 +153,11 @@ export function Navigation({ items, isLoading = false }: Props) {
             </ul>
           )}
         </nav>
+      </div>
+      
+      <div className="shrink-0 border-t border-border p-4 flex items-center justify-between gap-2">
+        <LanguageSelector />
+        {bottomActions}
       </div>
     </aside>
   );

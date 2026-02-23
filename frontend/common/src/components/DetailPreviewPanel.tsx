@@ -31,9 +31,9 @@ export function DetailPreviewPanel({
 }: DetailPreviewPanelProps) {
   const { t } = useLanguage();
   return (
-    <div className="flex flex-col h-full min-w-0 border-l border-gray-200 bg-gray-50">
-      <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-gray-200 bg-white shrink-0">
-        {title && <span className="text-sm font-medium text-gray-700 truncate">{title}</span>}
+    <div className="flex flex-col h-full min-w-0 border border-border bg-card rounded-lg shadow-sm">
+      <div className="flex items-center justify-between gap-2 px-4 py-3 border-b border-border bg-muted/30 shrink-0">
+        {title && <span className="text-sm font-semibold text-foreground truncate">{title}</span>}
         <div className="flex items-center gap-2 ml-auto shrink-0">
           {expandHref && (
             <Link
@@ -57,7 +57,7 @@ export function DetailPreviewPanel({
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-12">
             <Spinner size="lg" />
-            <span className="mt-2 text-sm text-gray-500">{t('common.loading')}</span>
+            <span className="mt-2 text-sm text-muted-foreground">{t('common.loading')}</span>
           </div>
         ) : (
           children

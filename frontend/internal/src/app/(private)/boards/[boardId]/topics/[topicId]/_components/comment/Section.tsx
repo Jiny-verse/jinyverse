@@ -106,16 +106,16 @@ export function CommentSection({ topicId, comments, apiOptions, onReload }: Comm
   };
 
   const renderComment = (c: Comment, isReply: boolean) => (
-    <li key={c.id} className={isReply ? 'ml-4 mt-2 border-l-2 border-gray-600 pl-3' : undefined}>
-      <div className="flex flex-col gap-2 rounded border border-gray-700 p-3 bg-gray-800/30">
+    <li key={c.id} className={isReply ? 'ml-4 mt-2 border-l-2 border-border pl-3' : undefined}>
+      <div className="flex flex-col gap-2 rounded border border-gray-700 p-3 bg-muted/30">
         {editingId === c.id ? (
           <>
-            <p className="text-sm text-gray-400">{c.author?.nickname ?? '-'} · {formatRelativeOrAbsolute(c.createdAt)}</p>
+            <p className="text-sm text-muted-foreground">{c.author?.nickname ?? '-'} · {formatRelativeOrAbsolute(c.createdAt)}</p>
             <Textarea
               value={editContent}
               onChange={(e) => setEditContent(e.target.value)}
               rows={3}
-              className="bg-gray-800 border-gray-600 text-gray-100 placeholder:text-gray-500 focus:ring-gray-500"
+              className="bg-muted border-border text-foreground placeholder:text-muted-foreground focus:ring-ring"
             />
             <div className="flex gap-2">
               <Button size="sm" onClick={handleSaveEdit} disabled={submitting || !editContent.trim()}>{t('ui.button.save')}</Button>
@@ -126,16 +126,16 @@ export function CommentSection({ topicId, comments, apiOptions, onReload }: Comm
           <>
             <div className="flex justify-between items-start">
               <div className="min-w-0 flex-1">
-                <p className="text-sm text-gray-400">{c.author?.nickname ?? '-'} · {formatRelativeOrAbsolute(c.createdAt)}</p>
+                <p className="text-sm text-muted-foreground">{c.author?.nickname ?? '-'} · {formatRelativeOrAbsolute(c.createdAt)}</p>
                 <p className="mt-1 wrap-break-word">{c.content}</p>
               </div>
               <div className="flex gap-2 shrink-0 ml-2">
                 {user?.userId && (
-                  <button type="button" onClick={() => { setReplyingToId((prev) => (prev === c.id ? null : c.id)); setReplyContent(''); }} className="text-gray-400 text-sm hover:text-white hover:underline">{t('post.reply')}</button>
+                  <button type="button" onClick={() => { setReplyingToId((prev) => (prev === c.id ? null : c.id)); setReplyContent(''); }} className="text-muted-foreground text-sm hover:text-foreground hover:underline">{t('post.reply')}</button>
                 )}
                 {canModify(c, currentUserId, role) && (
                   <>
-                    <button type="button" onClick={() => handleStartEdit(c)} className="text-gray-400 text-sm hover:text-white hover:underline">{t('ui.button.edit')}</button>
+                    <button type="button" onClick={() => handleStartEdit(c)} className="text-muted-foreground text-sm hover:text-foreground hover:underline">{t('ui.button.edit')}</button>
                     <button type="button" onClick={() => handleDelete(c.id)} className="text-red-400 text-sm hover:underline">{t('ui.button.delete')}</button>
                   </>
                 )}
@@ -148,7 +148,7 @@ export function CommentSection({ topicId, comments, apiOptions, onReload }: Comm
                   onChange={(e) => setReplyContent(e.target.value)}
                   placeholder={t('post.replyPlaceholder')}
                   rows={2}
-                  className="bg-gray-800 border-gray-600 text-gray-100 placeholder:text-gray-500 focus:ring-gray-500 text-sm"
+                  className="bg-muted border-border text-foreground placeholder:text-muted-foreground focus:ring-ring text-sm"
                 />
                 <div className="flex gap-2">
                   <Button size="sm" onClick={() => handleReplySubmit(c.id)} disabled={replySubmitting || !replyContent.trim()}>

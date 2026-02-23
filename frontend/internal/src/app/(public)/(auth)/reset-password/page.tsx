@@ -30,7 +30,7 @@ function ResetPasswordContent() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-neutral-400">{t('common.loading', { defaultValue: '로딩 중...' })}</p>
+        <p className="text-muted-foreground">{t('common.loading', { defaultValue: '로딩 중...' })}</p>
       </div>
     );
   }
@@ -56,8 +56,8 @@ function ResetPasswordContent() {
   if (done) {
     return (
       <>
-        <h1 className="text-2xl font-bold text-white">{t('auth.reset.done.title', { defaultValue: '비밀번호 재설정 완료' })}</h1>
-        <p className="text-neutral-400 text-sm">{t('auth.reset.done.desc', { defaultValue: '비밀번호가 변경되었습니다. 새 비밀번호로 로그인해 주세요.' })}</p>
+        <h1 className="text-2xl font-bold text-foreground">{t('auth.reset.done.title', { defaultValue: '비밀번호 재설정 완료' })}</h1>
+        <p className="text-muted-foreground text-sm">{t('auth.reset.done.desc', { defaultValue: '비밀번호가 변경되었습니다. 새 비밀번호로 로그인해 주세요.' })}</p>
         <AuthLink href="/login">{t('auth.login.title', { defaultValue: '로그인' })}</AuthLink>
       </>
     );
@@ -65,7 +65,7 @@ function ResetPasswordContent() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-white">{t('auth.reset.title', { defaultValue: '비밀번호 재설정' })}</h1>
+      <h1 className="text-2xl font-bold text-foreground">{t('auth.reset.title', { defaultValue: '비밀번호 재설정' })}</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <FormError message={error} />
         <Input
@@ -113,7 +113,7 @@ export default function ResetPasswordPage() {
     <Suspense
       fallback={
         <div className="flex min-h-screen items-center justify-center">
-          <p className="text-neutral-400">{t('common.loading', { defaultValue: '로딩 중...' })}</p>
+          <p className="text-muted-foreground">{t('common.loading', { defaultValue: '로딩 중...' })}</p>
         </div>
       }
     >

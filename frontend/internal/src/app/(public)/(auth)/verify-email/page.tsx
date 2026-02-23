@@ -29,7 +29,7 @@ function VerifyEmailContent() {
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <p className="text-neutral-400">{t('common.loading', { defaultValue: '로딩 중...' })}</p>
+        <p className="text-muted-foreground">{t('common.loading', { defaultValue: '로딩 중...' })}</p>
       </div>
     );
   }
@@ -55,8 +55,8 @@ function VerifyEmailContent() {
   if (done) {
     return (
       <>
-        <h1 className="text-2xl font-bold text-white">{t('auth.verify.done.title', { defaultValue: '이메일 인증 완료' })}</h1>
-        <p className="text-neutral-400 text-sm">{t('auth.verify.done.desc', { defaultValue: '이메일 인증이 완료되었습니다. 로그인해 주세요.' })}</p>
+        <h1 className="text-2xl font-bold text-foreground">{t('auth.verify.done.title', { defaultValue: '이메일 인증 완료' })}</h1>
+        <p className="text-muted-foreground text-sm">{t('auth.verify.done.desc', { defaultValue: '이메일 인증이 완료되었습니다. 로그인해 주세요.' })}</p>
         <AuthLink href="/login">{t('auth.login.title', { defaultValue: '로그인' })}</AuthLink>
       </>
     );
@@ -64,7 +64,7 @@ function VerifyEmailContent() {
 
   return (
     <>
-      <h1 className="text-2xl font-bold text-white">{t('auth.verify.title', { defaultValue: '이메일 인증' })}</h1>
+      <h1 className="text-2xl font-bold text-foreground">{t('auth.verify.title', { defaultValue: '이메일 인증' })}</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <FormError message={error} />
         <Input
@@ -101,7 +101,7 @@ export default function VerifyEmailPage() {
     <Suspense
       fallback={
         <div className="flex min-h-screen items-center justify-center">
-          <p className="text-neutral-400">{t('common.loading', { defaultValue: '로딩 중...' })}</p>
+          <p className="text-muted-foreground">{t('common.loading', { defaultValue: '로딩 중...' })}</p>
         </div>
       }
     >
