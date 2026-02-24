@@ -154,9 +154,9 @@ export function Navigation({ items, isLoading = false, bottomActions }: Props) {
           )}
         </nav>
       </div>
-      
+
       <div className="shrink-0 border-t border-border p-4 flex items-center justify-between gap-2">
-        <LanguageSelector />
+        <LanguageSelector direction="up" />
         {bottomActions}
       </div>
     </aside>

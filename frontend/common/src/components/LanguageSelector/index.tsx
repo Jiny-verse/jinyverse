@@ -10,7 +10,11 @@ const LANGUAGE_LABELS: Record<Locale, string> = {
   ja: '日本語',
 };
 
-export function LanguageSelector() {
+interface LanguageSelectorProps {
+  direction?: 'up' | 'down';
+}
+
+export function LanguageSelector({ direction = 'down' }: LanguageSelectorProps) {
   const { language, supportedLanguages, switchLanguage } = useLanguage();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -43,7 +47,9 @@ export function LanguageSelector() {
       {open && (
         <ul
           role="listbox"
-          className="absolute left-0 bottom-full z-50 mb-1 min-w-[110px] list-none rounded bg-popover py-1 shadow-lg border border-border"
+          className={`absolute left-0 z-50 min-w-[110px] list-none rounded bg-popover py-1 shadow-lg border border-border ${
+            direction === 'up' ? 'bottom-full mb-1' : 'top-full mt-1'
+          }`}
         >
           {supportedLanguages.map((lang) => (
             <li key={lang} role="option" aria-selected={lang === language} className="list-none">

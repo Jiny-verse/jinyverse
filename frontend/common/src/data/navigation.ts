@@ -20,8 +20,7 @@ function menuTreeToNavItems(nodes: MenuTreeNode[]): NavigationItem[] {
     id: node.code,
     label: node.name ?? node.code,
     href: `/m/${encodeURIComponent(node.code)}`,
-    children:
-      node.children.length > 0 ? menuTreeToNavItems(node.children) : undefined,
+    children: node.children.length > 0 ? menuTreeToNavItems(node.children) : undefined,
   }));
 }
 

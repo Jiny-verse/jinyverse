@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { AuthProvider, I18nProvider } from 'common';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 export const metadata: Metadata = {
   title: 'Jinyverse',
@@ -16,12 +17,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" suppressHydrationWarning>
-      <body className="bg-[#141414] text-white min-h-screen antialiased">
-        <I18nProvider>
-          <AuthProvider baseUrl={baseUrl}>
-            {children}
-          </AuthProvider>
-        </I18nProvider>
+      <body className="bg-background text-foreground min-h-screen antialiased transition-colors duration-200">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <I18nProvider>
+            <AuthProvider baseUrl={baseUrl}>{children}</AuthProvider>
+          </I18nProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
