@@ -22,7 +22,7 @@ public class AppRequestContextFilter extends OncePerRequestFilter {
             @NonNull HttpServletResponse response,
             @NonNull FilterChain chain
     ) throws ServletException, IOException {
-        Channel channel = Channel.fromHeader(request.getHeader("X-App-Channel"));
+        Channel channel = Channel.fromHeader(request.getHeader("X-Channel"));
         String ip = ClientIpUtil.extractIp(request);
         RequestContextHolder.set(RequestContext.anonymous(channel, ip));
         try {

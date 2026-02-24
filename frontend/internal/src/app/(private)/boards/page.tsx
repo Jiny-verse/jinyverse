@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getCodes, getMenus } from 'common/services';
+import { getCodes, getMenusForManagement } from 'common/services';
 import { buildMenuTree, menuTreeToSelectOptionsByCode } from 'common';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import { Table, CreateDialog, UpdateDialog } from './_components';
@@ -24,7 +24,7 @@ function BoardsContent() {
 
   useEffect(() => {
     const menuNone = { value: '', label: t('admin.none') };
-    getMenus(options, { size: 100 })
+    getMenusForManagement(options, { size: 100 })
       .then((res) => {
         const tree = buildMenuTree(res.content);
         setMenuOptions([menuNone, ...menuTreeToSelectOptionsByCode(tree)]);

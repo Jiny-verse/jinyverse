@@ -33,8 +33,8 @@ public class Menu extends BaseEntity {
     @Column(name = "id", columnDefinition = "UUID", nullable = false)
     private UUID id;
 
-    /** 메뉴 코드 (수정 가능, UNIQUE) */
-    @Column(name = "code", length = 40, nullable = false, unique = true)
+    /** 메뉴 코드 (수정 가능, 소프트 삭제 미적용 행에만 UNIQUE) */
+    @Column(name = "code", length = 40, nullable = false)
     private String code;
 
     /** 메뉴 명 */
