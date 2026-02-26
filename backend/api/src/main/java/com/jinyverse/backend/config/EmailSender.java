@@ -6,4 +6,6 @@ package com.jinyverse.backend.config;
 public interface EmailSender {
 
     void sendVerificationEmail(String toEmail, String code, String type);
+
+    void sendInquiryReplyEmail(String toEmail, String ticketNo, String content, String replierName);
 }

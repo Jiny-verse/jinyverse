@@ -12,6 +12,7 @@ interface Props {
   items: NavigationItem[];
   isLoading?: boolean;
   rightControls?: React.ReactNode;
+  showLanguageSelector?: boolean;
 }
 
 function isItemActive(item: NavigationItem, pathname: string): boolean {
@@ -150,11 +151,13 @@ function MobileMenu({
   items,
   pathname,
   rightControls,
+  showLanguageSelector,
   onClose,
 }: {
   items: NavigationItem[];
   pathname: string;
   rightControls?: React.ReactNode;
+  showLanguageSelector?: boolean;
   onClose: () => void;
 }) {
   return (
@@ -163,14 +166,14 @@ function MobileMenu({
         <MobileMenuItems items={items} pathname={pathname} onClose={onClose} depth={0} />
       </div>
       <div className="mt-4 flex items-center gap-3 border-t border-border pt-4">
-        <LanguageSelector />
+        {showLanguageSelector && <LanguageSelector />}
         {rightControls}
       </div>
     </nav>
   );
 }
 
-export function Navigation({ items, isLoading = false, rightControls }: Props) {
+export function Navigation({ items, isLoading = false, rightControls, showLanguageSelector = true }: Props) {
   const pathname = usePathname();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
@@ -278,7 +281,7 @@ export function Navigation({ items, isLoading = false, rightControls }: Props) {
             {/* Right controls */}
             <div className="h-14 flex items-center justify-end gap-2 shrink-0">
               <div className="hidden md:flex items-center gap-2">
-                <LanguageSelector />
+                {showLanguageSelector && <LanguageSelector />}
                 {rightControls}
               </div>
 
@@ -312,6 +315,7 @@ export function Navigation({ items, isLoading = false, rightControls }: Props) {
               items={items}
               pathname={pathname}
               rightControls={rightControls}
+              showLanguageSelector={showLanguageSelector}
               onClose={() => setIsMobileOpen(false)}
             />
           )}

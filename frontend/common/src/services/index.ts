@@ -10,3 +10,6 @@ export * from './topic';
 export * from './setting';
 export * from './file';
 export * from './user';
+export * from './notificationTemplate';
+export * from './notification';
+export * from './inquiry';

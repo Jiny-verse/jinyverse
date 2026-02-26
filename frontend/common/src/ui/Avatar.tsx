@@ -32,6 +32,12 @@ export function Avatar({
     lg: 'w-12 h-12',
   };
 
+  const textSizeStyles = {
+    sm: 'text-[11px]',
+    md: 'text-xs',
+    lg: 'text-sm',
+  };
+
   return (
     <div
       className={`${sizeStyles[size]} rounded-full overflow-hidden bg-gray-200 flex items-center justify-center ${className}`}
@@ -39,7 +45,7 @@ export function Avatar({
       {src ? (
         <img src={src} alt={alt} className="w-full h-full object-cover" {...props} />
       ) : (
-        <span className="text-gray-600 font-medium">
+        <span className={`text-gray-600 font-medium ${textSizeStyles[size]}`}>
           {fallback || alt?.charAt(0).toUpperCase() || '?'}
         </span>
       )}

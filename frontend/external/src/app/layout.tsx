@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import { AuthProvider, I18nProvider } from 'common';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import { FloatingControls } from '@/components/FloatingControls';
 
 export const metadata: Metadata = {
   title: 'Jinyverse',
@@ -20,7 +21,10 @@ export default function RootLayout({
       <body className="bg-background text-foreground min-h-screen antialiased transition-colors duration-200">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <I18nProvider>
-            <AuthProvider baseUrl={baseUrl}>{children}</AuthProvider>
+            <AuthProvider baseUrl={baseUrl}>
+              {children}
+              <FloatingControls />
+            </AuthProvider>
           </I18nProvider>
         </ThemeProvider>
       </body>

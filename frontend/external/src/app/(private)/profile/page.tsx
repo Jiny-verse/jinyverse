@@ -20,11 +20,9 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<{ type: 'ok' | 'error'; text: string } | null>(null);
 
-  // 닉네임 수정
   const [nickname, setNickname] = useState('');
   const [savingNickname, setSavingNickname] = useState(false);
 
-  // 비밀번호 변경
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [savingPassword, setSavingPassword] = useState(false);
@@ -49,17 +47,12 @@ export default function ProfilePage() {
       .finally(() => {
         if (!done) setLoading(false);
       });
-    return () => {
-      done = true;
-    };
+    return () => { done = true; };
   }, [authUser, authLoading, options.baseUrl, options.channel]);
 
   const loadMe = () => {
     getMe(options)
-      .then((data) => {
-        setMe(data);
-        setNickname(data.nickname);
-      })
+      .then((data) => { setMe(data); setNickname(data.nickname); })
       .catch(() => setMessage({ type: 'error', text: t('user.profile.loadFailed') }));
   };
 
@@ -99,7 +92,7 @@ export default function ProfilePage() {
   if (authLoading || loading) {
     return (
       <div className="flex items-center justify-center py-20">
-        <p className="text-neutral-400">{t('common.loading')}</p>
+        <p className="text-muted-foreground">{t('common.loading')}</p>
       </div>
     );
   }
@@ -107,23 +100,23 @@ export default function ProfilePage() {
   if (!me) {
     return (
       <div className="flex items-center justify-center py-20">
-        <p className="text-neutral-400">{t('user.profile.notFound')}</p>
+        <p className="text-muted-foreground">{t('user.profile.notFound')}</p>
       </div>
     );
   }
 
   return (
     <div className="max-w-xl mx-auto">
-      <h1 className="mb-6 text-2xl font-bold text-white">{t('user.profile.myProfile')}</h1>
+      <h1 className="mb-6 text-2xl font-bold text-foreground">{t('user.profile.myProfile')}</h1>
 
       {message && (
-        <p className={`mb-4 text-sm ${message.type === 'ok' ? 'text-green-400' : 'text-red-400'}`}>
+        <p className={`mb-4 text-sm ${message.type === 'ok' ? 'text-green-600 dark:text-green-400' : 'text-destructive'}`}>
           {message.text}
         </p>
       )}
 
       {/* 기본 정보 */}
-      <section className="mb-6 rounded-lg border border-[#333] bg-[#1f1f1f] p-6">
+      <section className="mb-6 rounded-lg border border-border bg-card p-6">
         <div className="flex items-center gap-4 mb-4">
           <Avatar
             fileId={me.profileImageFileId}
@@ -132,11 +125,11 @@ export default function ProfilePage() {
             size="lg"
           />
           <div>
-            <p className="text-white font-semibold">{me.name}</p>
-            <p className="text-neutral-400 text-sm">@{me.username}</p>
-            <p className="text-neutral-400 text-sm">{me.email}</p>
+            <p className="text-foreground font-semibold">{me.name}</p>
+            <p className="text-muted-foreground text-sm">@{me.username}</p>
+            <p className="text-muted-foreground text-sm">{me.email}</p>
             {me.createdAt && (
-              <p className="text-neutral-500 text-xs mt-1">
+              <p className="text-muted-foreground text-xs mt-1">
                 {t('user.profile.joinedAt', { date: new Date(me.createdAt).toLocaleDateString() })}
               </p>
             )}
@@ -145,8 +138,8 @@ export default function ProfilePage() {
       </section>
 
       {/* 프로필 이미지 */}
-      <section className="mb-6 rounded-lg border border-[#333] bg-[#1f1f1f] p-6">
-        <h2 className="mb-3 text-lg font-semibold text-white">{t('user.profile.image')}</h2>
+      <section className="mb-6 rounded-lg border border-border bg-card p-6">
+        <h2 className="mb-3 text-lg font-semibold text-foreground">{t('user.profile.image')}</h2>
         <SingleImageField
           apiOptions={options}
           value={me.profileImageFileId ?? null}
@@ -170,8 +163,8 @@ export default function ProfilePage() {
       </section>
 
       {/* 닉네임 수정 */}
-      <section className="mb-6 rounded-lg border border-[#333] bg-[#1f1f1f] p-6">
-        <h2 className="mb-3 text-lg font-semibold text-white">{t('user.profile.editNickname')}</h2>
+      <section className="mb-6 rounded-lg border border-border bg-card p-6">
+        <h2 className="mb-3 text-lg font-semibold text-foreground">{t('user.profile.editNickname')}</h2>
         <form onSubmit={handleSaveNickname} className="flex gap-2">
           <input
             type="text"
@@ -179,12 +172,12 @@ export default function ProfilePage() {
             onChange={(e) => setNickname(e.target.value)}
             required
             maxLength={20}
-            className="flex-1 rounded border border-[#444] bg-[#181818] px-3 py-2 text-white placeholder:text-gray-500 focus:border-[#666] focus:outline-none"
+            className="flex-1 rounded border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
           />
           <button
             type="submit"
             disabled={savingNickname}
-            className="rounded border border-[#555] bg-[#333] px-4 py-2 text-sm font-medium text-white hover:bg-[#444] disabled:opacity-50"
+            className="rounded border border-border bg-muted px-4 py-2 text-sm font-medium text-foreground hover:bg-muted/80 disabled:opacity-50"
           >
             {savingNickname ? t('common.saving') : t('ui.button.save')}
           </button>
@@ -192,22 +185,22 @@ export default function ProfilePage() {
       </section>
 
       {/* 비밀번호 변경 */}
-      <section className="rounded-lg border border-[#333] bg-[#1f1f1f] p-6">
-        <h2 className="mb-3 text-lg font-semibold text-white">{t('user.profile.changePassword')}</h2>
+      <section className="rounded-lg border border-border bg-card p-6">
+        <h2 className="mb-3 text-lg font-semibold text-foreground">{t('user.profile.changePassword')}</h2>
         <form onSubmit={handleChangePassword} className="flex flex-col gap-3">
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-gray-300">{t('user.profile.currentPassword')}</span>
+            <span className="text-sm font-medium text-foreground">{t('user.profile.currentPassword')}</span>
             <input
               type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               required
               autoComplete="current-password"
-              className="rounded border border-[#444] bg-[#181818] px-3 py-2 text-white focus:border-[#666] focus:outline-none"
+              className="rounded border border-input bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </label>
           <label className="flex flex-col gap-1">
-            <span className="text-sm font-medium text-gray-300">{t('auth.reset.newPassword')}</span>
+            <span className="text-sm font-medium text-foreground">{t('auth.reset.newPassword')}</span>
             <input
               type="password"
               value={newPassword}
@@ -217,13 +210,13 @@ export default function ProfilePage() {
               maxLength={100}
               autoComplete="new-password"
               placeholder={t('auth.reset.passwordPlaceholder')}
-              className="rounded border border-[#444] bg-[#181818] px-3 py-2 text-white placeholder:text-gray-500 focus:border-[#666] focus:outline-none"
+              className="rounded border border-input bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </label>
           <button
             type="submit"
             disabled={savingPassword}
-            className="self-start rounded border border-[#555] bg-[#333] px-4 py-2 text-sm font-medium text-white hover:bg-[#444] disabled:opacity-50"
+            className="self-start rounded bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
             {savingPassword ? t('user.profile.changingPassword') : t('user.profile.changePassword')}
           </button>

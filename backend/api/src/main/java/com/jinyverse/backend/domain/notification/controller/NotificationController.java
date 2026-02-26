@@ -57,4 +57,24 @@ public class NotificationController {
         notificationService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    /** 미읽음 카운트 */
+    @GetMapping("/unread-count")
+    public ResponseEntity<Map<String, Long>> getUnreadCount(RequestContext ctx) {
+        long count = notificationService.countUnread(ctx.getCurrentUserId());
+        return ResponseEntity.ok(Map.of("count", count));
+    }
+
+    /** 단건 읽음 처리 */
+    @PutMapping("/{id}/read")
+    public ResponseEntity<NotificationResponseDto> markAsRead(@PathVariable UUID id, RequestContext ctx) {
+        return ResponseEntity.ok(notificationService.markAsRead(id, ctx.getCurrentUserId()));
+    }
+
+    /** 전체 읽음 처리 */
+    @PutMapping("/read-all")
+    public ResponseEntity<Void> markAllAsRead(RequestContext ctx) {
+        notificationService.markAllAsRead(ctx.getCurrentUserId());
+        return ResponseEntity.noContent().build();
+    }
 }

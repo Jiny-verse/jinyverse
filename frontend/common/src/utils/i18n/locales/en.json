@@ -1,467 +1,531 @@
 {
-  "ui": {
-    "button": {
-      "accept": "Accept",
-      "cancel": "Cancel",
-      "confirm": "Confirm",
-      "delete": "Delete",
-      "save": "Save",
-      "edit": "Edit",
-      "close": "Close",
-      "login": "Login",
-      "register": "Register",
-      "logout": "Logout",
-      "add": "Add",
-      "create": "Create",
-      "change": "Change",
-      "preview": "Preview",
-      "search": "Search",
-      "upload": "Upload",
-      "back": "Back",
-      "saving": "Saving...",
-      "uploading": "Uploading...",
-      "loading": "Loading..."
+    "ui": {
+        "button": {
+            "accept": "Accept",
+            "cancel": "Cancel",
+            "confirm": "Confirm",
+            "delete": "Delete",
+            "save": "Save",
+            "edit": "Edit",
+            "close": "Close",
+            "login": "Login",
+            "register": "Register",
+            "logout": "Logout",
+            "add": "Add",
+            "create": "Create",
+            "change": "Change",
+            "preview": "Preview",
+            "search": "Search",
+            "upload": "Upload",
+            "back": "Back",
+            "saving": "Saving...",
+            "uploading": "Uploading...",
+            "loading": "Loading..."
+        },
+        "input": {
+            "placeholder": "Please enter",
+            "search": "Search"
+        },
+        "dialog": {
+            "alert": "Alert"
+        }
     },
-    "input": {
-      "placeholder": "Please enter",
-      "search": "Search"
+    "message": {
+        "warning": "Please note the following",
+        "error": "An error has occurred",
+        "success": "Completed successfully",
+        "confirm": "Are you sure you want to proceed?",
+        "loginRequired": "Login required.",
+        "commentFailed": "Failed to post comment."
     },
-    "dialog": {
-      "alert": "Alert"
-    }
-  },
-  "message": {
-    "warning": "Please note the following",
-    "error": "An error has occurred",
-    "success": "Completed successfully",
-    "confirm": "Are you sure you want to proceed?",
-    "loginRequired": "Login required.",
-    "commentFailed": "Failed to post comment."
-  },
-  "validation": {
-    "required": "This field is required",
-    "email": "Please enter a valid email address",
-    "minLength": "Please enter at least {{min}} characters",
-    "maxLength": "Please enter no more than {{max}} characters",
-    "pattern": "Invalid format",
-    "passwordMismatch": "Passwords do not match"
-  },
-  "error": {
-    "notFound": "The requested page could not be found",
-    "unauthorized": "Authentication required",
-    "forbidden": "Access denied",
-    "serverError": "A server error occurred",
-    "networkError": "A network error occurred",
-    "timeout": "Request timeout"
-  },
-  "common": {
-    "loading": "Loading...",
-    "noData": "No data available",
-    "retry": "Retry",
-    "back": "Back",
-    "next": "Next",
-    "previous": "Previous",
-    "submit": "Submit",
-    "reset": "Reset",
-    "all": "All",
-    "list": "List",
-    "detail": "Detail",
-    "required": "(Required)",
-    "optional": "(Optional)",
-    "saving": "Saving...",
-    "uploading": "Uploading...",
-    "redirecting": "Redirecting...",
-    "yes": "Yes",
-    "no": "No"
-  },
-  "datetime": {
-    "secondsAgo": "{{count}}s ago",
-    "minutesAgo": "{{count}}m ago",
-    "hoursAgo": "{{count}}h ago",
-    "daysAgo": "{{count}}d ago",
-    "now": "just now"
-  },
-  "channel": {
-    "internal": "Internal",
-    "external": "External",
-    "public": "Public"
-  },
-  "form": {
-    "label": {
-      "email": "Email",
-      "password": "Password",
-      "name": "Name",
-      "phone": "Phone",
-      "username": "Username",
-      "nickname": "Nickname",
-      "title": "Title",
-      "description": "Description",
-      "usage": "Usage",
-      "action": "Action",
-      "targetType": "Target Type",
-      "createdAt": "Created At",
-      "tagName": "Tag Name",
-      "sortOrder": "Sort Order",
-      "category": "Category",
-      "code": "Code",
-      "content": "Content",
-      "thumbnail": "Thumbnail",
-      "image": "Image",
-      "file": "File",
-      "tags": "Tags",
-      "author": "Author",
-      "status": "Status",
-      "viewCount": "Views",
-      "type": "Type",
-      "note": "Note",
-      "order": "Order",
-      "isPublic": "Public",
-      "isPrivate": "Private",
-      "menuCode": "Menu Code",
-      "typeCategory": "Type Category",
-      "updatedAt": "Updated At",
-      "categoryCode": "Category Code",
-      "categoryName": "Category Name",
-      "isSealed": "Locked (no edits or additions)",
-      "value": "Value"
+    "validation": {
+        "required": "This field is required",
+        "email": "Please enter a valid email address",
+        "minLength": "Please enter at least {{min}} characters",
+        "maxLength": "Please enter no more than {{max}} characters",
+        "pattern": "Invalid format",
+        "passwordMismatch": "Passwords do not match"
     },
-    "placeholder": {
-      "email": "Enter your email",
-      "password": "Enter your password",
-      "name": "Enter your name",
-      "phone": "Enter your phone number",
-      "nickname": "Enter your nickname",
-      "title": "Enter title",
-      "description": "Enter description",
-      "content": "Enter content",
-      "search": "Enter search keyword",
-      "url": "Enter URL",
-      "tagName": "Enter tag name"
-    }
-  },
-  "table": {
-    "noData": "No data to display",
-    "loading": "Loading data...",
-    "pageInfo": "Page {{current}} / {{total}}",
-    "rowsPerPage": "Rows per page",
-    "actions": "Actions",
-    "selected": "{{count}} selected",
-    "batchDelete": "Batch Delete",
-    "selectAll": "Select All",
-    "selectRow": "Select row {{id}}"
-  },
-  "modal": {
-    "close": "Close",
-    "confirm": "Confirm",
-    "cancel": "Cancel"
-  },
-  "editor": {
-    "toolbar": {
-      "bold": "Bold",
-      "italic": "Italic",
-      "underline": "Underline",
-      "strike": "Strikethrough",
-      "code": "Inline Code",
-      "codeBlock": "Code Block",
-      "h1": "Heading 1",
-      "h2": "Heading 2",
-      "h3": "Heading 3",
-      "ul": "Bullet List",
-      "ol": "Ordered List",
-      "link": "Link",
-      "image": "Image",
-      "blockquote": "Blockquote",
-      "hr": "Horizontal Rule",
-      "alignLeft": "Align Left",
-      "alignCenter": "Align Center",
-      "alignRight": "Align Right",
-      "textColor": "Text Color",
-      "highlight": "Highlight",
-      "lineHeight": "Line Height",
-      "specialChar": "Special Characters",
-      "fontFamily": "Font",
-      "fontSize": "Size",
-      "callout": "Callout",
-      "embed": "Embed",
-      "table": "Table",
-      "undo": "Undo",
-      "redo": "Redo",
-      "switchMode": "Switch Mode"
+    "error": {
+        "notFound": "The requested page could not be found",
+        "unauthorized": "Authentication required",
+        "forbidden": "Access denied",
+        "serverError": "A server error occurred",
+        "networkError": "A network error occurred",
+        "timeout": "Request timeout"
     },
-    "mode": {
-      "text": "Rich Text",
-      "markdown": "Markdown"
+    "common": {
+        "loading": "Loading...",
+        "noData": "No data available",
+        "retry": "Retry",
+        "back": "Back",
+        "next": "Next",
+        "previous": "Previous",
+        "submit": "Submit",
+        "reset": "Reset",
+        "all": "All",
+        "list": "List",
+        "detail": "Detail",
+        "required": "(Required)",
+        "optional": "(Optional)",
+        "saving": "Saving...",
+        "uploading": "Uploading...",
+        "redirecting": "Redirecting...",
+        "yes": "Yes",
+        "no": "No"
     },
-    "status": {
-      "cursor": "{{line}}:{{col}}",
-      "chars": "{{count}} chars"
+    "datetime": {
+        "secondsAgo": "{{count}}s ago",
+        "minutesAgo": "{{count}}m ago",
+        "hoursAgo": "{{count}}h ago",
+        "daysAgo": "{{count}}d ago",
+        "now": "just now"
     },
-    "placeholder": "Enter content..."
-  },
-  "editorDialog": {
-    "link": {
-      "title": "Insert Link",
-      "text": "Display Text",
-      "textPlaceholder": "Link text (optional)"
-    },
-    "table": {
-      "title": "Insert Table",
-      "rows": "Rows",
-      "cols": "Columns",
-      "hasHeader": "First row as header",
-      "preview": "Preview"
-    },
-    "embed": {
-      "title": "Insert Embed",
-      "placeholder": "Enter YouTube or Vimeo URL",
-      "supported": "✅ Supported format (YouTube / Vimeo)",
-      "unsupported": "⚠️ Not a YouTube/Vimeo URL. Will be inserted as a link card."
-    },
-    "image": {
-      "title": "Insert Image",
-      "upload": "Upload File",
-      "selectFile": "Select File",
-      "uploadError": "Upload failed.",
-      "alt": "Alt Text",
-      "altPlaceholder": "Image description (optional)"
-    }
-  },
-  "editorTable": {
-    "addRowAbove": "Add Row Above",
-    "addRowBelow": "Add Row Below",
-    "deleteRow": "Delete Row",
-    "addColLeft": "Add Column Left",
-    "addColRight": "Add Column Right",
-    "deleteCol": "Delete Column",
-    "cellBgColor": "Cell Background Color",
-    "cellTextColor": "Cell Text Color",
-    "deleteTable": "Delete Table"
-  },
-  "auth": {
-    "login": {
-      "title": "Login",
-      "forgot": "Forgot Password",
-      "register": "Register",
-      "error": "Login failed.",
-      "submitting": "Logging in...",
-      "username": "Username"
-    },
-    "register": {
-      "title": "Register",
-      "submit": "Sign Up",
-      "submitting": "Signing up...",
-      "error": "Registration failed.",
-      "agreeError": "You must agree to the terms of service.",
-      "agreeLabel": "I agree to the terms of service",
-      "verifyEmailSent": "A verification email has been sent to {{email}}. Please enter the verification code from the email.",
-      "verifyEmailLink": "Verify Email"
-    },
-    "verify": {
-      "title": "Email Verification",
-      "description": "Please check your email",
-      "submit": "Verify",
-      "submitting": "Verifying...",
-      "error": "Verification failed.",
-      "code": "Verification Code",
-      "codePlaceholder": "Code from email",
-      "resend": "Resend",
-      "resending": "Sending...",
-      "resendSuccess": "Verification email resent."
-    },
-    "forgot": {
-      "title": "Forgot Password",
-      "description": "Enter the email you used to sign up and we'll send you a reset link.",
-      "submit": "Send Reset Email",
-      "submitting": "Sending...",
-      "error": "Request failed.",
-      "sentTitle": "Password Reset Email Sent",
-      "sentDesc": "A password reset email has been sent to {{email}}. Please use the link or code in the email to set a new password.",
-      "resetLink": "Reset Password"
-    },
-    "reset": {
-      "title": "Reset Password",
-      "doneTitle": "Password Reset Complete",
-      "doneDesc": "Your password has been changed. Please log in with your new password.",
-      "submit": "Change Password",
-      "submitting": "Resetting...",
-      "error": "Password reset failed.",
-      "newPassword": "New Password",
-      "verifyCode": "Verification Code",
-      "verifyCodePlaceholder": "Code from email",
-      "passwordPlaceholder": "Min 8 characters with letters, numbers, and symbols"
-    }
-  },
-  "user": {
-    "profile": {
-      "title": "Profile",
-      "myProfile": "My Profile",
-      "nicknameChanged": "Nickname has been changed",
-      "nicknameChangeFailed": "Failed to change nickname.",
-      "loadError": "Failed to load profile",
-      "loadFailed": "Failed to load profile.",
-      "notFound": "Cannot load profile.",
-      "image": "Profile Image",
-      "imageChangeFailed": "Failed to change image.",
-      "imageSetFailed": "Image setup failed: {{msg}}",
-      "editNickname": "Edit Nickname",
-      "basicInfo": "Edit Basic Info",
-      "changePassword": "Change Password",
-      "currentPassword": "Current Password",
-      "passwordChanged": "Password has been changed.",
-      "passwordChangeFailed": "Failed to change password.",
-      "changingPassword": "Changing...",
-      "joinedAt": "Joined: {{date}}",
-      "saveFailed": "Failed to save.",
-      "saved": "Information saved."
-    }
-  },
-  "board": {
-    "title": {
-      "main": "Board"
-    },
-    "topic": {
-      "title": "Post",
-      "create": "Create Post",
-      "edit": "Edit Post"
+    "channel": {
+        "internal": "Internal",
+        "external": "External",
+        "public": "Public"
     },
     "form": {
-      "basicInfo": "Basic Info",
-      "basicInfoDesc": "Enter the title and content of your post",
-      "extraSettings": "Additional Settings",
-      "tagDesc": "Press Enter or comma (,) to add",
-      "publishSettings": "Publish & Visibility Settings",
-      "publishAt": "Publish Date",
-      "publishAtDesc": "Set if you need scheduled publishing",
-      "isPublic": "Public",
-      "isNotice": "Notice",
-      "isPinned": "Pinned",
-      "titleMaxLen": "Post title (max 200 characters)",
-      "body": "Content",
-      "coverImage": "Cover Image",
-      "coverImageDesc": "Upload a cover image to display in the list (optional)",
-      "images": "Images",
-      "galleryImagesDesc": "Upload images for the gallery (required, min 1, max 10)",
-      "projectImagesDesc": "Upload project images. Click to set cover (★) (required, min 1, max 10)",
-      "galleryDesc": "Description",
-      "galleryDescSub": "Enter a brief description of the images (optional)"
-    }
-  },
-  "file": {
-    "add": "Add File",
-    "upload": "Upload File",
-    "uploading": "Uploading...",
-    "download": "Download",
-    "noFile": "No File",
-    "attachFile": "Attach File",
-    "selectFile": "Select File",
-    "changeImage": "Change Image",
-    "deleteImage": "Delete Image",
-    "mainImage": "Main Image",
-    "imageOnly": "Only image files can be uploaded",
-    "uploadFailed": "Upload failed",
-    "uploadFailedMsg": "Upload failed: {{msg}}",
-    "dragOrClick": "Drag or click to upload image",
-    "remove": "Remove",
-    "delete": "Delete",
-    "current": "Current:",
-    "imageSelect": "Select Image",
-    "addImage": "Add Image",
-    "mainImageHint": "Click to change main image (★) · Max {{max}}",
-    "mainImageHintMin": "(Min {{min}})"
-  },
-  "admin": {
-    "none": "(None)",
-    "audit": {
-      "title": "Audit Logs",
-      "detail": "Audit Log Detail",
-      "actorId": "Actor ID",
-      "targetId": "Target ID",
-      "ipAddress": "IP Address",
-      "before": "Before",
-      "after": "After",
-      "sealed": "Locked — No edits allowed",
-      "selectCategory": "Select a category on the left to view codes."
+        "label": {
+            "email": "Email",
+            "password": "Password",
+            "name": "Name",
+            "phone": "Phone",
+            "username": "Username",
+            "nickname": "Nickname",
+            "title": "Title",
+            "description": "Description",
+            "usage": "Usage",
+            "action": "Action",
+            "targetType": "Target Type",
+            "createdAt": "Created At",
+            "tagName": "Tag Name",
+            "sortOrder": "Sort Order",
+            "category": "Category",
+            "code": "Code",
+            "content": "Content",
+            "thumbnail": "Thumbnail",
+            "image": "Image",
+            "file": "File",
+            "tags": "Tags",
+            "author": "Author",
+            "status": "Status",
+            "viewCount": "Views",
+            "type": "Type",
+            "note": "Note",
+            "order": "Order",
+            "isPublic": "Public",
+            "isPrivate": "Private",
+            "menuCode": "Menu Code",
+            "typeCategory": "Type Category",
+            "updatedAt": "Updated At",
+            "categoryCode": "Category Code",
+            "categoryName": "Category Name",
+            "isSealed": "Locked (no edits or additions)",
+            "value": "Value"
+        },
+        "placeholder": {
+            "email": "Enter your email",
+            "password": "Enter your password",
+            "name": "Enter your name",
+            "phone": "Enter your phone number",
+            "nickname": "Enter your nickname",
+            "title": "Enter title",
+            "description": "Enter description",
+            "content": "Enter content",
+            "search": "Enter search keyword",
+            "url": "Enter URL",
+            "tagName": "Enter tag name"
+        }
     },
-    "setting": {
-      "title": "Settings",
-      "loadFailed": "Failed to load settings.",
-      "saved": "Saved.",
-      "saveFailed": "Failed to save. Please check admin permissions.",
-      "fileStorage": "File Storage",
-      "fileStorageDesc": "Server directory path for uploaded files. Leave blank to use the default from application.yml or environment variables.",
-      "savePath": "Storage Path",
-      "profileImage": "Profile Image",
-      "profileImageDesc": "Uploading a profile image will link it to your account. (Only available for logged-in users)",
-      "profileImageSetFailed": "Profile image setup failed: {{msg}}"
+    "table": {
+        "noData": "No data to display",
+        "loading": "Loading data...",
+        "pageInfo": "Page {{current}} / {{total}}",
+        "rowsPerPage": "Rows per page",
+        "actions": "Actions",
+        "selected": "{{count}} selected",
+        "batchDelete": "Batch Delete",
+        "selectAll": "Select All",
+        "selectRow": "Select row {{id}}"
     },
-    "tag": {
-      "title": "Tag Management",
-      "create": "Create Tag",
-      "edit": "Edit Tag"
+    "modal": {
+        "close": "Close",
+        "confirm": "Confirm",
+        "cancel": "Cancel"
     },
-    "category": {
-      "title": "Code Category Management",
-      "add": "Add Category",
-      "edit": "Edit Category",
-      "sealed": "Locked",
-      "unsealed": "Unlocked",
-      "sealedHeader": "Lock"
+    "editor": {
+        "toolbar": {
+            "bold": "Bold",
+            "italic": "Italic",
+            "underline": "Underline",
+            "strike": "Strikethrough",
+            "code": "Inline Code",
+            "codeBlock": "Code Block",
+            "h1": "Heading 1",
+            "h2": "Heading 2",
+            "h3": "Heading 3",
+            "ul": "Bullet List",
+            "ol": "Ordered List",
+            "link": "Link",
+            "image": "Image",
+            "blockquote": "Blockquote",
+            "hr": "Horizontal Rule",
+            "alignLeft": "Align Left",
+            "alignCenter": "Align Center",
+            "alignRight": "Align Right",
+            "textColor": "Text Color",
+            "highlight": "Highlight",
+            "lineHeight": "Line Height",
+            "specialChar": "Special Characters",
+            "fontFamily": "Font",
+            "fontSize": "Size",
+            "callout": "Callout",
+            "embed": "Embed",
+            "table": "Table",
+            "undo": "Undo",
+            "redo": "Redo",
+            "switchMode": "Switch Mode"
+        },
+        "mode": {
+            "text": "Rich Text",
+            "markdown": "Markdown"
+        },
+        "status": {
+            "cursor": "{{line}}:{{col}}",
+            "chars": "{{count}} chars"
+        },
+        "placeholder": "Enter content..."
     },
-    "code": {
-      "title": "Code Management",
-      "add": "Add Code",
-      "edit": "Edit Code"
+    "editorDialog": {
+        "link": {
+            "title": "Insert Link",
+            "text": "Display Text",
+            "textPlaceholder": "Link text (optional)"
+        },
+        "table": {
+            "title": "Insert Table",
+            "rows": "Rows",
+            "cols": "Columns",
+            "hasHeader": "First row as header",
+            "preview": "Preview"
+        },
+        "embed": {
+            "title": "Insert Embed",
+            "placeholder": "Enter YouTube or Vimeo URL",
+            "supported": "✅ Supported format (YouTube / Vimeo)",
+            "unsupported": "⚠️ Not a YouTube/Vimeo URL. Will be inserted as a link card."
+        },
+        "image": {
+            "title": "Insert Image",
+            "upload": "Upload File",
+            "selectFile": "Select File",
+            "uploadError": "Upload failed.",
+            "alt": "Alt Text",
+            "altPlaceholder": "Image description (optional)"
+        }
     },
-    "menu": {
-      "title": "Menu Management",
-      "create": "Create Menu",
-      "add": "Add Menu",
-      "edit": "Edit Menu",
-      "deleteConfirm": "Delete this menu?",
-      "hierarchy": "Hierarchy",
-      "internal": "Internal",
-      "external": "External",
-      "public": "Public"
+    "editorTable": {
+        "addRowAbove": "Add Row Above",
+        "addRowBelow": "Add Row Below",
+        "deleteRow": "Delete Row",
+        "addColLeft": "Add Column Left",
+        "addColRight": "Add Column Right",
+        "deleteCol": "Delete Column",
+        "cellBgColor": "Cell Background Color",
+        "cellTextColor": "Cell Text Color",
+        "deleteTable": "Delete Table"
+    },
+    "auth": {
+        "login": {
+            "title": "Login",
+            "forgot": "Forgot Password",
+            "register": "Register",
+            "error": "Login failed.",
+            "submitting": "Logging in...",
+            "username": "Username"
+        },
+        "register": {
+            "title": "Register",
+            "submit": "Sign Up",
+            "submitting": "Signing up...",
+            "error": "Registration failed.",
+            "agreeError": "You must agree to the terms of service.",
+            "agreeLabel": "I agree to the terms of service",
+            "verifyEmailSent": "A verification email has been sent to {{email}}. Please enter the verification code from the email.",
+            "verifyEmailLink": "Verify Email"
+        },
+        "verify": {
+            "title": "Email Verification",
+            "description": "Please check your email",
+            "submit": "Verify",
+            "submitting": "Verifying...",
+            "error": "Verification failed.",
+            "code": "Verification Code",
+            "codePlaceholder": "Code from email",
+            "resend": "Resend",
+            "resending": "Sending...",
+            "resendSuccess": "Verification email resent."
+        },
+        "forgot": {
+            "title": "Forgot Password",
+            "description": "Enter the email you used to sign up and we'll send you a reset link.",
+            "submit": "Send Reset Email",
+            "submitting": "Sending...",
+            "error": "Request failed.",
+            "sentTitle": "Password Reset Email Sent",
+            "sentDesc": "A password reset email has been sent to {{email}}. Please use the link or code in the email to set a new password.",
+            "resetLink": "Reset Password"
+        },
+        "reset": {
+            "title": "Reset Password",
+            "doneTitle": "Password Reset Complete",
+            "doneDesc": "Your password has been changed. Please log in with your new password.",
+            "submit": "Change Password",
+            "submitting": "Resetting...",
+            "error": "Password reset failed.",
+            "newPassword": "New Password",
+            "verifyCode": "Verification Code",
+            "verifyCodePlaceholder": "Code from email",
+            "passwordPlaceholder": "Min 8 characters with letters, numbers, and symbols"
+        }
     },
     "user": {
-      "title": "User Management"
+        "profile": {
+            "title": "Profile",
+            "myProfile": "My Profile",
+            "nicknameChanged": "Nickname has been changed",
+            "nicknameChangeFailed": "Failed to change nickname.",
+            "loadError": "Failed to load profile",
+            "loadFailed": "Failed to load profile.",
+            "notFound": "Cannot load profile.",
+            "image": "Profile Image",
+            "imageChangeFailed": "Failed to change image.",
+            "imageSetFailed": "Image setup failed: {{msg}}",
+            "editNickname": "Edit Nickname",
+            "basicInfo": "Edit Basic Info",
+            "changePassword": "Change Password",
+            "currentPassword": "Current Password",
+            "passwordChanged": "Password has been changed.",
+            "passwordChangeFailed": "Failed to change password.",
+            "changingPassword": "Changing...",
+            "joinedAt": "Joined: {{date}}",
+            "saveFailed": "Failed to save.",
+            "saved": "Information saved."
+        }
     },
     "board": {
-      "title": "Board Management",
-      "create": "Create Board",
-      "edit": "Edit Board"
+        "title": {
+            "main": "Board"
+        },
+        "topic": {
+            "title": "Post",
+            "create": "Create Post",
+            "edit": "Edit Post"
+        },
+        "form": {
+            "basicInfo": "Basic Info",
+            "basicInfoDesc": "Enter the title and content of your post",
+            "extraSettings": "Additional Settings",
+            "tagDesc": "Press Enter or comma (,) to add",
+            "publishSettings": "Publish & Visibility Settings",
+            "publishAt": "Publish Date",
+            "publishAtDesc": "Set if you need scheduled publishing",
+            "isPublic": "Public",
+            "isNotice": "Notice",
+            "isPinned": "Pinned",
+            "titleMaxLen": "Post title (max 200 characters)",
+            "body": "Content",
+            "coverImage": "Cover Image",
+            "coverImageDesc": "Upload a cover image to display in the list (optional)",
+            "images": "Images",
+            "galleryImagesDesc": "Upload images for the gallery (required, min 1, max 10)",
+            "projectImagesDesc": "Upload project images. Click to set cover (★) (required, min 1, max 10)",
+            "galleryDesc": "Description",
+            "galleryDescSub": "Enter a brief description of the images (optional)"
+        }
+    },
+    "file": {
+        "add": "Add File",
+        "upload": "Upload File",
+        "uploading": "Uploading...",
+        "download": "Download",
+        "noFile": "No File",
+        "attachFile": "Attach File",
+        "selectFile": "Select File",
+        "changeImage": "Change Image",
+        "deleteImage": "Delete Image",
+        "mainImage": "Main Image",
+        "imageOnly": "Only image files can be uploaded",
+        "uploadFailed": "Upload failed",
+        "uploadFailedMsg": "Upload failed: {{msg}}",
+        "dragOrClick": "Drag or click to upload image",
+        "remove": "Remove",
+        "delete": "Delete",
+        "current": "Current:",
+        "imageSelect": "Select Image",
+        "addImage": "Add Image",
+        "mainImageHint": "Click to change main image (★) · Max {{max}}",
+        "mainImageHintMin": "(Min {{min}})"
+    },
+    "admin": {
+        "none": "(None)",
+        "audit": {
+            "title": "Audit Logs",
+            "detail": "Audit Log Detail",
+            "actorId": "Actor ID",
+            "targetId": "Target ID",
+            "ipAddress": "IP Address",
+            "before": "Before",
+            "after": "After",
+            "sealed": "Locked — No edits allowed",
+            "selectCategory": "Select a category on the left to view codes."
+        },
+        "setting": {
+            "title": "Settings",
+            "loadFailed": "Failed to load settings.",
+            "saved": "Saved.",
+            "saveFailed": "Failed to save. Please check admin permissions.",
+            "fileStorage": "File Storage",
+            "fileStorageDesc": "Server directory path for uploaded files. Leave blank to use the default from application.yml or environment variables.",
+            "savePath": "Storage Path",
+            "profileImage": "Profile Image",
+            "profileImageDesc": "Uploading a profile image will link it to your account. (Only available for logged-in users)",
+            "profileImageSetFailed": "Profile image setup failed: {{msg}}"
+        },
+        "tag": {
+            "title": "Tag Management",
+            "create": "Create Tag",
+            "edit": "Edit Tag"
+        },
+        "category": {
+            "title": "Code Category Management",
+            "add": "Add Category",
+            "edit": "Edit Category",
+            "sealed": "Locked",
+            "unsealed": "Unlocked",
+            "sealedHeader": "Lock"
+        },
+        "code": {
+            "title": "Code Management",
+            "add": "Add Code",
+            "edit": "Edit Code"
+        },
+        "menu": {
+            "title": "Menu Management",
+            "create": "Create Menu",
+            "add": "Add Menu",
+            "edit": "Edit Menu",
+            "deleteConfirm": "Delete this menu?",
+            "hierarchy": "Hierarchy",
+            "internal": "Internal",
+            "external": "External",
+            "public": "Public"
+        },
+        "user": {
+            "title": "User Management"
+        },
+        "board": {
+            "title": "Board Management",
+            "create": "Create Board",
+            "edit": "Edit Board"
+        }
+    },
+    "nav": {
+        "loading": "Loading...",
+        "all": "All",
+        "search": "Search",
+        "notification": "Notifications",
+        "profile": "Profile",
+        "profileManage": "Profile",
+        "myInquiries": "My Inquiries",
+        "login": "Login"
+    },
+    "post": {
+        "create": "Write",
+        "edit": "Edit",
+        "delete": "Delete",
+        "list": "List",
+        "noPost": "No posts available",
+        "notice": "Notice",
+        "pinned": "Pinned",
+        "viewCount": "Views {{count}}",
+        "attachments": "Attachments",
+        "imageGallery": "Image Gallery",
+        "zoomIn": "View image",
+        "close": "Close",
+        "prev": "Previous",
+        "next": "Next",
+        "saveDraft": "Save as Draft",
+        "comments": "Comments",
+        "commentLoginHint": "Please log in to comment.",
+        "reply": "Reply",
+        "registerComment": "Post Comment",
+        "submitting": "Submitting...",
+        "replyPlaceholder": "Enter your reply...",
+        "commentPlaceholder": "Enter your comment...",
+        "deleteComment": "Delete this comment?"
+    },
+    "notification": {
+        "title": "Notifications",
+        "markAllRead": "Mark all read",
+        "empty": "No new notifications.",
+        "viewAll": "View all notifications",
+        "pageEmpty": "No notifications.",
+        "settings": {
+            "title": "Notification Settings",
+            "basic": "Basic Settings",
+            "systemEnabled": "Receive system notifications",
+            "emailEnabled": "Receive email notifications",
+            "emailOverrideLabel": "Email address (optional)",
+            "emailOverridePlaceholder": "Leave blank to use account email",
+            "typeSettings": "Settings by notification type",
+            "saved": "Saved.",
+            "loadFailed": "Failed to load settings.",
+            "type": {
+                "comment": "Comment notifications",
+                "reply": "Reply notifications",
+                "system": "System notifications",
+                "inquiry_replied": "Inquiry reply notifications"
+            }
+        }
+    },
+    "inquiry": {
+        "title": "My Inquiries",
+        "new": "+ New Inquiry",
+        "empty": "No inquiries found.",
+        "backToList": "← Back to List",
+        "statusChange": "Status changed",
+        "messagePlaceholder": "Enter additional message...",
+        "sendFailed": "Failed to send.",
+        "closed": "This inquiry is closed.",
+        "status": {
+            "pending": "Pending",
+            "in_progress": "In Progress",
+            "answered": "Answered",
+            "closed": "Closed"
+        }
+    },
+    "contact": {
+        "title": "Contact Us",
+        "description": "Please fill out the form below for any questions or issues.",
+        "guestEmail": "Email *",
+        "guestEmailPlaceholder": "Your email address for replies",
+        "category": "Category *",
+        "titleLabel": "Title *",
+        "titlePlaceholder": "Enter inquiry title",
+        "content": "Content *",
+        "contentPlaceholder": "Please describe your inquiry in detail",
+        "submit": "Submit Inquiry",
+        "submitting": "Submitting...",
+        "submitFailed": "Submission failed. Please try again.",
+        "categoryOptions": {
+            "general": "General",
+            "bug": "Bug Report",
+            "billing": "Billing",
+            "partnership": "Partnership",
+            "other": "Other"
+        }
     }
-  },
-  "nav": {
-    "loading": "Loading...",
-    "all": "All",
-    "search": "Search",
-    "notification": "Notifications",
-    "profile": "Profile"
-  },
-  "post": {
-    "create": "Write",
-    "edit": "Edit",
-    "delete": "Delete",
-    "list": "List",
-    "noPost": "No posts available",
-    "notice": "Notice",
-    "pinned": "Pinned",
-    "viewCount": "Views {{count}}",
-    "attachments": "Attachments",
-    "imageGallery": "Image Gallery",
-    "zoomIn": "View image",
-    "close": "Close",
-    "prev": "Previous",
-    "next": "Next",
-    "saveDraft": "Save as Draft",
-    "comments": "Comments",
-    "commentLoginHint": "Please log in to comment.",
-    "reply": "Reply",
-    "registerComment": "Post Comment",
-    "submitting": "Submitting...",
-    "replyPlaceholder": "Enter your reply...",
-    "commentPlaceholder": "Enter your comment...",
-    "deleteComment": "Delete this comment?"
-  }
 }

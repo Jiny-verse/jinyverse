@@ -30,6 +30,10 @@ public class NotificationResponseDto {
     private String link;
     /** 읽음 여부 */
     private Boolean isRead;
+    /** 이메일 발송 여부 */
+    private Boolean sendEmail;
+    /** 이메일 발송 완료 여부 */
+    private Boolean emailSent;
     /** 생성일 */
     private LocalDateTime createdAt;
     /** 읽은 시점 */

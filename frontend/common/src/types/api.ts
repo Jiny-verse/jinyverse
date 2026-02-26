@@ -20,6 +20,9 @@ export type {
   CommentUpdateInput,
 } from '../schemas/comment';
 export type { Menu, MenuFilter, MenuCreateInput, MenuUpdateInput } from '../schemas/menu';
+export type { NotificationTemplate, NotificationTemplateInput } from '../schemas/notificationTemplate';
+export type { Notification, NotificationSetting, NotificationSettingInput } from '../schemas/notification';
+export type { Inquiry, InquiryThread, InquiryCreateInput, InquiryThreadCreateInput } from '../schemas/inquiry';
 
 export interface PageResponse<T> {
   content: T[];

@@ -19,4 +19,9 @@ public class LogEmailSender implements EmailSender {
     public void sendVerificationEmail(String toEmail, String code, String type) {
         log.info("[이메일 스텁] to={}, type={}, code={}", toEmail, type, code);
     }
+
+    @Override
+    public void sendInquiryReplyEmail(String toEmail, String ticketNo, String content, String replierName) {
+        log.info("[EMAIL STUB] inquiry reply to={} ticket={}", toEmail, ticketNo);
+    }
 }

@@ -14,12 +14,12 @@ import {
 import type { CodeCategory, Code } from 'common/services';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import { useLanguage } from 'common/utils';
-import { CategoryTable } from './components/CategoryTable';
-import { CodeTable } from './components/CodeTable';
-import { CreateCategoryDialog } from './components/CreateCategoryDialog';
-import { UpdateCategoryDialog } from './components/UpdateCategoryDialog';
-import { CreateCodeDialog } from './components/CreateCodeDialog';
-import { UpdateCodeDialog } from './components/UpdateCodeDialog';
+import { CategoryTable } from './_components/CategoryTable';
+import { CodeTable } from './_components/CodeTable';
+import { CreateCategoryDialog } from './_components/CreateCategoryDialog';
+import { UpdateCategoryDialog } from './_components/UpdateCategoryDialog';
+import { CreateCodeDialog } from './_components/CreateCodeDialog';
+import { UpdateCodeDialog } from './_components/UpdateCodeDialog';
 
 type PageData = {
   content: CodeCategory[];
