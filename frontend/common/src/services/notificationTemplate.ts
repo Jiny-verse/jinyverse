@@ -1,5 +1,5 @@
 import type { ApiOptions, PageResponse } from '../types/api';
-import { apiGet, apiPost, apiPut, apiDelete } from './api';
+import { apiGet, apiPost, apiDelete } from './api';
 import type { NotificationTemplate, NotificationTemplateInput } from '../schemas/notificationTemplate';
 
 const TEMPLATE_PATH = 'api/notification-templates';
@@ -35,7 +35,7 @@ export async function updateNotificationTemplate(
   id: string,
   data: Partial<NotificationTemplateInput>
 ): Promise<NotificationTemplate> {
-  return apiPut<NotificationTemplate>(options, `${TEMPLATE_PATH}/${id}`, data);
+  return apiPost<NotificationTemplate>(options, `${TEMPLATE_PATH}/${id}/update`, data);
 }
 
 export async function deleteNotificationTemplate(options: ApiOptions, id: string): Promise<void> {

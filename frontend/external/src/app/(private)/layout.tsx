@@ -3,8 +3,8 @@
 import { HorizontalNavigation } from 'common/components';
 import { useAuth, useNavigationItems } from 'common';
 import { ApiProvider, useApiOptions } from '@/app/providers/ApiProvider';
-import { NotificationWidget } from '@/components/NotificationWidget';
-import { UserWidget } from '@/components/UserWidget';
+import { NotificationWidget } from '@/app/_components/NotificationWidget';
+import { UserWidget } from '@/app/_components/UserWidget';
 
 const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
 

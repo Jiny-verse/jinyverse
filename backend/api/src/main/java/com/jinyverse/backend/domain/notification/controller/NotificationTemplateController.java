@@ -39,7 +39,7 @@ public class NotificationTemplateController {
         return ResponseEntity.ok(templateService.getById(id));
     }
 
-    @PutMapping("/{id}")
+    @PostMapping("/{id}/update")
     public ResponseEntity<NotificationTemplateResponseDto> update(
             @PathVariable UUID id,
             @Valid @RequestBody NotificationTemplateRequestDto dto) {

@@ -85,27 +85,6 @@ export async function apiPost<T>(options: ApiOptions, path: string, body: unknow
   return res.json() as Promise<T>;
 }
 
-export async function apiPut<T>(options: ApiOptions, path: string, body: unknown): Promise<T> {
-  const url = buildUrl(options.baseUrl, path);
-  const res = await fetch(url, {
-    method: 'PUT',
-    headers: headers(options, false, newIdempotencyKey()),
-    body: JSON.stringify(body),
-    credentials: CREDENTIALS,
-  });
-  if (res.status === 401) {
-    options.on401?.();
-  }
-  if (!res.ok) {
-    const body = await res.text().catch(() => res.statusText);
-    throw new Error(`API ${res.status} ${res.statusText}: ${body || res.url}`);
-  }
-  if (res.status === 204) {
-    return undefined as T;
-  }
-  return res.json() as Promise<T>;
-}
-
 export async function apiPostFormData<T>(
   options: ApiOptions,
   path: string,

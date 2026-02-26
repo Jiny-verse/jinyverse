@@ -111,7 +111,7 @@ public class CommonFileController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{id}")
+    @PostMapping("/{id}/update")
     public ResponseEntity<CommonFileResponseDto> update(
             @PathVariable UUID id,
             @Valid @RequestBody CommonFileRequestDto requestDto) {

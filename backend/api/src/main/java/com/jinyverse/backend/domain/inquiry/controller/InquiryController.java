@@ -45,7 +45,7 @@ public class InquiryController {
     }
 
     /** [Admin] 상태 변경 */
-    @PutMapping("/{id}/status")
+    @PostMapping("/{id}/update-status")
     public ResponseEntity<InquiryResponseDto> updateStatus(
             @PathVariable UUID id,
             @RequestBody Map<String, String> body,
@@ -54,7 +54,7 @@ public class InquiryController {
     }
 
     /** [Admin] 우선순위 변경 */
-    @PutMapping("/{id}/priority")
+    @PostMapping("/{id}/update-priority")
     public ResponseEntity<InquiryResponseDto> updatePriority(
             @PathVariable UUID id,
             @RequestBody Map<String, String> body) {
@@ -62,7 +62,7 @@ public class InquiryController {
     }
 
     /** [Admin] 담당자 지정 */
-    @PutMapping("/{id}/assignee")
+    @PostMapping("/{id}/assign")
     public ResponseEntity<InquiryResponseDto> assign(
             @PathVariable UUID id,
             @RequestBody Map<String, String> body) {

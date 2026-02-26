@@ -1,6 +1,6 @@
 'use client';
 
-import { TopicForm } from '@/components/topic';
+import { TopicForm } from '../../_components/TopicForm';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getBoard, getTopic } from 'common/services';

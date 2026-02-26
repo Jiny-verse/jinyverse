@@ -1,5 +1,5 @@
 import type { ApiOptions } from '../types/api';
-import { apiGet, apiPost, apiPut, apiDelete } from './api';
+import { apiGet, apiPost, apiDelete } from './api';
 
 export type Code = {
   categoryCode: string;
@@ -86,7 +86,7 @@ export async function updateCodeCategory(
   code: string,
   data: Partial<Omit<CodeCategory, 'code' | 'createdAt' | 'updatedAt' | 'deletedAt'>>
 ): Promise<CodeCategory> {
-  return apiPut<CodeCategory>(options, `/api/code-categories/${code}`, data);
+  return apiPost<CodeCategory>(options, `/api/code-categories/${code}/update`, data);
 }
 
 /** 공통코드 분류 삭제 */
@@ -127,7 +127,7 @@ export async function updateCode(
     upperCode: string;
   }>
 ): Promise<Code> {
-  return apiPut<Code>(options, `/api/codes/${catCode}/${code}`, {
+  return apiPost<Code>(options, `/api/codes/${catCode}/${code}/update`, {
     categoryCode: catCode,
     code,
     ...data,

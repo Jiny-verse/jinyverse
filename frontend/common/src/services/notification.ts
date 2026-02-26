@@ -1,5 +1,5 @@
 import type { ApiOptions, PageResponse } from '../types/api';
-import { apiGet, apiPut } from './api';
+import { apiGet, apiPost } from './api';
 import type { Notification, NotificationSetting, NotificationSettingInput } from '../schemas/notification';
 
 const NOTIFICATION_PATH = 'api/notifications';
@@ -23,11 +23,11 @@ export async function markNotificationRead(
   options: ApiOptions,
   id: string
 ): Promise<Notification> {
-  return apiPut<Notification>(options, `${NOTIFICATION_PATH}/${id}/read`, {});
+  return apiPost<Notification>(options, `${NOTIFICATION_PATH}/${id}/mark-read`, {});
 }
 
 export async function markAllNotificationsRead(options: ApiOptions): Promise<void> {
-  return apiPut<void>(options, `${NOTIFICATION_PATH}/read-all`, {});
+  return apiPost<void>(options, `${NOTIFICATION_PATH}/mark-all-read`, {});
 }
 
 export async function getNotificationSetting(
@@ -40,5 +40,5 @@ export async function updateNotificationSetting(
   options: ApiOptions,
   data: NotificationSettingInput
 ): Promise<NotificationSetting> {
-  return apiPut<NotificationSetting>(options, `${NOTIFICATION_PATH}/settings`, data);
+  return apiPost<NotificationSetting>(options, `${NOTIFICATION_PATH}/settings/update`, data);
 }

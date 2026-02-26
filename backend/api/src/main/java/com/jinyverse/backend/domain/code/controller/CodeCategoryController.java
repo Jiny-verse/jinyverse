@@ -43,7 +43,7 @@ public class CodeCategoryController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{code}")
+    @PostMapping("/{code}/update")
     public ResponseEntity<CodeCategoryResponseDto> update(
             @PathVariable String code,
             @Valid @RequestBody CodeCategoryRequestDto requestDto) {

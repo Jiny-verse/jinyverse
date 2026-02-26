@@ -1,4 +1,6 @@
 export * from './navigation';
+export { ThemeProvider } from './ThemeProvider';
+export { ThemeToggle } from './ThemeToggle';
 export { LanguageSelector } from './LanguageSelector';
 export { ConfirmDialog } from './ConfirmDialog';
 export { AutoDialog } from './AutoDialog';

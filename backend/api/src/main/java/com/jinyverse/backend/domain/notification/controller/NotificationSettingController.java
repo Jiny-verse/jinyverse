@@ -20,7 +20,7 @@ public class NotificationSettingController {
         return ResponseEntity.ok(settingService.getOrCreate(ctx.getCurrentUserId()));
     }
 
-    @PutMapping
+    @PostMapping("/update")
     public ResponseEntity<NotificationSettingResponseDto> update(
             @RequestBody NotificationSettingRequestDto dto,
             RequestContext ctx) {

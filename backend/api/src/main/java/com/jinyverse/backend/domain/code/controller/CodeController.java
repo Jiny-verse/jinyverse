@@ -45,7 +45,7 @@ public class CodeController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{categoryCode}/{code}")
+    @PostMapping("/{categoryCode}/{code}/update")
     public ResponseEntity<CodeResponseDto> update(
             @PathVariable String categoryCode,
             @PathVariable String code,

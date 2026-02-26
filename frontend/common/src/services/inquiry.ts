@@ -1,5 +1,5 @@
 import type { ApiOptions, PageResponse } from '../types/api';
-import { apiGet, apiPost, apiPut, apiDelete } from './api';
+import { apiGet, apiPost, apiDelete } from './api';
 import type { Inquiry, InquiryThread, InquiryCreateInput, InquiryThreadCreateInput } from '../schemas/inquiry';
 
 const INQUIRY_PATH = 'api/inquiries';
@@ -86,7 +86,7 @@ export async function updateInquiryStatus(
   id: string,
   statusCode: string
 ): Promise<Inquiry> {
-  return apiPut<Inquiry>(options, `${INQUIRY_PATH}/${id}/status`, { statusCode });
+  return apiPost<Inquiry>(options, `${INQUIRY_PATH}/${id}/update-status`, { statusCode });
 }
 
 /** [Admin] 우선순위 변경 */
@@ -95,7 +95,7 @@ export async function updateInquiryPriority(
   id: string,
   priorityCode: string
 ): Promise<Inquiry> {
-  return apiPut<Inquiry>(options, `${INQUIRY_PATH}/${id}/priority`, { priorityCode });
+  return apiPost<Inquiry>(options, `${INQUIRY_PATH}/${id}/update-priority`, { priorityCode });
 }
 
 /** [Admin] 담당자 지정 */
@@ -104,7 +104,7 @@ export async function assignInquiry(
   id: string,
   assigneeId: string
 ): Promise<Inquiry> {
-  return apiPut<Inquiry>(options, `${INQUIRY_PATH}/${id}/assignee`, { assigneeId });
+  return apiPost<Inquiry>(options, `${INQUIRY_PATH}/${id}/assign`, { assigneeId });
 }
 
 /** [Admin] 스레드 추가 (reply / internal_note) */

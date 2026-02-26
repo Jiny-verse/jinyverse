@@ -7,7 +7,7 @@ import { useNavigationItems } from 'common';
 import { ApiProvider, useApiOptions } from '@/app/providers/ApiProvider';
 import { useAuth } from 'common';
 import { useLanguage } from 'common/utils';
-import { ThemeToggle } from '@/components/ThemeToggle';
+import { ThemeToggle } from 'common/components';
 
 function PrivateLayoutContent({
   children,

@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { AuthProvider, I18nProvider } from 'common';
-import { ThemeProvider } from '@/components/ThemeProvider';
-import { FloatingControls } from '@/components/FloatingControls';
+import { ThemeProvider } from 'common/components';
+import { FloatingControls } from './_components/FloatingControls';
 
 export const metadata: Metadata = {
   title: 'Jinyverse',

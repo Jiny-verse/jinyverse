@@ -44,7 +44,7 @@ public class NotificationController {
         return ResponseEntity.ok(response);
     }
 
-    @PutMapping("/{id}")
+    @PostMapping("/{id}/update")
     public ResponseEntity<NotificationResponseDto> update(
             @PathVariable UUID id,
             @Valid @RequestBody NotificationRequestDto requestDto) {
@@ -66,13 +66,13 @@ public class NotificationController {
     }
 
     /** 단건 읽음 처리 */
-    @PutMapping("/{id}/read")
+    @PostMapping("/{id}/mark-read")
     public ResponseEntity<NotificationResponseDto> markAsRead(@PathVariable UUID id, RequestContext ctx) {
         return ResponseEntity.ok(notificationService.markAsRead(id, ctx.getCurrentUserId()));
     }
 
     /** 전체 읽음 처리 */
-    @PutMapping("/read-all")
+    @PostMapping("/mark-all-read")
     public ResponseEntity<Void> markAllAsRead(RequestContext ctx) {
         notificationService.markAllAsRead(ctx.getCurrentUserId());
         return ResponseEntity.noContent().build();
