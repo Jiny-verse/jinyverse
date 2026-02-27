@@ -22,7 +22,7 @@ function LightboxImage({ fileId, apiOptions }: { fileId: string; apiOptions: Api
   return url ? (
     <img src={url} alt="" className="max-w-full max-h-[80vh] object-contain" onClick={(e) => e.stopPropagation()} />
   ) : (
-    <div className="w-32 h-32 bg-gray-700 animate-pulse rounded" />
+    <div className="w-32 h-32 bg-muted animate-pulse rounded" />
   );
 }
 
@@ -88,13 +88,13 @@ function GridImage({
   const url = useImageUrlFromFileId(fileId, apiOptions);
   return (
     <div
-      className="aspect-square overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+      className="aspect-square overflow-hidden cursor-zoom-in hover:scale-[1.02] transition-transform duration-200"
       onClick={onClick}
     >
       {url ? (
         <img src={url} alt="" className="w-full h-full object-cover" />
       ) : (
-        <div className="w-full h-full bg-gray-200 animate-pulse" />
+        <div className="w-full h-full bg-muted animate-pulse" />
       )}
     </div>
   );
@@ -124,38 +124,40 @@ export function ProjectPostDetail({ topic, apiOptions }: ProjectPostDetailProps)
   const editorImageFileIds = extractEditorImageFileIds(topic.content ?? '');
 
   return (
-    <article className="max-w-4xl mx-auto">
+    <article className="py-10 px-4">
       {coverUrl && (
-        <div className="w-full aspect-video overflow-hidden mb-6">
+        <div className="w-full aspect-video overflow-hidden shadow-lg mb-8">
           <img src={coverUrl} alt={topic.title} className="w-full h-full object-cover" />
         </div>
       )}
 
       <header className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-3">{topic.title}</h1>
+        <div className="flex items-baseline justify-between gap-4 mb-2">
+          <h1 className="text-4xl font-bold tracking-tight text-foreground">{topic.title}</h1>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground shrink-0">
+            <span>{topic.author?.nickname ?? '-'}</span>
+            <span>·</span>
+            <span>{formatRelativeOrAbsolute(topic.createdAt)}</span>
+          </div>
+        </div>
         {topic.tags?.length ? (
-          <div className="flex flex-wrap gap-2 mb-3">
+          <div className="flex flex-wrap gap-2">
             {topic.tags.map((tag) => (
-              <span key={tag.id} className="text-sm text-blue-600">
+              <span key={tag.id} className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">
                 #{tag.name}
               </span>
             ))}
           </div>
         ) : null}
-        <div className="flex items-center gap-2 text-sm text-gray-500">
-          <span>{topic.author?.nickname ?? '-'}</span>
-          <span>·</span>
-          <span>{formatRelativeOrAbsolute(topic.createdAt)}</span>
-        </div>
       </header>
 
-      <hr className="border-gray-200 mb-6" />
+      <hr className="border-border mb-8" />
 
       <ContentViewer content={topic.content} apiOptions={apiOptions} />
 
       {editorImageFileIds.length > 0 && (
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <h2 className="text-sm font-semibold text-gray-700 mb-3">{t('post.imageGallery')}</h2>
+        <div className="mt-10 pt-8 border-t border-border">
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">{t('post.imageGallery')}</h2>
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
             {editorImageFileIds.map((id, i) => (
               <GridImage

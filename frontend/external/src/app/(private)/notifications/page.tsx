@@ -11,7 +11,7 @@ const EMPTY_PAGE: PageResponse<Notification> = {
   content: [],
   totalElements: 0,
   totalPages: 0,
-  size: 20,
+  size: 10,
   number: 0,
   first: true,
   last: true,
@@ -27,7 +27,7 @@ export default function NotificationsPage() {
 
   const load = useCallback(() => {
     setLoading(true);
-    getNotifications(options, { page, size: 20 })
+    getNotifications(options, { page, size: 10 })
       .then(setData)
       .catch(() => setData(EMPTY_PAGE))
       .finally(() => setLoading(false));

@@ -26,7 +26,7 @@ export default function CreateTopicPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-8 px-4">
+      <div className="py-8">
         <div className="text-center">로딩 중...</div>
       </div>
     );
@@ -34,15 +34,15 @@ export default function CreateTopicPage() {
 
   if (error || !board) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <div className="text-red-500">{error || '게시판을 찾을 수 없습니다.'}</div>
+      <div className="py-8">
+        <div className="text-destructive">{error || '게시판을 찾을 수 없습니다.'}</div>
       </div>
     );
   }
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-foreground">
+      <h1 className="text-2xl font-bold mb-6 text-foreground">
         새 게시글 작성
       </h1>
       <TopicForm

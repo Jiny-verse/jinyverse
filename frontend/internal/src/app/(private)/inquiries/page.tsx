@@ -13,24 +13,24 @@ const EMPTY_PAGE: PageResponse<Inquiry> = {
   content: [],
   totalElements: 0,
   totalPages: 0,
-  size: 20,
+  size: 10,
   number: 0,
   first: true,
   last: true,
 };
 
-const STATUS_OPTIONS = [
-  { value: 'pending', label: '접수 대기' },
-  { value: 'in_progress', label: '처리 중' },
-  { value: 'answered', label: '답변 완료' },
-  { value: 'closed', label: '종료' },
+const STATUS_OPTIONS = (t: any) => [
+  { value: 'pending', label: t('inquiry.status.pending') },
+  { value: 'in_progress', label: t('inquiry.status.in_progress') },
+  { value: 'answered', label: t('inquiry.status.answered') },
+  { value: 'closed', label: t('inquiry.status.closed') },
 ];
 
-const PRIORITY_OPTIONS = [
-  { value: 'low', label: '낮음' },
-  { value: 'medium', label: '보통' },
-  { value: 'high', label: '높음' },
-  { value: 'urgent', label: '긴급' },
+const PRIORITY_OPTIONS = (t: any) => [
+  { value: 'low', label: t('inquiry.priority.low', { defaultValue: '낮음' }) },
+  { value: 'medium', label: t('inquiry.priority.medium', { defaultValue: '보통' }) },
+  { value: 'high', label: t('inquiry.priority.high', { defaultValue: '높음' }) },
+  { value: 'urgent', label: t('inquiry.priority.urgent', { defaultValue: '긴급' }) },
 ];
 
 const STATUS_VARIANTS: Record<string, 'default' | 'success' | 'warning' | 'error'> = {
@@ -47,19 +47,19 @@ const PRIORITY_VARIANTS: Record<string, 'default' | 'success' | 'warning' | 'err
   urgent: 'error',
 };
 
-const STATUS_LABELS: Record<string, string> = {
-  pending: '접수 대기',
-  in_progress: '처리 중',
-  answered: '답변 완료',
-  closed: '종료',
-};
+const STATUS_LABELS = (t: any): Record<string, string> => ({
+  pending: t('inquiry.status.pending'),
+  in_progress: t('inquiry.status.in_progress'),
+  answered: t('inquiry.status.answered'),
+  closed: t('inquiry.status.closed'),
+});
 
-const PRIORITY_LABELS: Record<string, string> = {
-  low: '낮음',
-  medium: '보통',
-  high: '높음',
-  urgent: '긴급',
-};
+const PRIORITY_LABELS = (t: any): Record<string, string> => ({
+  low: t('inquiry.priority.low', { defaultValue: '낮음' }),
+  medium: t('inquiry.priority.medium', { defaultValue: '보통' }),
+  high: t('inquiry.priority.high', { defaultValue: '높음' }),
+  urgent: t('inquiry.priority.urgent', { defaultValue: '긴급' }),
+});
 
 export default function InquiriesPage() {
   const options = useApiOptions();
@@ -67,11 +67,16 @@ export default function InquiriesPage() {
   const { t } = useLanguage();
   const [data, setData] = useState<PageResponse<Inquiry>>(EMPTY_PAGE);
   const [page, setPage] = useState(0);
-  const [size, setSize] = useState(20);
+  const [size, setSize] = useState(10);
   const [q, setQ] = useState('');
   const [statusCode, setStatusCode] = useState('');
   const [priorityCode, setPriorityCode] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const statusLabels = STATUS_LABELS(t);
+  const priorityLabels = PRIORITY_LABELS(t);
+  const statusOptions = STATUS_OPTIONS(t);
+  const priorityOptions = PRIORITY_OPTIONS(t);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -92,45 +97,45 @@ export default function InquiriesPage() {
   const columns: ColumnDef<Inquiry>[] = [
     {
       key: 'ticketNo',
-      header: '티켓번호',
+      header: t('inquiry.form.ticketNo', { defaultValue: '티켓번호' }),
       render: (row) => <span className="font-mono text-xs">{row.ticketNo}</span>,
     },
     {
       key: 'title',
-      header: '제목',
+      header: t('form.label.title'),
       render: (row) => <span className="text-sm">{row.title}</span>,
     },
     {
       key: 'categoryCode',
-      header: '카테고리',
+      header: t('form.label.category'),
       render: (row) => <span className="text-xs text-muted-foreground">{row.categoryCode}</span>,
     },
     {
       key: 'statusCode',
-      header: '상태',
+      header: t('form.label.status'),
       render: (row) => (
         <Badge variant={STATUS_VARIANTS[row.statusCode] ?? 'default'}>
-          {STATUS_LABELS[row.statusCode] ?? row.statusCode}
+          {statusLabels[row.statusCode] ?? row.statusCode}
         </Badge>
       ),
     },
     {
       key: 'priorityCode',
-      header: '우선순위',
+      header: t('inquiry.form.priority', { defaultValue: '우선순위' }),
       render: (row) => (
         <Badge variant={PRIORITY_VARIANTS[row.priorityCode] ?? 'default'}>
-          {PRIORITY_LABELS[row.priorityCode] ?? row.priorityCode}
+          {priorityLabels[row.priorityCode] ?? row.priorityCode}
         </Badge>
       ),
     },
     {
       key: 'assigneeName',
-      header: '담당자',
+      header: t('inquiry.form.assignee', { defaultValue: '담당자' }),
       render: (row) => <span className="text-xs text-muted-foreground">{row.assigneeName ?? '-'}</span>,
     },
     {
       key: 'createdAt',
-      header: '생성일',
+      header: t('form.label.createdAt'),
       render: (row) => (
         <span className="text-xs text-muted-foreground">
           {new Date(row.createdAt).toLocaleDateString('ko-KR')}
@@ -141,12 +146,12 @@ export default function InquiriesPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6">문의 티켓</h1>
+      <h1 className="text-2xl font-bold mb-6">{t('inquiry.title')}</h1>
       <DataTable<Inquiry>
         data={data.content}
         columns={columns}
         isLoading={loading}
-        emptyMessage="문의가 없습니다."
+        emptyMessage={t('inquiry.empty')}
         onRowClick={(row) => router.push(`/inquiries/${row.id}`)}
         pagination={{
           page,
@@ -159,23 +164,23 @@ export default function InquiriesPage() {
         search={{
           value: q,
           onChange: (v) => { setQ(v); setPage(0); },
-          placeholder: '제목 검색...',
+          placeholder: t('form.placeholder.search'),
         }}
         filterSlot={
           <div className="flex gap-3">
             <FilterSelect
-              label="상태"
+              label={t('form.label.status')}
               value={statusCode}
-              options={STATUS_OPTIONS}
+              options={statusOptions}
               onChange={(v) => { setStatusCode(v); setPage(0); }}
-              placeholder="전체"
+              placeholder={t('common.all')}
             />
             <FilterSelect
-              label="우선순위"
+              label={t('inquiry.form.priority', { defaultValue: '우선순위' })}
               value={priorityCode}
-              options={PRIORITY_OPTIONS}
+              options={priorityOptions}
               onChange={(v) => { setPriorityCode(v); setPage(0); }}
-              placeholder="전체"
+              placeholder={t('common.all')}
             />
           </div>
         }

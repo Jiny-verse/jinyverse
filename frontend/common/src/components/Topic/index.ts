@@ -1,4 +1,5 @@
-// Backward compatibility re-exports — use BoardCard, BoardList, PostForm directly
-export * from '../BoardCard';
-export * from '../BoardList';
-export * from '../PostForm';
+export { TopicTable } from './TopicTable';
+export type { TopicTableProps } from './TopicTable';
+export { getTopicColumns } from './TopicColumn';
+export { TopicForm } from './TopicForm';
+export type { TopicFormProps } from './TopicForm';

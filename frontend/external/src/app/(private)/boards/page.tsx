@@ -1,9 +1,19 @@
-import { redirect } from 'next/navigation';
+'use client';
 
-/**
- * External에서는 전체 보드 목록을 보여주지 않음.
- * 필요한 보드만 링크로 진입하므로 /boards 접근 시 랜딩으로 이동.
- */
+import { BoardTable } from 'common/components';
+import { useApiOptions } from '@/app/providers/ApiProvider';
+import { useLanguage } from 'common/utils';
+
 export default function BoardsPage() {
-  redirect('/landing');
+  const options = useApiOptions();
+  const { t } = useLanguage();
+  return (
+    <div className="min-h-screen pt-[90px]">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-3xl font-bold text-foreground mb-2">{t('board.title.main')}</h1>
+        <p className="text-muted-foreground mb-6">{t('board.title.desc')}</p>
+        <BoardTable apiOptions={options} linkPrefix="/boards" />
+      </div>
+    </div>
+  );
 }

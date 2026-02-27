@@ -317,7 +317,8 @@
     },
     "board": {
         "title": {
-            "main": "Board"
+            "main": "Board",
+            "desc": "Browse and read posts from our community boards."
         },
         "topic": {
             "title": "Post",

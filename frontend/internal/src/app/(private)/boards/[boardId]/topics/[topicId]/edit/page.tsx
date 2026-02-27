@@ -33,7 +33,7 @@ export default function EditTopicPage() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-8 px-4">
+      <div className="py-8">
         <div className="text-center">{t('common.loading')}</div>
       </div>
     );
@@ -41,15 +41,15 @@ export default function EditTopicPage() {
 
   if (error || !board || !topic) {
     return (
-      <div className="container mx-auto py-8 px-4">
-        <div className="text-red-500">{error || t('common.noData')}</div>
+      <div className="py-8">
+        <div className="text-destructive">{error || t('common.noData')}</div>
       </div>
     );
   }
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-foreground">
+      <h1 className="text-2xl font-bold mb-6 text-foreground">
         {t('board.topic.edit')}
       </h1>
       <TopicForm

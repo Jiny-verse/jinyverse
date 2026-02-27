@@ -10,16 +10,16 @@ export function FormSection({
   className = '',
 }: FormSectionProps) {
   return (
-    <div className={`space-y-4 ${className}`}>
+    <div className={`space-y-4 rounded-xl border border-border bg-card p-6 ${className}`}>
       {(title || description) && (
         <div className="space-y-1">
           {title && (
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+            <h3 className="text-base font-semibold text-foreground">
               {title}
             </h3>
           )}
           {description && (
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-muted-foreground leading-relaxed">
               {description}
             </p>
           )}

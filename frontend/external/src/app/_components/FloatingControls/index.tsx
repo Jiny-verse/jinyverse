@@ -13,6 +13,7 @@ const LANGUAGE_LABELS: Record<Locale, string> = {
 
 function CircleThemeToggle() {
   const { theme, setTheme } = useTheme();
+  const { t } = useLanguage();
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
   if (!mounted) return <div className="w-10 h-10" />;
@@ -22,7 +23,7 @@ function CircleThemeToggle() {
     <button
       type="button"
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
-      aria-label={isDark ? '라이트 모드로 전환' : '다크 모드로 전환'}
+      aria-label={isDark ? t('ui.theme.switchToLight') : t('ui.theme.switchToDark')}
       className="w-10 h-10 flex items-center justify-center rounded-full bg-background border border-border shadow-md text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
     >
       {isDark ? (
@@ -39,7 +40,7 @@ function CircleThemeToggle() {
 }
 
 function CircleLanguageToggle() {
-  const { language, supportedLanguages, switchLanguage } = useLanguage();
+  const { t, language, supportedLanguages, switchLanguage } = useLanguage();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -56,7 +57,7 @@ function CircleLanguageToggle() {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        aria-label="언어 선택"
+        aria-label={t('ui.language.select', { defaultValue: '언어 선택' })}
         className="w-10 h-10 flex items-center justify-center rounded-full bg-background border border-border shadow-md text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors text-xs font-bold"
       >
         {LANGUAGE_LABELS[language]}

@@ -12,7 +12,7 @@ interface BlogBoardListProps {
 
 export function BlogBoardList({ topics, apiOptions, onTopicClick }: BlogBoardListProps) {
   return (
-    <div className="divide-y divide-gray-200">
+    <div className="divide-y divide-border">
       {topics.map((topic) => (
         <BlogBoardCard
           key={topic.id}

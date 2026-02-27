@@ -28,6 +28,12 @@
         },
         "dialog": {
             "alert": "알림"
+        },
+        "theme": {
+            "light": "라이트 모드",
+            "dark": "다크 모드",
+            "switchToLight": "라이트 모드로 전환",
+            "switchToDark": "다크 모드로 전환"
         }
     },
     "message": {
@@ -72,7 +78,9 @@
         "uploading": "업로드 중...",
         "redirecting": "이동 중...",
         "yes": "예",
-        "no": "아니오"
+        "no": "아니오",
+        "nickname": "닉네임",
+        "greeting": "{{name}}님"
     },
     "datetime": {
         "secondsAgo": "{{count}}초 전",
@@ -317,7 +325,8 @@
     },
     "board": {
         "title": {
-            "main": "게시판"
+            "main": "게시판",
+            "desc": "커뮤니티 게시판의 글을 확인해보세요."
         },
         "topic": {
             "title": "게시글",
@@ -473,6 +482,19 @@
         "empty": "새 알림이 없습니다.",
         "viewAll": "전체 알림 보기",
         "pageEmpty": "알림이 없습니다.",
+        "message": "메시지",
+        "isRead": "읽음",
+        "read": "읽음",
+        "unread": "미읽음",
+        "email": "이메일",
+        "sent": "발송완료",
+        "notSent": "미발송",
+        "template": {
+            "title": "알림 템플릿",
+            "new": "새 템플릿",
+            "name": "템플릿명",
+            "deleteConfirm": "템플릿을 삭제하시겠습니까?"
+        },
         "settings": {
             "title": "알림 설정",
             "basic": "기본 설정",
@@ -492,10 +514,21 @@
         }
     },
     "inquiry": {
-        "title": "내 문의",
+        "title": "문의 티켓",
         "new": "+ 새 문의",
-        "empty": "문의 내역이 없습니다.",
+        "empty": "문의가 없습니다.",
         "backToList": "← 목록으로",
+        "form": {
+            "ticketNo": "티켓번호",
+            "priority": "우선순위",
+            "assignee": "담당자"
+        },
+        "priority": {
+            "low": "낮음",
+            "medium": "보통",
+            "high": "높음",
+            "urgent": "긴급"
+        },
         "statusChange": "상태 변경",
         "messagePlaceholder": "추가 문의 사항을 입력하세요...",
         "sendFailed": "전송에 실패했습니다.",

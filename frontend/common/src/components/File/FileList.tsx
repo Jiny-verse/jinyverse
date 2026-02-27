@@ -45,28 +45,28 @@ function FileListRow({ item, onRemove, readOnly, apiOptions }: FileListRowProps)
   const { t } = useLanguage();
 
   return (
-    <li className="flex items-center justify-between gap-2 rounded border border-[#333] bg-[#1f1f1f] px-3 py-2 text-sm">
+    <li className="flex items-center justify-between gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2.5 text-sm transition-colors hover:bg-muted">
       <div className="flex items-center gap-2 min-w-0 flex-1">
         {showThumb && (
-          <div className="shrink-0 w-10 h-10 rounded overflow-hidden bg-gray-700">
+          <div className="shrink-0 w-10 h-10 rounded overflow-hidden bg-muted">
             {thumbUrl ? (
               <img src={thumbUrl} alt={name} className="w-full h-full object-cover" />
             ) : (
-              <div className="w-full h-full bg-gray-600 animate-pulse" />
+              <div className="w-full h-full bg-muted animate-pulse" />
             )}
           </div>
         )}
-        <span className="min-w-0 truncate text-gray-300" title={name}>
+        <span className="min-w-0 truncate text-foreground" title={name}>
           {name}
         </span>
       </div>
-      {size != null && <span className="shrink-0 text-gray-500">{formatSize(size)}</span>}
-      <FileDownloadLink fileId={id} label={t('file.download')} apiOptions={apiOptions} className="shrink-0 text-blue-400 hover:underline" />
+      {size != null && <span className="shrink-0 text-muted-foreground">{formatSize(size)}</span>}
+      <FileDownloadLink fileId={id} label={t('file.download')} apiOptions={apiOptions} className="shrink-0 text-primary text-xs hover:underline" />
       {!readOnly && onRemove && (
         <button
           type="button"
           onClick={() => onRemove(id)}
-          className="shrink-0 text-red-400 hover:underline"
+          className="shrink-0 text-destructive text-xs hover:underline"
         >
           {t('file.delete')}
         </button>

@@ -13,7 +13,7 @@ const EMPTY_PAGE: PageResponse<NotificationTemplate> = {
   content: [],
   totalElements: 0,
   totalPages: 0,
-  size: 20,
+  size: 10,
   number: 0,
   first: true,
   last: true,
@@ -36,7 +36,7 @@ export default function NotificationTemplatesPage() {
   const { t } = useLanguage();
   const [data, setData] = useState<PageResponse<NotificationTemplate>>(EMPTY_PAGE);
   const [page, setPage] = useState(0);
-  const [size, setSize] = useState(20);
+  const [size, setSize] = useState(10);
   const [q, setQ] = useState('');
   const [channel, setChannel] = useState('');
   const [loading, setLoading] = useState(false);
@@ -52,7 +52,7 @@ export default function NotificationTemplatesPage() {
   useEffect(() => { load(); }, [load]);
 
   const handleDelete = async (id: string) => {
-    if (!confirm('템플릿을 삭제하시겠습니까?')) return;
+    if (!confirm(t('notification.template.deleteConfirm', { defaultValue: '템플릿을 삭제하시겠습니까?' }))) return;
     await deleteNotificationTemplate(options, id);
     load();
   };
@@ -60,7 +60,7 @@ export default function NotificationTemplatesPage() {
   const columns: ColumnDef<NotificationTemplate>[] = [
     {
       key: 'name',
-      header: '템플릿명',
+      header: t('notification.template.name', { defaultValue: '템플릿명' }),
       render: (row) => (
         <Link href={`/notification-templates/${row.id}`} className="font-medium text-primary hover:underline">
           {row.name}
@@ -69,7 +69,7 @@ export default function NotificationTemplatesPage() {
     },
     {
       key: 'channel',
-      header: '채널',
+      header: t('form.label.channel', { defaultValue: '채널' }),
       render: (row) => (
         <Badge variant={CHANNEL_VARIANTS[row.channel] ?? 'default'}>{row.channel}</Badge>
       ),
@@ -97,7 +97,7 @@ export default function NotificationTemplatesPage() {
           onClick={() => handleDelete(row.id)}
           className="text-xs text-destructive hover:underline"
         >
-          삭제
+          {t('ui.button.delete')}
         </button>
       ),
     },
@@ -106,12 +106,12 @@ export default function NotificationTemplatesPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold">알림 템플릿</h1>
+        <h1 className="text-2xl font-bold">{t('notification.template.title', { defaultValue: '알림 템플릿' })}</h1>
         <Link
           href="/notification-templates/new"
           className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium hover:bg-primary/90"
         >
-          + 새 템플릿
+          + {t('notification.template.new', { defaultValue: '새 템플릿' })}
         </Link>
       </div>
       {loading && <p className="text-sm text-muted-foreground mb-2">{t('common.loading')}</p>}
@@ -119,7 +119,7 @@ export default function NotificationTemplatesPage() {
         data={data.content}
         columns={columns}
         isLoading={loading}
-        emptyMessage="템플릿이 없습니다."
+        emptyMessage={t('common.noData')}
         pagination={{
           page,
           size,
@@ -131,15 +131,15 @@ export default function NotificationTemplatesPage() {
         search={{
           value: q,
           onChange: (v) => { setQ(v); setPage(0); },
-          placeholder: '템플릿명 검색...',
+          placeholder: t('form.placeholder.search'),
         }}
         filterSlot={
           <FilterSelect
-            label="채널"
+            label={t('form.label.channel', { defaultValue: '채널' })}
             value={channel}
             options={CHANNEL_OPTIONS}
             onChange={(v) => { setChannel(v); setPage(0); }}
-            placeholder="전체"
+            placeholder={t('common.all')}
           />
         }
       />

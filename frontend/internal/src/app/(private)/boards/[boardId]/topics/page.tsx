@@ -19,7 +19,7 @@ import {
   BoardListRenderer,
   PostDetailRenderer,
 } from 'common/components';
-import { PaginationFooter } from 'common/ui';
+import { PaginationFooter, Toolbar, Button } from 'common/ui';
 import type { Topic, Comment, Board } from 'common/types';
 import { Table } from './_components';
 
@@ -119,7 +119,7 @@ export default function TopicsPage() {
   if (error) {
     return (
       <div className="">
-        <p className="text-red-400">{error}</p>
+        <p className="text-destructive">{error}</p>
         <Link href="/boards" className="mt-4 inline-block text-muted-foreground hover:text-foreground">
           {t('board.list.title', { defaultValue: '게시판 목록' })}
         </Link>
@@ -137,9 +137,10 @@ export default function TopicsPage() {
         ← {t('board.list.title', { defaultValue: '게시판 목록' })}
       </Link>
       <h1 className="text-2xl font-bold mb-6">{t('board.topic.manage', { defaultValue: '게시글 관리' })}</h1>
-      <div className={hasPreview ? 'flex gap-0 h-[calc(100vh-10rem)] min-h-[400px]' : ''}>
-        <div className={hasPreview ? 'w-1/2 min-w-0 pr-4 flex flex-col' : ''}>
-          {isNormal ? (
+
+      {isNormal ? (
+        <div className={hasPreview ? 'flex gap-0 h-[calc(100vh-10rem)] min-h-[400px]' : ''}>
+          <div className={hasPreview ? 'w-1/2 min-w-0 pr-4 flex flex-col' : ''}>
             <Table
               boardId={boardId}
               data={data?.content ?? []}
@@ -190,121 +191,112 @@ export default function TopicsPage() {
               onRowClick={(row) => setSelectedTopicId(row.id)}
               selectedRowId={selectedTopicId}
             />
-          ) : (
-            <div className="flex flex-col gap-4">
-              {/* 어드민 툴바 */}
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => { setSearch(e.target.value); setPage(0); }}
-                    placeholder={t('form.placeholder.search_title_content', { defaultValue: '제목·내용 검색' })}
-                    className="border border-gray-300 rounded px-3 py-1.5 text-sm w-60"
-                  />
-                  <FilterSelect
-                    label={t('form.label.isPublic', { defaultValue: '공개 여부' })}
-                    value={isPublic === undefined ? '' : isPublic ? 'true' : 'false'}
-                    options={[
-                      { value: 'true', label: t('common.public', { defaultValue: '공개' }) },
-                      { value: 'false', label: t('common.private', { defaultValue: '비공개' }) },
-                    ]}
-                    placeholder={t('common.all', { defaultValue: '전체' })}
-                    onChange={(v) => {
-                      setIsPublic(v === '' ? undefined : v === 'true');
-                      setPage(0);
-                    }}
-                  />
-                </div>
-                <div className="flex items-center gap-2">
-                  {selectedIds.length > 0 && (
-                    <button
-                      onClick={handleBatchDelete}
-                      className="px-3 py-1.5 text-sm text-red-600 border border-red-200 rounded hover:bg-red-50"
-                    >
-                      {t('ui.button.deleteSelected', { defaultValue: '선택 삭제 ({{count}})', count: selectedIds.length })}
-                    </button>
-                  )}
-                  <button
-                    onClick={() => router.push(`/boards/${boardId}/topics/create`)}
-                    className="px-3 py-1.5 text-sm text-foreground bg-blue-600 rounded hover:bg-blue-700"
-                  >
-                    + {t('ui.button.add', { defaultValue: '추가' })}
-                  </button>
-                </div>
-              </div>
-
-              {/* 타입별 목록 렌더러 */}
-              {board && data ? (
-                <BoardListRenderer
-                  board={board}
-                  topics={data.content}
-                  apiOptions={options}
-                  onTopicClick={(topic) => setSelectedTopicId(topic.id)}
-                />
-              ) : (
-                <div className="py-8 text-center text-muted-foreground">{t('common.loading', { defaultValue: '로딩 중...' })}</div>
-              )}
-
-              {/* 페이지네이션 */}
-              {data && (
-                <PaginationFooter
-                  page={page}
-                  size={size}
-                  totalElements={data.totalElements}
-                  totalPages={data.totalPages}
-                  onPageChange={setPage}
-                  onSizeChange={(s) => { setSize(s); setPage(0); }}
-                  currentCount={data.content.length}
-                />
-              )}
+          </div>
+          {hasPreview && (
+            <div className="w-1/2 min-w-0 flex flex-col">
+              <DetailPreviewPanel
+                onClose={() => setSelectedTopicId(null)}
+                expandHref={`/boards/${boardId}/topics/${selectedTopicId}`}
+                isLoading={previewLoading}
+                title={previewTopic?.title}
+              >
+                {previewTopic && board && (
+                  <>
+                    <div className="mb-4">
+                      <PostDetailRenderer
+                        board={board}
+                        topic={previewTopic}
+                        apiOptions={options}
+                      />
+                    </div>
+                    <section>
+                      <h2 className="text-sm font-semibold text-foreground mb-2">
+                        {t('board.comment.title', { defaultValue: '댓글 ({{count}})', count: previewComments.length })}
+                      </h2>
+                      <ul className="space-y-2">
+                        {previewComments
+                          .filter((c) => !c.isDeleted)
+                          .map((c) => (
+                            <li key={c.id} className="rounded border border-border p-2 bg-card text-sm">
+                              <p className="text-muted-foreground text-xs">
+                                {c.author?.nickname ?? '-'} ·{' '}
+                                {formatRelativeOrAbsolute(c.createdAt, t)}
+                              </p>
+                              <p className="mt-0.5 text-foreground">{c.content}</p>
+                            </li>
+                          ))}
+                      </ul>
+                    </section>
+                  </>
+                )}
+              </DetailPreviewPanel>
             </div>
           )}
         </div>
-        {hasPreview && (
-          <div className="w-1/2 min-w-0 flex flex-col">
-            <DetailPreviewPanel
-              onClose={() => setSelectedTopicId(null)}
-              expandHref={`/boards/${boardId}/topics/${selectedTopicId}`}
-              isLoading={previewLoading}
-              title={previewTopic?.title}
-            >
-              {previewTopic && board && (
-                <>
-                  <div className="mb-4">
-                    <PostDetailRenderer
-                      board={board}
-                      topic={previewTopic}
-                      apiOptions={options}
-                    />
-                  </div>
-                  <section>
-                    <h2 className="text-sm font-semibold text-gray-700 mb-2">
-                      {t('board.comment.title', { defaultValue: '댓글 ({{count}})', count: previewComments.length })}
-                    </h2>
-                    <ul className="space-y-2">
-                      {previewComments
-                        .filter((c) => !c.isDeleted)
-                        .map((c) => (
-                          <li
-                            key={c.id}
-                            className="rounded border border-border p-2 bg-white text-sm"
-                          >
-                            <p className="text-muted-foreground text-xs">
-                              {c.author?.nickname ?? '-'} ·{' '}
-                              {formatRelativeOrAbsolute(c.createdAt, t)}
-                            </p>
-                            <p className="mt-0.5 text-gray-900">{c.content}</p>
-                          </li>
-                        ))}
-                    </ul>
-                  </section>
-                </>
-              )}
-            </DetailPreviewPanel>
-          </div>
-        )}
-      </div>
+      ) : (
+        <div className="flex flex-col gap-6">
+          {/* 어드민 툴바 */}
+          <Toolbar
+            search={{
+              value: search,
+              onChange: (v) => { setSearch(v); setPage(0); },
+              placeholder: t('form.placeholder.search_title_content', { defaultValue: '제목·내용 검색' }),
+            }}
+            filterSlot={
+              <FilterSelect
+                label={t('form.label.isPublic', { defaultValue: '공개 여부' })}
+                value={isPublic === undefined ? '' : isPublic ? 'true' : 'false'}
+                options={[
+                  { value: 'true', label: t('common.public', { defaultValue: '공개' }) },
+                  { value: 'false', label: t('common.private', { defaultValue: '비공개' }) },
+                ]}
+                placeholder={t('common.all', { defaultValue: '전체' })}
+                onChange={(v) => {
+                  setIsPublic(v === '' ? undefined : v === 'true');
+                  setPage(0);
+                }}
+              />
+            }
+            rightSlot={
+              <>
+                {selectedIds.length > 0 && (
+                  <Button size="sm" variant="danger" onClick={handleBatchDelete}>
+                    {t('ui.button.deleteSelected', { defaultValue: '선택 삭제 ({{count}})', count: selectedIds.length })}
+                  </Button>
+                )}
+                <Button size="sm" onClick={() => router.push(`/boards/${boardId}/topics/create`)}>
+                  {t('ui.button.add', { defaultValue: '추가' })} {t('board.topic.title', { defaultValue: '게시글' })}
+                </Button>
+              </>
+            }
+          />
+
+          {/* 타입별 목록 렌더러 */}
+          {board && data ? (
+            <BoardListRenderer
+              board={board}
+              topics={data.content}
+              apiOptions={options}
+              onTopicClick={(topic) => router.push(`/boards/${boardId}/topics/${topic.id}`)}
+            />
+          ) : (
+            <div className="py-8 text-center text-muted-foreground">{t('common.loading', { defaultValue: '로딩 중...' })}</div>
+          )}
+
+          {/* 페이지네이션 */}
+          {data && (
+            <PaginationFooter
+              page={page}
+              size={size}
+              totalElements={data.totalElements}
+              totalPages={data.totalPages}
+              onPageChange={setPage}
+              onSizeChange={(s) => { setSize(s); setPage(0); }}
+              currentCount={data.content.length}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 }

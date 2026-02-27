@@ -17,7 +17,7 @@ interface BlogPostFormFieldsProps {
 export function BlogPostFormFields({ apiOptions, thumbnailFile, onThumbnailChange, error }: BlogPostFormFieldsProps) {
   const { t } = useLanguage();
   return (
-    <FormSection title={t('board.form.coverImage')} description={t('board.form.coverImageDesc')}>
+    <FormSection title={t('board.form.coverImage')} description={t('board.form.coverImageDesc')} className="border-primary/20">
       <FormField label={t('board.form.coverImage')} name="thumbnailFile" error={error}>
         <ImagePreviewField
           apiOptions={apiOptions}
@@ -25,6 +25,7 @@ export function BlogPostFormFields({ apiOptions, thumbnailFile, onThumbnailChang
           onChange={onThumbnailChange}
           aspectRatio="16:9"
         />
+        <p className="text-xs text-muted-foreground mt-1">Recommended: 1280×720px or larger (16:9)</p>
       </FormField>
     </FormSection>
   );

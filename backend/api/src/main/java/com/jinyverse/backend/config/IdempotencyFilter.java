@@ -68,11 +68,24 @@ public class IdempotencyFilter extends OncePerRequestFilter {
         }
 
         // 3. 요청 body 캐시 + 응답 래핑
-        CachedBodyHttpServletRequest cachedRequest = new CachedBodyHttpServletRequest(request);
+        // multipart 요청은 InputStream을 소비하면 Spring의 멀티파트 파서가 동작하지 않으므로 원본 request를 그대로 사용
+        String contentType = request.getContentType();
+        boolean isMultipart = contentType != null && contentType.toLowerCase().startsWith("multipart/");
+
+        HttpServletRequest processedRequest;
+        byte[] bodyBytes;
+        if (isMultipart) {
+            processedRequest = request;
+            bodyBytes = new byte[0];
+        } else {
+            CachedBodyHttpServletRequest cachedRequest = new CachedBodyHttpServletRequest(request);
+            processedRequest = cachedRequest;
+            bodyBytes = cachedRequest.getCachedBody();
+        }
         ContentCachingResponseWrapper cachedResponse = new ContentCachingResponseWrapper(response);
 
         // 4. body SHA-256 해시 계산
-        String requestHash = sha256(cachedRequest.getCachedBody());
+        String requestHash = sha256(bodyBytes);
         String requestPath = request.getRequestURI();
         String requestMethod = request.getMethod();
 
@@ -133,7 +146,7 @@ public class IdempotencyFilter extends OncePerRequestFilter {
         // 6. 실제 필터 체인 실행
         boolean success = false;
         try {
-            chain.doFilter(cachedRequest, cachedResponse);
+            chain.doFilter(processedRequest, cachedResponse);
             success = true;
         } finally {
             if (success) {

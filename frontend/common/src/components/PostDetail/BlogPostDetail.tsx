@@ -20,30 +20,32 @@ export function BlogPostDetail({ topic, apiOptions }: BlogPostDetailProps) {
   const { t } = useLanguage();
 
   return (
-    <article className="max-w-3xl mx-auto">
+    <article className="py-10 px-4">
       {coverUrl && (
-        <div className="w-full aspect-video overflow-hidden mb-8">
+        <div className="w-full aspect-video overflow-hidden shadow-lg mb-10">
           <img src={coverUrl} alt={topic.title} className="w-full h-full object-cover" />
         </div>
       )}
 
       <header className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-3">{topic.title}</h1>
-        <div className="flex items-center gap-2 text-sm text-gray-500">
-          <span>{topic.author?.nickname ?? '-'}</span>
-          <span>·</span>
-          <span>{formatRelativeOrAbsolute(topic.createdAt)}</span>
-          <span>·</span>
-          <span>{t('post.viewCount', { count: topic.viewCount ?? 0 })}</span>
+        <div className="flex items-baseline justify-between gap-4">
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-foreground">{topic.title}</h1>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground shrink-0">
+            <span>{topic.author?.nickname ?? '-'}</span>
+            <span>·</span>
+            <span>{formatRelativeOrAbsolute(topic.createdAt)}</span>
+            <span>·</span>
+            <span>{t('post.viewCount', { count: topic.viewCount ?? 0 })}</span>
+          </div>
         </div>
       </header>
 
-      <hr className="border-gray-200 mb-8" />
+      <hr className="border-border mb-10" />
 
       <ContentViewer content={topic.content} apiOptions={apiOptions} className="prose-lg" />
 
       {topic.tags?.length ? (
-        <div className="mt-8 pt-6 border-t border-gray-200 flex flex-wrap gap-2">
+        <div className="mt-10 pt-8 border-t border-border flex flex-wrap gap-2">
           {topic.tags.map((tag) => (
             <Badge key={tag.id} variant="info">
               #{tag.name}

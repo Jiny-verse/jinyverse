@@ -47,6 +47,7 @@ export function GalleryPostFormFields({
             onMainChange={onMainFileIdChange}
             error={imagesError}
           />
+          <p className="text-xs text-muted-foreground mt-1">Click the ★ icon on an image to set it as the main/cover image.</p>
         </FormField>
       </FormSection>
 

@@ -63,7 +63,7 @@ export function UserWidget({ apiOptions }: UserWidgetProps) {
           size="sm"
           fallback={displayName.charAt(0).toUpperCase()}
         />
-        <span className="flex-1 text-center text-sm font-medium truncate">{displayName}님</span>
+        <span className="flex-1 text-center text-sm font-medium truncate">{t('common.greeting', { name: displayName })}</span>
         <svg
           viewBox="0 0 24 24"
           width={14}
@@ -80,7 +80,7 @@ export function UserWidget({ apiOptions }: UserWidgetProps) {
       {open && (
         <div className="absolute right-0 top-full z-50 w-52 rounded-b-[20px] border border-t-0 border-border bg-background shadow-sm overflow-hidden">
           <div className="px-4 py-3 border-b border-border">
-            <p className="text-sm font-semibold text-foreground truncate">{displayName}님</p>
+            <p className="text-sm font-semibold text-foreground truncate">{t('common.greeting', { name: displayName })}</p>
             <p className="text-xs text-muted-foreground truncate">{me?.email ?? authUser.username}</p>
           </div>
           <div className="py-1">

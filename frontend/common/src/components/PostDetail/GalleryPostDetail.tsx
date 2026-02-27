@@ -31,7 +31,7 @@ function GalleryImage({
       {url ? (
         <img src={url} alt="" className="w-full h-auto" />
       ) : (
-        <div className="w-full aspect-video bg-gray-200 animate-pulse" />
+        <div className="w-full aspect-video bg-muted animate-pulse" />
       )}
     </button>
   );
@@ -50,22 +50,24 @@ export function GalleryPostDetail({ topic, apiOptions }: GalleryPostDetailProps)
 
   return (
     <>
-      <article className="max-w-2xl mx-auto">
+      <article className="py-10 px-4">
         {/* 제목 + 설명 + 메타 */}
         <header className="mb-6">
-          <h1 className="text-xl font-bold text-gray-900 mb-2">{topic.title}</h1>
+          <div className="flex items-baseline justify-between gap-4 mb-2">
+            <h1 className="text-3xl font-bold tracking-tight text-foreground">{topic.title}</h1>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground shrink-0">
+              <span>{topic.author?.nickname ?? '-'}</span>
+              <span>·</span>
+              <span>{formatRelativeOrAbsolute(topic.createdAt)}</span>
+              <span>·</span>
+              <span>{t('post.viewCount', { count: topic.viewCount ?? 0 })}</span>
+            </div>
+          </div>
           {topic.content && topic.content.trim() && (
-            <p className="text-gray-700 whitespace-pre-wrap text-sm leading-relaxed mb-3">
+            <p className="text-muted-foreground whitespace-pre-wrap text-sm leading-relaxed">
               {topic.content}
             </p>
           )}
-          <div className="flex items-center gap-2 text-sm text-gray-500">
-            <span>{topic.author?.nickname ?? '-'}</span>
-            <span>·</span>
-            <span>{formatRelativeOrAbsolute(topic.createdAt)}</span>
-            <span>·</span>
-            <span>{t('post.viewCount', { count: topic.viewCount ?? 0 })}</span>
-          </div>
         </header>
 
         {topic.tags?.length ? (
@@ -80,7 +82,7 @@ export function GalleryPostDetail({ topic, apiOptions }: GalleryPostDetailProps)
 
         {/* 이미지 수직 스크롤 목록 */}
         {sortedFiles.length > 0 && (
-          <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {sortedFiles.map((file, i) => (
               <GalleryImage
                 key={file.fileId}

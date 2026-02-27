@@ -11,7 +11,7 @@ interface CardProps {
 
 export function Card({ children, className = '', title, footer }: CardProps) {
   return (
-    <div className={`bg-white rounded-lg shadow-md ${className}`}>
+    <div className={`bg-card rounded-xl border border-border shadow-sm ${className}`}>
       {title && (
         <div className="px-6 py-4 border-b">
           <h3 className="text-lg font-semibold">{title}</h3>

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { ApiOptions } from 'common/types';
 import { getNotifications, getUnreadCount } from 'common/services';
 import type { Notification } from 'common/types';
+import { useLanguage } from 'common/utils';
 import { NotificationList } from './NotificationList';
 
 interface NotificationWidgetProps {
@@ -11,6 +12,7 @@ interface NotificationWidgetProps {
 }
 
 export function NotificationWidget({ apiOptions }: NotificationWidgetProps) {
+  const { t } = useLanguage();
   const [unreadCount, setUnreadCount] = useState(0);
   const [open, setOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -80,7 +82,7 @@ export function NotificationWidget({ apiOptions }: NotificationWidgetProps) {
       <button
         type="button"
         onClick={handleToggle}
-        aria-label="알림"
+        aria-label={t('notification.title')}
         className="relative w-10 h-10 flex items-center justify-center rounded-full bg-background border border-border shadow-sm text-muted-foreground hover:text-foreground hover:border-primary/50 transition-colors"
       >
         {/* Bell icon */}

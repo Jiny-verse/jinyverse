@@ -42,7 +42,7 @@ export default function TopicDetailPage() {
   if (error) {
     return (
       <div className="">
-        <p className="text-red-400">{error}</p>
+        <p className="text-destructive">{error}</p>
         <Link
           href={`/boards/${boardId}/topics`}
           className="mt-4 inline-block text-muted-foreground hover:text-foreground"
@@ -70,7 +70,7 @@ export default function TopicDetailPage() {
         ← {t('board.topic.title')}
       </Link>
 
-      <div className="rounded-lg border border-gray-700 bg-muted/50 p-6 mb-8">
+      <div className="mb-8">
         <PostDetailRenderer board={board} topic={topic} apiOptions={options} />
       </div>
 

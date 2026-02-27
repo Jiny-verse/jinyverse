@@ -18,29 +18,33 @@ export function NormalPostDetail({ topic, apiOptions }: NormalPostDetailProps) {
   const { t } = useLanguage();
 
   return (
-    <article className="max-w-4xl mx-auto">
+    <article className="py-10 px-4">
       <header className="mb-6">
-        <div className="flex items-center gap-2 mb-2">
-          {topic.isNotice && <Badge variant="default">{t('post.notice')}</Badge>}
-          {topic.isPinned && <Badge variant="info">{t('post.pinned')}</Badge>}
-        </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">{topic.title}</h1>
-        <div className="flex items-center gap-2 text-sm text-gray-500">
-          <span>{topic.author?.nickname ?? '-'}</span>
-          <span>·</span>
-          <span>{formatRelativeOrAbsolute(topic.createdAt)}</span>
-          <span>·</span>
-          <span>{t('post.viewCount', { count: topic.viewCount ?? 0 })}</span>
+        {(topic.isNotice || topic.isPinned) && (
+          <div className="flex items-center gap-2 mb-2">
+            {topic.isNotice && <Badge variant="default">{t('post.notice')}</Badge>}
+            {topic.isPinned && <Badge variant="info">{t('post.pinned')}</Badge>}
+          </div>
+        )}
+        <div className="flex items-baseline justify-between gap-4">
+          <h1 className="text-4xl font-bold tracking-tight text-foreground">{topic.title}</h1>
+          <div className="flex items-center gap-2 text-sm text-muted-foreground shrink-0">
+            <span>{topic.author?.nickname ?? '-'}</span>
+            <span>·</span>
+            <span>{formatRelativeOrAbsolute(topic.createdAt)}</span>
+            <span>·</span>
+            <span>{t('post.viewCount', { count: topic.viewCount ?? 0 })}</span>
+          </div>
         </div>
       </header>
 
-      <hr className="border-gray-200 mb-6" />
+      <hr className="border-border mb-8" />
 
       <ContentViewer content={topic.content} apiOptions={apiOptions} />
 
       {attachedFiles.length > 0 && (
-        <div className="mt-8 pt-6 border-t border-gray-200">
-          <h2 className="text-sm font-semibold text-gray-700 mb-2">{t('post.attachments')}</h2>
+        <div className="mt-10 pt-8 border-t border-border">
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">{t('post.attachments')}</h2>
           <FileList files={attachedFiles} readOnly apiOptions={apiOptions} />
         </div>
       )}
