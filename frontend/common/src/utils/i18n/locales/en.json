@@ -36,7 +36,12 @@
         "success": "Completed successfully",
         "confirm": "Are you sure you want to proceed?",
         "loginRequired": "Login required.",
-        "commentFailed": "Failed to post comment."
+        "commentFailed": "Failed to post comment.",
+        "saved": "Saved successfully.",
+        "deleted": "Deleted successfully.",
+        "copied": "Copied to clipboard.",
+        "confirmDelete": "Are you sure you want to delete? This action cannot be undone.",
+        "confirmAction": "Are you sure you want to proceed?"
     },
     "validation": {
         "required": "This field is required",
@@ -48,11 +53,20 @@
     },
     "error": {
         "notFound": "The requested page could not be found",
-        "unauthorized": "Authentication required",
-        "forbidden": "Access denied",
-        "serverError": "A server error occurred",
-        "networkError": "A network error occurred",
-        "timeout": "Request timeout"
+        "unauthorized": "Unauthorized access",
+        "forbidden": "Access forbidden",
+        "accountLocked": "Your account has been locked due to 5 failed login attempts. Please try again in 15 minutes or reset your password.",
+        "accountDisabled": "This account has been disabled. Please contact an administrator.",
+        "loginFailed": "Invalid username or password.",
+        "serverError": "Internal server error",
+        "networkError": "Network error",
+        "timeout": "Request timeout",
+        "rateLimit": "Too many requests. Please try again later.",
+        "loadFailed": "Failed to load data. Please refresh the page and try again.",
+        "saveFailed": "Failed to save. Please try again in a moment.",
+        "deleteFailed": "Failed to delete. Please try again in a moment.",
+        "uploadFailed": "File upload failed. Please check the file size and format.",
+        "unknown": "An unknown error occurred. If the problem persists, please contact support."
     },
     "common": {
         "loading": "Loading...",

@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Button, Input } from 'common/ui';
 import { useAuth, verifyEmail as verifyEmailApi } from 'common';
-import { useLanguage } from 'common/utils';
+import { useLanguage, parseApiError } from 'common/utils';
 import { FormError, AuthLink } from '../_components';
 
 function VerifyEmailContent() {
@@ -46,7 +46,8 @@ function VerifyEmailContent() {
       await verifyEmailApi(baseUrl, { email, code });
       setDone(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('auth.verify.failed', { defaultValue: '인증에 실패했습니다.' }));
+      const { messageKey, fallback } = parseApiError(err);
+      setError(t(messageKey) || fallback);
     } finally {
       setSubmitting(false);
     }

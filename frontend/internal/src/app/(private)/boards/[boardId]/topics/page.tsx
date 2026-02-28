@@ -11,7 +11,7 @@ import {
   getBoard,
 } from 'common/services';
 import { formatRelativeOrAbsolute } from 'common';
-import { useLanguage } from 'common/utils';
+import { useLanguage, parseApiError } from 'common/utils';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import {
   DetailPreviewPanel,
@@ -19,7 +19,7 @@ import {
   BoardListRenderer,
   PostDetailRenderer,
 } from 'common/components';
-import { PaginationFooter, Toolbar, Button } from 'common/ui';
+import { PaginationFooter, Toolbar, Button, ConfirmDialog } from 'common/ui';
 import type { Topic, Comment, Board } from 'common/types';
 import { Table } from './_components';
 
@@ -44,6 +44,7 @@ export default function TopicsPage() {
   const [search, setSearch] = useState('');
   const [isPublic, setIsPublic] = useState<boolean | undefined>(undefined);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [pendingDelete, setPendingDelete] = useState<{ ids: string[]; isBatch: boolean } | null>(null);
   const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
   const [previewTopic, setPreviewTopic] = useState<Topic | null>(null);
   const [previewComments, setPreviewComments] = useState<Comment[]>([]);
@@ -65,7 +66,10 @@ export default function TopicsPage() {
       isPublic,
     })
       .then(setData)
-      .catch((e) => setError(e instanceof Error ? e.message : String(e)));
+      .catch((e) => {
+        const { messageKey, fallback } = parseApiError(e);
+        setError(t(messageKey) || fallback);
+      });
   }, [options.baseUrl, options.channel, boardId, page, size, search, isPublic]);
 
   useEffect(() => {
@@ -101,18 +105,21 @@ export default function TopicsPage() {
     };
   }, [options.baseUrl, options.channel, selectedTopicId]);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm(t('message.confirmDelete', { defaultValue: '삭제하시겠습니까?' }))) return;
-    await deleteTopic(options, id);
-    load();
+  const handleDelete = (id: string) => {
+    setPendingDelete({ ids: [id], isBatch: false });
   };
 
-  const handleBatchDelete = async () => {
-    if (!confirm(t('message.confirmBatchDelete', { defaultValue: '선택한 {{count}}개를 삭제하시겠습니까?', count: selectedIds.length }))) return;
-    for (const id of selectedIds) {
+  const handleBatchDelete = () => {
+    setPendingDelete({ ids: selectedIds, isBatch: true });
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!pendingDelete) return;
+    for (const id of pendingDelete.ids) {
       await deleteTopic(options, id);
     }
-    setSelectedIds([]);
+    if (pendingDelete.isBatch) setSelectedIds([]);
+    setPendingDelete(null);
     load();
   };
 
@@ -127,11 +134,22 @@ export default function TopicsPage() {
     );
   }
 
+  const confirmDialog = (
+    <ConfirmDialog
+      isOpen={pendingDelete !== null}
+      message={t('message.confirmDelete')}
+      onConfirm={handleDeleteConfirm}
+      onCancel={() => setPendingDelete(null)}
+    />
+  );
+
   const hasPreview = selectedTopicId != null;
   const boardType = board?.type ?? 'normal';
   const isNormal = boardType === 'normal';
 
   return (
+    <>
+    {confirmDialog}
     <div className="">
       <Link href="/boards" className="text-muted-foreground hover:text-foreground mb-4 inline-block">
         ← {t('board.list.title', { defaultValue: '게시판 목록' })}
@@ -298,5 +316,6 @@ export default function TopicsPage() {
         </div>
       )}
     </div>
+    </>
   );
 }

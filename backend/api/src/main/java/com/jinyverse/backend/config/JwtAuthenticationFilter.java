@@ -7,6 +7,7 @@ import com.jinyverse.backend.domain.common.util.JwtUtil;
 import com.jinyverse.backend.domain.common.util.RequestContext;
 import com.jinyverse.backend.domain.common.util.RequestContextHolder;
 import com.jinyverse.backend.domain.common.util.Role;
+import com.jinyverse.backend.exception.ApiErrorResponse;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
@@ -14,12 +15,12 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -81,13 +82,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 if (isPublicGetRequest(request)) {
                     filterChain.doFilter(request, response);
                 } else {
-                    sendUnauthorized(response, "UNAUTHORIZED", "Missing or invalid access token (cookie or Authorization header)");
+                    sendError(response, HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "Missing or invalid access token (cookie or Authorization header)");
                 }
             }
         } catch (ExpiredJwtException e) {
-            sendUnauthorized(response, "TOKEN_EXPIRED", "Access token has expired");
+            sendError(response, HttpStatus.UNAUTHORIZED, "TOKEN_EXPIRED", "Access token has expired");
         } catch (JwtException e) {
-            sendUnauthorized(response, "INVALID_TOKEN", "Invalid or malformed token");
+            sendError(response, HttpStatus.UNAUTHORIZED, "INVALID_TOKEN", "Invalid or malformed token");
         }
     }
 
@@ -118,13 +119,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return header.substring(BEARER.length()).trim();
     }
 
-    private void sendUnauthorized(HttpServletResponse response, String error, String message) throws IOException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    private void sendError(HttpServletResponse response, HttpStatus status, String code, String message) throws IOException {
+        response.setStatus(status.value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
-        objectMapper.writeValue(response.getOutputStream(), Map.of(
-                "error", error,
-                "message", message
-        ));
+        objectMapper.writeValue(response.getOutputStream(), new ApiErrorResponse(code, message));
     }
 }

@@ -7,15 +7,15 @@ import com.jinyverse.backend.domain.comment.entity.Comment;
 import com.jinyverse.backend.domain.comment.repository.CommentRepository;
 import com.jinyverse.backend.domain.common.util.CommonSpecifications;
 import com.jinyverse.backend.domain.common.util.RequestContext;
+import com.jinyverse.backend.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import com.jinyverse.backend.exception.ForbiddenException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,8 +37,7 @@ public class CommentService {
     @Transactional
     public CommentResponseDto create(CommentRequestDto requestDto, RequestContext ctx) {
         if (ctx == null || !ctx.hasRole()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "Comment create requires logged-in user (USER or ADMIN)");
+            throw new ForbiddenException("Comment create requires logged-in user (USER or ADMIN)");
         }
         Comment comment = Comment.fromRequestDto(requestDto);
         if (ctx.isAuthenticated() && ctx.getCurrentUserId() != null) {
@@ -52,7 +51,7 @@ public class CommentService {
 
     public CommentResponseDto getById(UUID id) {
         Comment comment = commentRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new RuntimeException("Comment not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Comment", id));
         return comment.toResponseDto();
     }
 
@@ -63,14 +62,13 @@ public class CommentService {
     @Transactional
     public CommentResponseDto update(UUID id, CommentRequestDto requestDto, RequestContext ctx) {
         if (ctx == null || !ctx.hasRole()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "Comment update requires logged-in user (USER or ADMIN)");
+            throw new ForbiddenException("Comment update requires logged-in user (USER or ADMIN)");
         }
         Comment comment = commentRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new RuntimeException("Comment not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Comment", id));
         boolean isOwner = ctx.isAuthenticated() && Objects.equals(comment.getUserId(), ctx.getCurrentUserId());
         if (!ctx.isAdmin() && !isOwner) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Comment update allowed only for author or ADMIN");
+            throw new ForbiddenException("Comment update allowed only for author or ADMIN");
         }
         CommentResponseDto before = comment.toResponseDto();
         comment.applyUpdate(requestDto);
@@ -83,13 +81,13 @@ public class CommentService {
     @Transactional
     public void delete(UUID id, RequestContext ctx) {
         if (ctx == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Comment delete requires authentication");
+            throw new ForbiddenException("Comment delete requires authentication");
         }
         Comment comment = commentRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new RuntimeException("Comment not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Comment", id));
         boolean isOwner = ctx.isAuthenticated() && Objects.equals(comment.getUserId(), ctx.getCurrentUserId());
         if (!ctx.isAdmin() && !isOwner) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Comment delete allowed only for author or ADMIN");
+            throw new ForbiddenException("Comment delete allowed only for author or ADMIN");
         }
         CommentResponseDto before = comment.toResponseDto();
         cascadeSoftDelete(comment);

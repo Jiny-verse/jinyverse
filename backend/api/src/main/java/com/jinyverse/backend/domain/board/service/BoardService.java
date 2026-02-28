@@ -12,15 +12,15 @@ import com.jinyverse.backend.domain.topic.entity.Topic;
 import com.jinyverse.backend.domain.topic.repository.RelTopicFileRepository;
 import com.jinyverse.backend.domain.topic.repository.RelTopicTagRepository;
 import com.jinyverse.backend.domain.topic.repository.TopicRepository;
+import com.jinyverse.backend.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
+import com.jinyverse.backend.exception.ForbiddenException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -44,7 +44,7 @@ public class BoardService {
     @Transactional
     public BoardResponseDto create(BoardRequestDto requestDto, RequestContext ctx) {
         if (ctx == null || !ctx.isAdmin() || ctx.getChannel() != Channel.INTERNAL) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Board create requires ADMIN on INTERNAL channel");
+            throw new ForbiddenException("Board create requires ADMIN on INTERNAL channel");
         }
         Board board = Board.fromRequestDto(requestDto);
         Board saved = boardRepository.save(board);
@@ -55,7 +55,7 @@ public class BoardService {
 
     public BoardResponseDto getById(UUID id) {
         Board board = boardRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new RuntimeException("Board not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Board", id));
         return board.toResponseDto();
     }
 
@@ -70,10 +70,10 @@ public class BoardService {
     @Transactional
     public BoardResponseDto update(UUID id, BoardRequestDto requestDto, RequestContext ctx) {
         if (ctx == null || !ctx.isAdmin() || ctx.getChannel() != Channel.INTERNAL) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Board update requires ADMIN on INTERNAL channel");
+            throw new ForbiddenException("Board update requires ADMIN on INTERNAL channel");
         }
         Board board = boardRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new RuntimeException("Board not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Board", id));
 
         BoardResponseDto before = board.toResponseDto();
         board.applyUpdate(requestDto);
@@ -86,10 +86,10 @@ public class BoardService {
     @Transactional
     public void delete(UUID id, RequestContext ctx) {
         if (ctx == null || !ctx.isAdmin() || ctx.getChannel() != Channel.INTERNAL) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Board delete requires ADMIN on INTERNAL channel");
+            throw new ForbiddenException("Board delete requires ADMIN on INTERNAL channel");
         }
         Board board = boardRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new RuntimeException("Board not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Board", id));
 
         BoardResponseDto before = board.toResponseDto();
         LocalDateTime now = LocalDateTime.now();

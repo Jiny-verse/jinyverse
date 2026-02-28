@@ -5,7 +5,7 @@ import { useAuth, formatRelativeOrAbsolute } from 'common';
 import { createComment, updateComment, deleteComment } from 'common/services';
 import type { ApiOptions } from 'common/types';
 import type { Comment } from 'common/types';
-import { Button, Textarea } from 'common/ui';
+import { Button, Textarea, ConfirmDialog } from 'common/ui';
 import { useLanguage } from 'common/utils';
 
 export type CommentSectionProps = {
@@ -47,6 +47,7 @@ export function CommentSection({ topicId, comments, apiOptions, onReload }: Comm
   const [replyingToId, setReplyingToId] = useState<string | null>(null);
   const [replyContent, setReplyContent] = useState('');
   const [replySubmitting, setReplySubmitting] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   const { roots, repliesByParent } = useMemo(() => buildCommentTree(comments), [comments]);
   const currentUserId = user?.userId;
@@ -76,13 +77,14 @@ export function CommentSection({ topicId, comments, apiOptions, onReload }: Comm
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm(t('post.deleteComment'))) return;
-    await deleteComment(apiOptions, id);
-    if (editingId === id) {
+  const handleDeleteConfirm = async () => {
+    if (!pendingDeleteId) return;
+    await deleteComment(apiOptions, pendingDeleteId);
+    if (editingId === pendingDeleteId) {
       setEditingId(null);
       setEditContent('');
     }
+    setPendingDeleteId(null);
     onReload();
   };
 
@@ -136,7 +138,7 @@ export function CommentSection({ topicId, comments, apiOptions, onReload }: Comm
                 {canModify(c, currentUserId, role) && (
                   <>
                     <button type="button" onClick={() => handleStartEdit(c)} className="text-muted-foreground text-sm hover:text-foreground hover:underline">{t('ui.button.edit')}</button>
-                    <button type="button" onClick={() => handleDelete(c.id)} className="text-red-400 text-sm hover:underline">{t('ui.button.delete')}</button>
+                    <button type="button" onClick={() => setPendingDeleteId(c.id)} className="text-red-400 text-sm hover:underline">{t('ui.button.delete')}</button>
                   </>
                 )}
               </div>
@@ -168,11 +170,19 @@ export function CommentSection({ topicId, comments, apiOptions, onReload }: Comm
   );
 
   return (
-    <section>
-      <h2 className="text-lg font-semibold mb-4">{t('post.comments')} ({totalVisible})</h2>
-      <ul className="space-y-3 list-none pl-0">
-        {roots.map((c) => renderComment(c, false))}
-      </ul>
-    </section>
+    <>
+      <ConfirmDialog
+        isOpen={pendingDeleteId !== null}
+        message={t('post.deleteComment')}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setPendingDeleteId(null)}
+      />
+      <section>
+        <h2 className="text-lg font-semibold mb-4">{t('post.comments')} ({totalVisible})</h2>
+        <ul className="space-y-3 list-none pl-0">
+          {roots.map((c) => renderComment(c, false))}
+        </ul>
+      </section>
+    </>
   );
 }

@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Button, Input } from 'common/ui';
 import { useAuth, requestPasswordReset as requestPasswordResetApi } from 'common';
 import { FormError, AuthLink } from '../_components';
-import { useLanguage } from 'common/utils';
+import { useLanguage, parseApiError } from 'common/utils';
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -36,7 +36,8 @@ export default function ForgotPasswordPage() {
       await requestPasswordResetApi(baseUrl, { email });
       setDone(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('auth.forgot.error'));
+      const { messageKey, fallback } = parseApiError(err);
+      setError(t(messageKey) || fallback);
     } finally {
       setSubmitting(false);
     }

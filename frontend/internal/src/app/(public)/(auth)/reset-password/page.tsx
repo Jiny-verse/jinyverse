@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Button, Input } from 'common/ui';
 import { useAuth, resetPassword as resetPasswordApi } from 'common';
-import { useLanguage } from 'common/utils';
+import { useLanguage, parseApiError } from 'common/utils';
 import { FormError, AuthLink } from '../_components';
 
 function ResetPasswordContent() {
@@ -47,7 +47,8 @@ function ResetPasswordContent() {
       await resetPasswordApi(baseUrl, { email, code, newPassword });
       setDone(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('message.error', { defaultValue: '비밀번호 재설정에 실패했습니다.' }));
+      const { messageKey, fallback } = parseApiError(err);
+      setError(t(messageKey) || fallback);
     } finally {
       setSubmitting(false);
     }

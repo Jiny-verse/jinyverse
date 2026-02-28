@@ -8,7 +8,8 @@ import type { Menu } from 'common/types';
 import { CreateDialog, UpdateDialog, TreeList, DetailPanel } from './_components';
 import { MenuProvider, useMenuContext } from './_hooks/useMenuContext';
 import type { MenuTreeNode } from 'common';
-import { useLanguage } from 'common/utils';
+import { useLanguage, parseApiError } from 'common/utils';
+import { ConfirmDialog, Alert } from 'common/ui';
 
 function MenusContent() {
   const options = useApiOptions();
@@ -20,8 +21,10 @@ function MenusContent() {
     noneOption,
   ]);
   const [menuTree, setMenuTree] = useState<MenuTreeNode[]>([]);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [previewChannel, setPreviewChannel] = useState<string>('');
   const [selectedMenu, setSelectedMenu] = useState<Menu | null>(null);
+  const [pendingDeleteCode, setPendingDeleteCode] = useState<string | null>(null);
 
   const CHANNEL_OPTIONS = [
     { value: 'INTERNAL', label: t('admin.menu.internal') },
@@ -46,8 +49,11 @@ function MenusContent() {
           const optionsList = menuTreeToSelectOptions(tree);
           setMenuTree(tree);
           setUpperMenuOptions([noneOption, ...optionsList]);
+          setLoadError(null);
         })
-        .catch(() => {
+        .catch((err) => {
+          const { messageKey, fallback } = parseApiError(err);
+          setLoadError(t(messageKey) || fallback);
           setMenuTree([]);
           setUpperMenuOptions([noneOption]);
         });
@@ -70,17 +76,20 @@ function MenusContent() {
     [domain.dialogs.update]
   );
 
-  const handleDelete = useCallback(
-    async (code: string) => {
-      if (!confirm(t('admin.menu.deleteConfirm'))) return;
-      await domain.crud.delete(code);
-      if (selectedMenu?.code === code) setSelectedMenu(null);
-    },
-    [domain.crud, selectedMenu?.code]
-  );
+  const handleDeleteRequest = useCallback((code: string) => {
+    setPendingDeleteCode(code);
+  }, []);
+
+  const handleDeleteConfirm = useCallback(async () => {
+    if (!pendingDeleteCode) return;
+    await domain.crud.delete(pendingDeleteCode);
+    if (selectedMenu?.code === pendingDeleteCode) setSelectedMenu(null);
+    setPendingDeleteCode(null);
+  }, [domain.crud, pendingDeleteCode, selectedMenu?.code]);
 
   return (
     <div className="">
+      {loadError && <Alert variant="error">{loadError}</Alert>}
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">{t('admin.menu.title')}</h1>
         <button
@@ -125,7 +134,7 @@ function MenusContent() {
               menu={selectedMenu}
               apiOptions={options}
               onEdit={handleOpenEdit}
-              onDelete={handleDelete}
+              onDelete={handleDeleteRequest}
             />
           ) : null}
         </div>
@@ -133,6 +142,12 @@ function MenusContent() {
 
       <CreateDialog channelOptions={CHANNEL_OPTIONS} upperMenuOptions={upperMenuOptions} />
       <UpdateDialog channelOptions={CHANNEL_OPTIONS} upperMenuOptions={upperMenuOptions} />
+      <ConfirmDialog
+        isOpen={pendingDeleteCode !== null}
+        message={t('message.confirmDelete')}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setPendingDeleteCode(null)}
+      />
     </div>
   );
 }

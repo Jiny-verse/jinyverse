@@ -5,7 +5,7 @@ import { useAuth } from 'common';
 import { createComment } from 'common/services';
 import type { ApiOptions } from 'common/types';
 import { Button, Textarea } from 'common/ui';
-import { useLanguage } from 'common/utils';
+import { useLanguage, parseApiError } from 'common/utils';
 
 export type CommentWriteFormProps = {
   topicId: string;
@@ -39,7 +39,8 @@ export function CommentWriteForm({ topicId, apiOptions, onSuccess }: CommentWrit
       setContent('');
       onSuccess();
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('message.commentFailed'));
+      const { messageKey, fallback } = parseApiError(err);
+      setError(t(messageKey) || fallback);
     } finally {
       setSubmitting(false);
     }

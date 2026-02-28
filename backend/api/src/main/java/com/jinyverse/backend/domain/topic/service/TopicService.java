@@ -12,15 +12,15 @@ import com.jinyverse.backend.domain.topic.entity.RelTopicTag;
 import com.jinyverse.backend.domain.topic.entity.Topic;
 import com.jinyverse.backend.domain.topic.repository.RelTopicTagRepository;
 import com.jinyverse.backend.domain.topic.repository.TopicRepository;
+import com.jinyverse.backend.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
+import com.jinyverse.backend.exception.ForbiddenException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -45,7 +45,7 @@ public class TopicService {
     @Transactional
     public TopicResponseDto create(TopicRequestDto requestDto, RequestContext ctx) {
         if (ctx == null || !ctx.isAdmin() || ctx.getChannel() != Channel.INTERNAL) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Topic create requires ADMIN on INTERNAL channel");
+            throw new ForbiddenException("Topic create requires ADMIN on INTERNAL channel");
         }
         Topic topic = Topic.fromRequestDto(requestDto);
         if ("temporary".equals(requestDto.getStatus())) {
@@ -62,14 +62,14 @@ public class TopicService {
     @Transactional(readOnly = false)
     public TopicResponseDto getById(UUID id, RequestContext ctx) {
         Topic topic = topicRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Topic not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Topic", id));
         if (ctx != null && ctx.getChannel() == Channel.EXTERNAL) {
             boolean privateOrDraft = !Boolean.TRUE.equals(topic.getIsPublic()) || "temporary".equals(topic.getStatus());
             if (privateOrDraft) {
                 boolean allowed = ctx.getUserId() != null
                         && (topic.getAuthorUserId().equals(ctx.getUserId()) || ctx.isAdmin());
                 if (!allowed) {
-                    throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Access denied to this topic");
+                    throw new ForbiddenException("Access denied to this topic");
                 }
             }
             // 외부 채널에서 상세 조회 시 조회수 증가
@@ -93,10 +93,10 @@ public class TopicService {
     @Transactional
     public TopicResponseDto update(UUID id, TopicRequestDto requestDto, RequestContext ctx) {
         if (ctx == null || !ctx.isAdmin() || ctx.getChannel() != Channel.INTERNAL) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Topic update requires ADMIN on INTERNAL channel");
+            throw new ForbiddenException("Topic update requires ADMIN on INTERNAL channel");
         }
         Topic topic = topicRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new RuntimeException("Topic not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Topic", id));
 
         TopicResponseDto before = toResponseDtoWithTagsAndFiles(id, topic.toResponseDto());
 
@@ -139,7 +139,7 @@ public class TopicService {
         relTopicTagRepository.saveAll(tags);
 
         Topic original = topicRepository.findByIdAndDeletedAtIsNull(originalId)
-                .orElseThrow(() -> new RuntimeException("Original topic not found: " + originalId));
+                .orElseThrow(() -> new ResourceNotFoundException("Topic", originalId));
         original.setDeletedAt(LocalDateTime.now());
         topicRepository.save(original);
 
@@ -167,10 +167,10 @@ public class TopicService {
     @Transactional
     public void delete(UUID id, RequestContext ctx) {
         if (ctx == null || !ctx.isAdmin() || ctx.getChannel() != Channel.INTERNAL) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Topic delete requires ADMIN on INTERNAL channel");
+            throw new ForbiddenException("Topic delete requires ADMIN on INTERNAL channel");
         }
         Topic topic = topicRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new RuntimeException("Topic not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Topic", id));
 
         TopicResponseDto before = toResponseDtoWithTagsAndFiles(id, topic.toResponseDto());
         topicFileService.deleteByTopicId(id);

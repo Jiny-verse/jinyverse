@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { Button, Input, Checkbox } from 'common/ui';
 import { useAuth, register as registerApi } from 'common';
 import { FormError, AuthLink } from '../_components';
-import { useLanguage } from 'common/utils';
+import { useLanguage, parseApiError } from 'common/utils';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -45,7 +45,8 @@ export default function RegisterPage() {
       await registerApi(baseUrl, { username, password, email, name, nickname });
       setDone(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('auth.register.error'));
+      const { messageKey, fallback } = parseApiError(err);
+      setError(t(messageKey) || fallback);
     } finally {
       setSubmitting(false);
     }

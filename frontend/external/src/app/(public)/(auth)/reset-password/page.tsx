@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { Button, Input } from 'common/ui';
 import { useAuth, resetPassword as resetPasswordApi } from 'common';
 import { FormError, AuthLink } from '../_components';
-import { useLanguage } from 'common/utils';
+import { useLanguage, parseApiError } from 'common/utils';
 
 function ResetPasswordContent() {
   const router = useRouter();
@@ -47,7 +47,8 @@ function ResetPasswordContent() {
       await resetPasswordApi(baseUrl, { email, code, newPassword });
       setDone(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('auth.reset.error'));
+      const { messageKey, fallback } = parseApiError(err);
+      setError(t(messageKey) || fallback);
     } finally {
       setSubmitting(false);
     }

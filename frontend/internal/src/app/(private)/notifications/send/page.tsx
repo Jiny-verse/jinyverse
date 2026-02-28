@@ -8,9 +8,11 @@ import {
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import type { NotificationTemplate } from 'common/types';
 import { apiPost } from 'common/services';
+import { useLanguage, parseApiError } from 'common/utils';
 
 export default function NotificationSendPage() {
   const options = useApiOptions();
+  const { t } = useLanguage();
   const [userId, setUserId] = useState('');
   const [type, setType] = useState('system');
   const [message, setMessage] = useState('');
@@ -27,7 +29,7 @@ export default function NotificationSendPage() {
   useEffect(() => {
     getNotificationTemplates(options, { size: 100 })
       .then((res) => setTemplates(res.content))
-      .catch(() => {});
+      .catch((err) => { console.warn('[NotificationSend] 템플릿 목록 로드 실패:', err); });
   }, [options.baseUrl]);
 
   useEffect(() => {
@@ -53,8 +55,9 @@ export default function NotificationSendPage() {
       setUserId('');
       setMessage('');
       setLink('');
-    } catch (err: any) {
-      setError(err?.message ?? '발송에 실패했습니다.');
+    } catch (err) {
+      const { messageKey, fallback } = parseApiError(err);
+      setError(t(messageKey) || fallback);
     } finally {
       setLoading(false);
     }

@@ -31,7 +31,7 @@ export async function login(baseUrl: string, body: LoginRequest): Promise<LoginR
   });
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
-    throw new Error(text || String(res.status));
+    throw new Error(`API ${res.status} ${res.statusText}: ${text}`);
   }
   const data = await res.json();
   return loginResponseSchema.parse(data);
@@ -46,7 +46,7 @@ export async function refresh(baseUrl: string): Promise<LoginResponse> {
   });
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
-    throw new Error(text || String(res.status));
+    throw new Error(`API ${res.status} ${res.statusText}: ${text}`);
   }
   const data = await res.json();
   return loginResponseSchema.parse(data);
@@ -61,7 +61,7 @@ export async function logout(baseUrl: string): Promise<void> {
   });
   if (!res.ok && res.status !== 401) {
     const text = await res.text().catch(() => res.statusText);
-    throw new Error(text || String(res.status));
+    throw new Error(`API ${res.status} ${res.statusText}: ${text}`);
   }
 }
 
@@ -73,7 +73,7 @@ export async function me(baseUrl: string): Promise<LoginResponse | null> {
   if (res.status === 401) return null;
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
-    throw new Error(text || String(res.status));
+    throw new Error(`API ${res.status} ${res.statusText}: ${text}`);
   }
   const data = await res.json();
   return loginResponseSchema.parse(data);
@@ -89,7 +89,7 @@ export async function register(baseUrl: string, body: RegisterRequest): Promise<
   });
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
-    throw new Error(text || String(res.status));
+    throw new Error(`API ${res.status} ${res.statusText}: ${text}`);
   }
 }
 
@@ -103,7 +103,7 @@ export async function verifyEmail(baseUrl: string, body: VerifyEmailRequest): Pr
   });
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
-    throw new Error(text || String(res.status));
+    throw new Error(`API ${res.status} ${res.statusText}: ${text}`);
   }
 }
 
@@ -120,7 +120,7 @@ export async function requestPasswordReset(
   });
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
-    throw new Error(text || String(res.status));
+    throw new Error(`API ${res.status} ${res.statusText}: ${text}`);
   }
 }
 
@@ -134,6 +134,6 @@ export async function resetPassword(baseUrl: string, body: ResetPasswordRequest)
   });
   if (!res.ok) {
     const text = await res.text().catch(() => res.statusText);
-    throw new Error(text || String(res.status));
+    throw new Error(`API ${res.status} ${res.statusText}: ${text}`);
   }
 }

@@ -23,7 +23,7 @@ export function NotificationList({
   const { t } = useLanguage();
 
   const handleMarkAllRead = async () => {
-    await markAllNotificationsRead(apiOptions).catch(() => {});
+    await markAllNotificationsRead(apiOptions).catch((err) => { console.warn('[NotificationList] 전체 읽음 처리 실패:', err); });
     onAllRead();
   };
 

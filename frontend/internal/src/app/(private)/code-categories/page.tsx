@@ -13,7 +13,8 @@ import {
 } from 'common/services';
 import type { CodeCategory, Code } from 'common/services';
 import { useApiOptions } from '@/app/providers/ApiProvider';
-import { useLanguage } from 'common/utils';
+import { useLanguage, parseApiError } from 'common/utils';
+import { Alert, Toast, useToast } from 'common/ui';
 import { CategoryTable } from './_components/CategoryTable';
 import { CodeTable } from './_components/CodeTable';
 import { CreateCategoryDialog } from './_components/CreateCategoryDialog';
@@ -30,8 +31,10 @@ type PageData = {
 export default function CodeCategoriesPage() {
   const options = useApiOptions();
   const { t } = useLanguage();
+  const { toast, showToast, hideToast } = useToast();
 
   const [categoryData, setCategoryData] = useState<PageData | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [catPage, setCatPage] = useState(0);
   const [catSize, setCatSize] = useState(10);
   const [catSearch, setCatSearch] = useState('');
@@ -51,8 +54,11 @@ export default function CodeCategoriesPage() {
       size: catSize,
       q: catSearch.trim() || undefined,
     })
-      .then(setCategoryData)
-      .catch((e) => console.error('분류 목록 로드 실패:', e));
+      .then((data) => { setCategoryData(data); setLoadError(null); })
+      .catch((err) => {
+        const { messageKey, fallback } = parseApiError(err);
+        setLoadError(t(messageKey) || fallback);
+      });
   }, [options.baseUrl, options.channel, options.role, catPage, catSize, catSearch]);
 
   useEffect(() => {
@@ -64,7 +70,10 @@ export default function CodeCategoriesPage() {
       setCodesLoading(true);
       getCodes(options, { categoryCode: category.code, size: 100 })
         .then(setCodes)
-        .catch((e) => console.error('코드 목록 로드 실패:', e))
+        .catch((err) => {
+          const { messageKey, fallback } = parseApiError(err);
+          setLoadError(t(messageKey) || fallback);
+        })
         .finally(() => setCodesLoading(false));
     },
     [options.baseUrl, options.channel, options.role]
@@ -108,11 +117,14 @@ export default function CodeCategoriesPage() {
   };
 
   const handleDeleteCategory = async (code: string) => {
-    await deleteCodeCategory(options, code);
-    if (selectedCategory?.code === code) {
-      setSelectedCategory(null);
+    try {
+      await deleteCodeCategory(options, code);
+      if (selectedCategory?.code === code) setSelectedCategory(null);
+      loadCategories();
+    } catch (err) {
+      const { messageKey, fallback } = parseApiError(err);
+      showToast(t(messageKey) || fallback, 'error');
     }
-    loadCategories();
   };
 
   const handleCreateCode = async (data: {
@@ -141,15 +153,20 @@ export default function CodeCategoriesPage() {
   };
 
   const handleDeleteCode = async (catCode: string, code: string) => {
-    await deleteCode(options, catCode, code);
-    if (selectedCategory) {
-      loadCodes(selectedCategory);
+    try {
+      await deleteCode(options, catCode, code);
+      if (selectedCategory) loadCodes(selectedCategory);
+    } catch (err) {
+      const { messageKey, fallback } = parseApiError(err);
+      showToast(t(messageKey) || fallback, 'error');
     }
   };
 
   return (
     <div className="flex flex-col gap-6">
+      <Toast {...toast} onClose={hideToast} />
       <h1 className="text-2xl font-bold">{t('admin.category.title')}</h1>
+      {loadError && <Alert variant="error">{loadError}</Alert>}
       <div className="flex gap-6">
         <div className="w-1/2 min-w-0">
           <CategoryTable

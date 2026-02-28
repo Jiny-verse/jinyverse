@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Button, Input } from 'common/ui';
 import { useAuth, requestPasswordReset as requestPasswordResetApi } from 'common';
-import { useLanguage } from 'common/utils';
+import { useLanguage, parseApiError } from 'common/utils';
 import { FormError, AuthLink } from '../_components';
 
 export default function ForgotPasswordPage() {
@@ -36,7 +36,8 @@ export default function ForgotPasswordPage() {
       await requestPasswordResetApi(baseUrl, { email });
       setDone(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('auth.forgot.failed', { defaultValue: '요청에 실패했습니다.' }));
+      const { messageKey, fallback } = parseApiError(err);
+      setError(t(messageKey) || fallback);
     } finally {
       setSubmitting(false);
     }

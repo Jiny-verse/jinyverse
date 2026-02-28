@@ -5,9 +5,9 @@ import Link from 'next/link';
 import { getNotificationTemplates, deleteNotificationTemplate } from 'common/services';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import { DataTable, type ColumnDef } from 'common/components';
-import { Badge, FilterSelect } from 'common/ui';
+import { Badge, FilterSelect, ConfirmDialog, Alert } from 'common/ui';
 import type { NotificationTemplate, PageResponse } from 'common/types';
-import { useLanguage } from 'common/utils';
+import { useLanguage, parseApiError } from 'common/utils';
 
 const EMPTY_PAGE: PageResponse<NotificationTemplate> = {
   content: [],
@@ -40,20 +40,27 @@ export default function NotificationTemplatesPage() {
   const [q, setQ] = useState('');
   const [channel, setChannel] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   const load = useCallback(() => {
     setLoading(true);
+    setLoadError(null);
     getNotificationTemplates(options, { page, size, q: q || undefined, channel: channel || undefined })
       .then(setData)
-      .catch(() => setData(EMPTY_PAGE))
+      .catch((e) => {
+        const { messageKey, fallback } = parseApiError(e);
+        setLoadError(t(messageKey) || fallback);
+      })
       .finally(() => setLoading(false));
   }, [options.baseUrl, options.channel, page, size, q, channel]);
 
   useEffect(() => { load(); }, [load]);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm(t('notification.template.deleteConfirm', { defaultValue: '템플릿을 삭제하시겠습니까?' }))) return;
-    await deleteNotificationTemplate(options, id);
+  const handleDeleteConfirm = async () => {
+    if (!pendingDeleteId) return;
+    await deleteNotificationTemplate(options, pendingDeleteId);
+    setPendingDeleteId(null);
     load();
   };
 
@@ -94,7 +101,7 @@ export default function NotificationTemplatesPage() {
       render: (row) => (
         <button
           type="button"
-          onClick={() => handleDelete(row.id)}
+          onClick={() => setPendingDeleteId(row.id)}
           className="text-xs text-destructive hover:underline"
         >
           {t('ui.button.delete')}
@@ -102,6 +109,15 @@ export default function NotificationTemplatesPage() {
       ),
     },
   ];
+
+  if (loadError) {
+    return (
+      <Alert variant="error">
+        <p>{loadError}</p>
+        <button onClick={load}>{t('common.retry')}</button>
+      </Alert>
+    );
+  }
 
   return (
     <div>
@@ -115,6 +131,12 @@ export default function NotificationTemplatesPage() {
         </Link>
       </div>
       {loading && <p className="text-sm text-muted-foreground mb-2">{t('common.loading')}</p>}
+      <ConfirmDialog
+        isOpen={pendingDeleteId !== null}
+        message={t('message.confirmDelete')}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setPendingDeleteId(null)}
+      />
       <DataTable<NotificationTemplate>
         data={data.content}
         columns={columns}

@@ -2,6 +2,8 @@ export { Alert } from './Alert';
 export type { AlertProps, AlertVariant } from './Alert';
 export { AlertDialog } from './AlertDialog';
 export type { AlertDialogProps } from './AlertDialog';
+export { ConfirmDialog } from './ConfirmDialog';
+export type { ConfirmDialogProps } from './ConfirmDialog';
 export { Button } from './Button';
 export { Input } from './Input';
 export { Textarea } from './Textarea';

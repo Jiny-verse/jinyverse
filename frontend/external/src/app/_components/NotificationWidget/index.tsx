@@ -22,7 +22,7 @@ export function NotificationWidget({ apiOptions }: NotificationWidgetProps) {
   const fetchUnreadCount = useCallback(() => {
     getUnreadCount(apiOptions)
       .then((res) => setUnreadCount(res.count))
-      .catch(() => {});
+      .catch((err) => { console.warn('[NotificationWidget] 미읽음 수 로드 실패:', err); });
   }, [apiOptions.baseUrl, apiOptions.channel]);
 
   // 초기 + 30초 폴링
@@ -59,7 +59,7 @@ export function NotificationWidget({ apiOptions }: NotificationWidgetProps) {
           setNotifications(res.content);
           setListLoaded(true);
         })
-        .catch(() => {});
+        .catch((err) => { console.warn('[NotificationWidget] 알림 목록 로드 실패:', err); });
     }
     setOpen((v) => !v);
   };

@@ -1,17 +1,18 @@
 package com.jinyverse.backend.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jinyverse.backend.exception.ApiErrorResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.lang.NonNull;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -68,16 +69,17 @@ public class CsrfProtectionFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         String value = request.getHeader(HEADER_NAME);
         if (value == null || !HEADER_VALUE.equalsIgnoreCase(value.trim())) {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.setCharacterEncoding("UTF-8");
-            objectMapper.writeValue(response.getOutputStream(), Map.of(
-                    "error", "CSRF_VALIDATION_FAILED",
-                    "message", "Missing or invalid " + HEADER_NAME + " header"
-            ));
+            sendError(response, HttpStatus.FORBIDDEN, "CSRF_VALIDATION_FAILED", "Missing or invalid " + HEADER_NAME + " header");
             return;
         }
         filterChain.doFilter(request, response);
+    }
+
+    private void sendError(HttpServletResponse response, HttpStatus status, String code, String message) throws IOException {
+        response.setStatus(status.value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
+        objectMapper.writeValue(response.getOutputStream(), new ApiErrorResponse(code, message));
     }
 
     private record PathMethod(String method, String path) {

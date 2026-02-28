@@ -19,7 +19,7 @@ export default function NotificationSettingsPage() {
   useEffect(() => {
     getNotificationSetting(options)
       .then(setSetting)
-      .catch(() => {})
+      .catch((err) => { console.warn('[NotificationSettings] 설정 로드 실패:', err); })
       .finally(() => setLoading(false));
   }, [options.baseUrl]);
 

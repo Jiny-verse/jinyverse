@@ -2,6 +2,7 @@ package com.jinyverse.backend.domain.notification.service;
 
 import com.jinyverse.backend.domain.common.util.CommonSpecifications;
 import com.jinyverse.backend.domain.common.util.RequestContext;
+import com.jinyverse.backend.exception.ResourceNotFoundException;
 import com.jinyverse.backend.domain.notification.dto.NotificationRequestDto;
 import com.jinyverse.backend.domain.notification.dto.NotificationResponseDto;
 import com.jinyverse.backend.domain.notification.entity.Notification;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import com.jinyverse.backend.exception.ForbiddenException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,7 +44,7 @@ public class NotificationService {
 
     public NotificationResponseDto getById(UUID id) {
         Notification notification = notificationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Notification not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Notification", id));
         return notification.toResponseDto();
     }
 
@@ -53,7 +55,7 @@ public class NotificationService {
     @Transactional
     public NotificationResponseDto update(UUID id, NotificationRequestDto requestDto) {
         Notification notification = notificationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Notification not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Notification", id));
 
         notification.applyUpdate(requestDto);
         Notification updated = notificationRepository.save(notification);
@@ -63,7 +65,7 @@ public class NotificationService {
     @Transactional
     public void delete(UUID id) {
         Notification notification = notificationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Notification not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Notification", id));
 
         notification.setDeletedAt(LocalDateTime.now());
         notificationRepository.save(notification);
@@ -114,9 +116,9 @@ public class NotificationService {
     @Transactional
     public NotificationResponseDto markAsRead(UUID id, UUID currentUserId) {
         Notification item = notificationRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Notification not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Notification", id));
         if (currentUserId != null && !currentUserId.equals(item.getUserId())) {
-            throw new RuntimeException("Not authorized to mark this notification as read");
+            throw new ForbiddenException("Not authorized to mark this notification as read");
         }
         item.setIsRead(true);
         item.setReadAt(LocalDateTime.now());

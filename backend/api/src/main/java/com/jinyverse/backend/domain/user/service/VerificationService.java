@@ -3,11 +3,10 @@ package com.jinyverse.backend.domain.user.service;
 import com.jinyverse.backend.config.EmailSender;
 import com.jinyverse.backend.domain.user.entity.Verification;
 import com.jinyverse.backend.domain.user.repository.VerificationRepository;
+import com.jinyverse.backend.exception.BadRequestException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.security.SecureRandom;
 import java.time.LocalDateTime;
@@ -29,7 +28,7 @@ public class VerificationService {
     @Transactional
     public String requestVerification(String email, String type, UUID userId) {
         if (!TYPE_EMAIL_VERIFY.equals(type) && !TYPE_PASSWORD_RESET.equals(type)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid verification type");
+            throw new BadRequestException("Invalid verification type");
         }
         String code = generateCode();
         LocalDateTime expiredAt = LocalDateTime.now().plusMinutes(EXPIRY_MINUTES);
@@ -54,12 +53,12 @@ public class VerificationService {
     public Verification verify(String email, String code, String type) {
         Verification v = verificationRepository
                 .findByEmailAndTypeAndCodeAndDeletedAtIsNull(email, type, code)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid or expired code"));
+                .orElseThrow(() -> new BadRequestException("Invalid or expired code"));
         if (Boolean.TRUE.equals(v.getIsVerified())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Already verified");
+            throw new BadRequestException("Already verified");
         }
         if (v.getExpiredAt() != null && LocalDateTime.now().isAfter(v.getExpiredAt())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Code expired");
+            throw new BadRequestException("Code expired");
         }
         v.setIsVerified(true);
         verificationRepository.save(v);

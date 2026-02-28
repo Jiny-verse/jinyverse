@@ -18,7 +18,7 @@ export function NotificationItem({ notification, apiOptions, onRead }: Notificat
 
   const handleClick = async () => {
     if (!notification.isRead) {
-      await markNotificationRead(apiOptions, notification.id).catch(() => {});
+      await markNotificationRead(apiOptions, notification.id).catch((err) => { console.warn('[NotificationItem] 읽음 처리 실패:', err); });
       onRead(notification.id);
     }
     if (notification.link) {

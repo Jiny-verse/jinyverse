@@ -122,7 +122,10 @@ export async function getMenuResolve(
     credentials: 'include',
   });
   if (res.status === 404) return null;
-  if (!res.ok) throw new Error(`API ${res.status}`);
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`API ${res.status} ${res.statusText}: ${body}`);
+  }
   const data = await res.json();
   return {
     type: data.type,

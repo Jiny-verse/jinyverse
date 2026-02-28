@@ -2,6 +2,7 @@ package com.jinyverse.backend.domain.file.service;
 
 import com.jinyverse.backend.domain.common.util.CommonSpecifications;
 import com.jinyverse.backend.domain.common.util.RequestContext;
+import com.jinyverse.backend.exception.ResourceNotFoundException;
 import com.jinyverse.backend.domain.file.dto.CommonFileRequestDto;
 import com.jinyverse.backend.domain.file.dto.CommonFileResponseDto;
 import com.jinyverse.backend.domain.file.entity.CommonFile;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
+import com.jinyverse.backend.exception.ForbiddenException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -75,7 +77,7 @@ public class CommonFileService {
 
     public CommonFileResponseDto getById(UUID id) {
         CommonFile commonFile = commonFileRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("CommonFile not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("CommonFile", id));
         return commonFile.toResponseDto();
     }
 
@@ -86,7 +88,7 @@ public class CommonFileService {
     @Transactional
     public CommonFileResponseDto update(UUID id, CommonFileRequestDto requestDto) {
         CommonFile commonFile = commonFileRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("CommonFile not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("CommonFile", id));
 
         commonFile.applyUpdate(requestDto);
         CommonFile updated = commonFileRepository.save(commonFile);
@@ -96,7 +98,7 @@ public class CommonFileService {
     @Transactional
     public void delete(UUID id) {
         CommonFile commonFile = commonFileRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("CommonFile not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("CommonFile", id));
         try {
             if (commonFile.getFilePath() != null && fileStorage.exists(commonFile.getFilePath())) {
                 fileStorage.delete(commonFile.getFilePath());
@@ -151,7 +153,7 @@ public class CommonFileService {
 
     public Resource getResourceForDownload(UUID id) throws IOException {
         CommonFile file = commonFileRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("CommonFile not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("CommonFile", id));
         Resource resource = fileStorage.getResource(file.getFilePath());
         if (resource == null || !resource.exists()) {
             throw new IOException("File not found in storage: " + file.getFilePath());
@@ -177,12 +179,12 @@ public class CommonFileService {
                 }
             }
         }
-        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "해당 파일에 접근할 권한이 없습니다.");
+        throw new ForbiddenException("해당 파일에 접근할 권한이 없습니다.");
     }
 
     public CommonFile getEntityById(UUID id) {
         return commonFileRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("CommonFile not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("CommonFile", id));
     }
 
     private void validateMimeType(MultipartFile file) {

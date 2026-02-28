@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createInquiry } from 'common/services';
 import { useAuth } from 'common';
-import { useLanguage } from 'common/utils';
+import { useLanguage, parseApiError } from 'common/utils';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 
 export default function ContactPage() {
@@ -41,8 +41,9 @@ export default function ContactPage() {
         content,
       });
       router.push(user ? '/inquiries' : '/');
-    } catch (err: any) {
-      setError(err?.message ?? t('contact.submitFailed'));
+    } catch (err) {
+      const { messageKey, fallback } = parseApiError(err);
+      setError(t(messageKey) || fallback);
     } finally {
       setLoading(false);
     }

@@ -19,6 +19,9 @@ import com.jinyverse.backend.domain.user.repository.UserRepository;
 import com.jinyverse.backend.domain.user.repository.UserSessionRepository;
 import com.jinyverse.backend.domain.common.util.JwtUtil;
 import jakarta.annotation.PostConstruct;
+import com.jinyverse.backend.exception.BadRequestException;
+import com.jinyverse.backend.exception.ConflictException;
+import com.jinyverse.backend.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -253,10 +256,10 @@ public class AuthService {
     @Transactional
     public void register(RegisterRequestDto request) {
         if (userRepository.findByUsernameAndDeletedAtIsNull(request.getUsername()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exists");
+            throw new ConflictException("Username already exists");
         }
         if (userRepository.findByEmailAndDeletedAtIsNull(request.getEmail()).isPresent()) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already registered");
+            throw new ConflictException("Email already registered");
         }
         String encoded = passwordEncoder.encode(request.getPassword());
         UserRequestDto dto = UserRequestDto.builder()
@@ -284,7 +287,7 @@ public class AuthService {
         if (v.getUserId() == null)
             return;
         User user = userRepository.findByIdAndDeletedAtIsNull(v.getUserId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User", v.getUserId()));
         user.setIsActive(true);
         userRepository.save(user);
     }
@@ -301,10 +304,10 @@ public class AuthService {
         Verification v = verificationService.verify(request.getEmail(), request.getCode(),
                 VERIFICATION_TYPE_PASSWORD_RESET);
         if (v.getUserId() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid verification");
+            throw new BadRequestException("Invalid verification");
         }
         User user = userRepository.findByIdAndDeletedAtIsNull(v.getUserId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User", v.getUserId()));
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
 

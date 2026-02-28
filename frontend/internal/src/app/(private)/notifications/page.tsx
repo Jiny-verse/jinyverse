@@ -4,9 +4,9 @@ import { useCallback, useEffect, useState } from 'react';
 import { getNotifications } from 'common/services';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import { DataTable, type ColumnDef } from 'common/components';
-import { Badge, FilterSelect } from 'common/ui';
+import { Badge, FilterSelect, Alert } from 'common/ui';
 import type { Notification, PageResponse } from 'common/types';
-import { useLanguage } from 'common/utils';
+import { useLanguage, parseApiError } from 'common/utils';
 
 const EMPTY_PAGE: PageResponse<Notification> = {
   content: [],
@@ -31,16 +31,21 @@ export default function NotificationsPage() {
   const [size, setSize] = useState(10);
   const [isRead, setIsRead] = useState('');
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const readOptions = READ_OPTIONS(t);
 
   const load = useCallback(() => {
     setLoading(true);
+    setLoadError(null);
     const params: Parameters<typeof getNotifications>[1] = { page, size };
     if (isRead !== '') params.isRead = isRead === 'true';
     getNotifications(options, params)
       .then(setData)
-      .catch(() => setData(EMPTY_PAGE))
+      .catch((e) => {
+        const { messageKey, fallback } = parseApiError(e);
+        setLoadError(t(messageKey) || fallback);
+      })
       .finally(() => setLoading(false));
   }, [options.baseUrl, options.channel, page, size, isRead]);
 
@@ -85,6 +90,15 @@ export default function NotificationsPage() {
       ),
     },
   ];
+
+  if (loadError) {
+    return (
+      <Alert variant="error">
+        <p>{loadError}</p>
+        <button onClick={load}>{t('common.retry')}</button>
+      </Alert>
+    );
+  }
 
   return (
     <div>

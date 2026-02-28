@@ -39,7 +39,7 @@ export default function NotificationsPage() {
 
   const handleClick = async (notification: Notification) => {
     if (!notification.isRead) {
-      await markNotificationRead(options, notification.id).catch(() => {});
+      await markNotificationRead(options, notification.id).catch((err) => { console.warn('[Notifications] 읽음 처리 실패:', err); });
       setData((prev) => ({
         ...prev,
         content: prev.content.map((n) =>

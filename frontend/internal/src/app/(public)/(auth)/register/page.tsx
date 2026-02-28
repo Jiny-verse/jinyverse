@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Button, Input } from 'common/ui';
 import { useAuth, register as registerApi } from 'common';
-import { useLanguage } from 'common/utils';
+import { useLanguage, parseApiError } from 'common/utils';
 import { FormError, AuthLink } from '../_components';
 
 export default function RegisterPage() {
@@ -40,7 +40,8 @@ export default function RegisterPage() {
       await registerApi(baseUrl, { username, password, email, name, nickname });
       setDone(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('auth.register.failed', { defaultValue: '회원가입에 실패했습니다.' }));
+      const { messageKey, fallback } = parseApiError(err);
+      setError(t(messageKey) || fallback);
     } finally {
       setSubmitting(false);
     }

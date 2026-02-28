@@ -7,9 +7,11 @@ import { Textarea } from '../ui/Textarea';
 import { Button } from '../ui/Button';
 import { Switch } from '../ui/Switch';
 import { Select } from '../ui/Select';
+import { Toast, useToast } from '../ui/Toast';
 import { Editor } from './Editor/Editor';
 import type { z } from 'zod';
 import useLanguage from '../utils/i18n/hooks/useLanguage';
+import { parseApiError } from '../utils/parseApiError';
 
 export type AutoDialogField = {
   key: string;
@@ -68,6 +70,7 @@ export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const { t } = useLanguage();
+  const { toast, showToast, hideToast } = useToast();
 
   const handleChange = useCallback((key: string, value: unknown) => {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -90,6 +93,9 @@ export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
       try {
         await onSubmit(parsed.data as z.infer<S>, intent);
         onClose();
+      } catch (err) {
+        const { messageKey, fallback } = parseApiError(err);
+        showToast(t(messageKey) || fallback, 'error');
       } finally {
         setSubmitting(false);
       }
@@ -107,12 +113,14 @@ export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
   }, [open, initialValues, fields]);
 
   return (
-    <Modal
-      isOpen={open}
-      onClose={onClose}
-      title={title}
-      size="lg"
-      footer={
+    <>
+      <Toast {...toast} onClose={hideToast} />
+      <Modal
+        isOpen={open}
+        onClose={onClose}
+        title={title}
+        size="lg"
+        footer={
         <div className="flex justify-end gap-2">
           <Button type="button" variant="secondary" onClick={onClose}>
             {t('ui.button.cancel')}
@@ -284,6 +292,7 @@ export function AutoDialog<S extends z.ZodObject<z.ZodRawShape>>({
         })}
         {children}
       </div>
-    </Modal>
+      </Modal>
+    </>
   );
 }

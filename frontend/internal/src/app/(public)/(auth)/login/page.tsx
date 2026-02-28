@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { Button, Input } from 'common/ui';
 import { useAuth, type LoginRequest } from 'common';
 import { FormError, AuthLink } from '../_components';
-import { useLanguage } from 'common/utils';
+import { useLanguage, parseApiError } from 'common/utils';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -32,7 +32,8 @@ export default function LoginPage() {
       await login({ username, password } as LoginRequest);
       router.replace('/');
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('auth.login.error'));
+      const { messageKey, fallback } = parseApiError(err);
+      setError(t(messageKey) || fallback);
     } finally {
       setSubmitting(false);
     }

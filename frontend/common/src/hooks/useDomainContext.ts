@@ -67,7 +67,6 @@ export function useDomainContext<T, CreateInput = Partial<T>, UpdateInput = Part
   // 삭제
   const handleDelete = useCallback(
     async (id: string) => {
-      if (!confirm('삭제하시겠습니까?')) return;
       await services.delete(apiOptions, id);
       triggerReload();
     },
@@ -77,7 +76,6 @@ export function useDomainContext<T, CreateInput = Partial<T>, UpdateInput = Part
   // 일괄 삭제
   const handleBatchDelete = useCallback(
     async (ids: string[]) => {
-      if (!confirm(`선택한 ${ids.length}개를 삭제하시겠습니까?`)) return;
       for (const id of ids) {
         await services.delete(apiOptions, id);
       }

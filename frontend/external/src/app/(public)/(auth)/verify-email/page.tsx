@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import { Button, Input } from 'common/ui';
 import { useAuth, verifyEmail as verifyEmailApi } from 'common';
 import { FormError, AuthLink } from '../_components';
-import { useLanguage } from 'common/utils';
+import { useLanguage, parseApiError } from 'common/utils';
 
 function VerifyEmailContent() {
   const router = useRouter();
@@ -46,7 +46,8 @@ function VerifyEmailContent() {
       await verifyEmailApi(baseUrl, { email, code });
       setDone(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : t('auth.verify.error'));
+      const { messageKey, fallback } = parseApiError(err);
+      setError(t(messageKey) || fallback);
     } finally {
       setSubmitting(false);
     }

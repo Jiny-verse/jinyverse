@@ -23,7 +23,7 @@ export function UserWidget({ apiOptions }: UserWidgetProps) {
 
   useEffect(() => {
     if (!authUser) return;
-    getMe(apiOptions).then(setMe).catch(() => {});
+    getMe(apiOptions).then(setMe).catch((err) => { console.warn('[UserWidget] 사용자 정보 로드 실패:', err); });
   }, [authUser, apiOptions.baseUrl]);
 
   useEffect(() => {
