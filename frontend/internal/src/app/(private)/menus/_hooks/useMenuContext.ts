@@ -1,7 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, ReactNode } from 'react';
-import { useDomainContext } from 'common';
+import { useDomainContext, useGlobalRefresh } from 'common';
 import { createMenu, updateMenu, deleteMenu } from 'common/services';
 import type { Menu, MenuCreateInput, MenuUpdateInput } from 'common/types';
 import type { ApiOptions } from 'common/types';
@@ -19,6 +19,7 @@ export function MenuProvider({
   apiOptions: ApiOptions;
   children: ReactNode;
 }) {
+  const { triggerMenuRefresh } = useGlobalRefresh();
   const value = useDomainContext<Menu, MenuCreateInput, MenuUpdateInput>({
     apiOptions,
     services: {
@@ -27,6 +28,7 @@ export function MenuProvider({
       delete: deleteMenu,
     },
     idKey: 'code',
+    onReload: triggerMenuRefresh,
   });
 
   return React.createElement(MenuContext.Provider, { value }, children);

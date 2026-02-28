@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { AuthProvider, I18nProvider } from 'common';
+import { AuthProvider, I18nProvider, GlobalRefreshProvider } from 'common';
 import { ThemeProvider } from 'common/components';
 
 export const metadata: Metadata = {
@@ -25,9 +25,11 @@ export default function RootLayout({
           disableTransitionOnChange={false}
         >
           <I18nProvider>
-            <AuthProvider baseUrl={baseUrl} on401RedirectPath="/login">
-              {children}
-            </AuthProvider>
+            <GlobalRefreshProvider>
+              <AuthProvider baseUrl={baseUrl} on401RedirectPath="/login">
+                {children}
+              </AuthProvider>
+            </GlobalRefreshProvider>
           </I18nProvider>
         </ThemeProvider>
       </body>

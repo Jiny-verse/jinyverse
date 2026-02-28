@@ -2,9 +2,10 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
-import { getTopic, getComments, getBoard } from 'common/services';
+import { useParams, useRouter } from 'next/navigation';
+import { getTopic, getComments, getBoard, deleteTopic } from 'common/services';
 import { PostDetailRenderer } from 'common/components';
+import { Button, ConfirmDialog } from 'common/ui';
 import { useApiOptions } from '@/app/providers/ApiProvider';
 import type { Topic, Comment, Board } from 'common/types';
 import { useLanguage } from 'common/utils';
@@ -12,6 +13,7 @@ import { CommentSection, CommentWriteForm } from './_components';
 
 export default function TopicDetailPage() {
   const { t } = useLanguage();
+  const router = useRouter();
   const params = useParams();
   const boardId = params.boardId as string;
   const topicId = params.topicId as string;
@@ -20,6 +22,19 @@ export default function TopicDetailPage() {
   const [topic, setTopic] = useState<Topic | null>(null);
   const [comments, setComments] = useState<Comment[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteConfirm = async () => {
+    setDeleting(true);
+    try {
+      await deleteTopic(options, topicId);
+      router.push(`/boards/${boardId}/topics`);
+    } finally {
+      setDeleting(false);
+      setConfirmDelete(false);
+    }
+  };
 
   const load = useCallback(() => {
     Promise.all([
@@ -63,12 +78,31 @@ export default function TopicDetailPage() {
 
   return (
     <div className="">
-      <Link
-        href={`/boards/${boardId}/topics`}
-        className="text-muted-foreground hover:text-foreground mb-4 inline-block"
-      >
-        ← {t('board.topic.title')}
-      </Link>
+      <div className="flex items-center justify-between mb-4">
+        <Link
+          href={`/boards/${boardId}/topics`}
+          className="text-muted-foreground hover:text-foreground inline-block"
+        >
+          ← {t('board.topic.title')}
+        </Link>
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={() => router.push(`/boards/${boardId}/topics/${topicId}/edit`)}
+          >
+            {t('ui.button.edit', { defaultValue: '수정' })}
+          </Button>
+          <Button
+            size="sm"
+            variant="danger"
+            disabled={deleting}
+            onClick={() => setConfirmDelete(true)}
+          >
+            {t('ui.button.delete', { defaultValue: '삭제' })}
+          </Button>
+        </div>
+      </div>
 
       <div className="mb-8">
         <PostDetailRenderer board={board} topic={topic} apiOptions={options} />
@@ -76,6 +110,13 @@ export default function TopicDetailPage() {
 
       <CommentWriteForm topicId={topicId} apiOptions={options} onSuccess={load} />
       <CommentSection topicId={topicId} comments={comments} apiOptions={options} onReload={load} />
+
+      <ConfirmDialog
+        isOpen={confirmDelete}
+        message={t('message.confirmDelete')}
+        onConfirm={handleDeleteConfirm}
+        onCancel={() => setConfirmDelete(false)}
+      />
     </div>
   );
 }

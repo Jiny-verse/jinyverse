@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import { DetailPreviewPanel } from 'common/components';
-import { Avatar, Badge, Switch } from 'common/ui';
-import { ConfirmDialog } from 'common/components';
+import { Avatar, Badge, Switch, ConfirmDialog } from 'common/ui';
 import { updateUser } from 'common/services';
 import type { ApiOptions, User } from 'common/types';
 import { useLanguage } from 'common/utils';
@@ -165,9 +164,11 @@ export function UserDetailPanel({ user, apiOptions, onClose, onUpdated }: UserDe
           isOpen={true}
           title={confirmAction.title}
           message={confirmAction.message}
-          variant="danger"
-          onClose={() => setConfirmAction(null)}
-          onConfirm={confirmAction.onConfirm}
+          onCancel={() => setConfirmAction(null)}
+          onConfirm={() => {
+            confirmAction.onConfirm();
+            setConfirmAction(null);
+          }}
         />
       )}
     </>

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { getMenus } from '../services/menu';
 import { menusToNavigationItemsTree } from '../data/navigation';
+import { useGlobalRefresh } from '../providers';
 import type { ApiOptions } from '../types/api';
 import type { NavigationItem } from '../types/navigation';
 
@@ -12,6 +13,7 @@ export function useNavigationItems(
 ): { items: NavigationItem[]; isLoading: boolean } {
   const [items, setItems] = useState<NavigationItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { menuRefreshKey } = useGlobalRefresh();
 
   useEffect(() => {
     if (!apiOptions) {
@@ -23,7 +25,7 @@ export function useNavigationItems(
       .then((res) => setItems(menusToNavigationItemsTree(res.content, channel)))
       .catch(() => setItems([]))
       .finally(() => setIsLoading(false));
-  }, [apiOptions?.baseUrl, apiOptions?.channel, channel]);
+  }, [apiOptions?.baseUrl, apiOptions?.channel, channel, menuRefreshKey]);
 
   return { items, isLoading };
 }

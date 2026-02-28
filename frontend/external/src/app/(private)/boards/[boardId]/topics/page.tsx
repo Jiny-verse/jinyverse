@@ -1,85 +1,35 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import { getTopics, getTopic, getComments, getBoard } from 'common/services';
-import { useApiOptions } from '@/app/providers/ApiProvider';
+import { useParams } from 'next/navigation';
 import { DetailPreviewPanel, BoardListRenderer, PostDetailRenderer, TopicTable } from 'common/components';
 import { PaginationFooter } from 'common/ui';
 import { formatRelativeOrAbsolute } from 'common';
-import type { Topic, Comment, Board } from 'common/types';
 import { useLanguage } from 'common/utils';
+import { useTopicContext } from './_hooks/useTopicContext';
 
 export default function TopicsPage() {
   const params = useParams();
-  const router = useRouter();
   const boardId = params.boardId as string;
-  const options = useApiOptions();
   const { t } = useLanguage();
 
-  const [board, setBoard] = useState<Board | null>(null);
-  const [data, setData] = useState<{
-    content: Topic[];
-    totalElements: number;
-    totalPages: number;
-  } | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(0);
-  const [size, setSize] = useState(10);
-  const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
-  const [previewTopic, setPreviewTopic] = useState<Topic | null>(null);
-  const [previewComments, setPreviewComments] = useState<Comment[]>([]);
-  const [previewLoading, setPreviewLoading] = useState(false);
-
-  useEffect(() => {
-    getBoard(options, boardId)
-      .then(setBoard)
-      .catch(() => setBoard(null));
-  }, [options.baseUrl, options.channel, boardId]);
-
-  useEffect(() => {
-    let cancelled = false;
-    setError(null);
-    getTopics(options, { page, size, boardId })
-      .then((res) => {
-        if (!cancelled) setData(res);
-      })
-      .catch((e) => {
-        if (!cancelled) setError(e instanceof Error ? e.message : String(e));
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [options.baseUrl, options.channel, options.role, boardId, page, size]);
-
-  useEffect(() => {
-    if (!selectedTopicId) {
-      setPreviewTopic(null);
-      setPreviewComments([]);
-      return;
-    }
-    let cancelled = false;
-    setPreviewLoading(true);
-    Promise.all([
-      getTopic(options, selectedTopicId),
-      getComments(options, { topicId: selectedTopicId, size: 50 }),
-    ])
-      .then(([topic, res]) => {
-        if (!cancelled) {
-          setPreviewTopic(topic);
-          setPreviewComments(res.content);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) setPreviewTopic(null);
-      })
-      .finally(() => {
-        if (!cancelled) setPreviewLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [options.baseUrl, options.channel, selectedTopicId]);
+  const {
+    board,
+    data,
+    error,
+    page,
+    size,
+    selectedTopicId,
+    previewTopic,
+    previewComments,
+    previewLoading,
+    setPage,
+    setSelectedTopicId,
+    handleSizeChange,
+    navigateToDetail,
+    options,
+    isNormal,
+    hasPreview,
+  } = useTopicContext(boardId);
 
   if (error) {
     return (
@@ -90,10 +40,6 @@ export default function TopicsPage() {
       </div>
     );
   }
-
-  const boardType = board?.type ?? 'normal';
-  const isNormal = boardType === 'normal';
-  const hasPreview = selectedTopicId != null;
 
   const previewPanel = hasPreview && (
     <div className="w-1/2 min-w-0 flex flex-col">
@@ -151,7 +97,7 @@ export default function TopicsPage() {
                       totalElements: data.totalElements,
                       totalPages: data.totalPages,
                       onPageChange: setPage,
-                      onSizeChange: (s) => { setSize(s); setPage(0); },
+                      onSizeChange: handleSizeChange,
                     }
                   : undefined
               }
@@ -168,7 +114,7 @@ export default function TopicsPage() {
               board={board}
               topics={data.content}
               apiOptions={options}
-              onTopicClick={(topic) => router.push(`/boards/${boardId}/topics/${topic.id}`)}
+              onTopicClick={(topic) => navigateToDetail(topic.id)}
             />
           ) : (
             <div className="py-8 text-center text-muted-foreground">{t('common.loading')}</div>
@@ -180,7 +126,7 @@ export default function TopicsPage() {
               totalElements={data.totalElements}
               totalPages={data.totalPages}
               onPageChange={setPage}
-              onSizeChange={(s) => { setSize(s); setPage(0); }}
+              onSizeChange={handleSizeChange}
               currentCount={data.content.length}
             />
           )}

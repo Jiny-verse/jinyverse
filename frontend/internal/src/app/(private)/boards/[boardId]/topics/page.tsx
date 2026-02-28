@@ -1,18 +1,9 @@
 'use client';
 
-import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
-import {
-  getTopics,
-  getTopic,
-  getComments,
-  deleteTopic,
-  getBoard,
-} from 'common/services';
+import { useParams } from 'next/navigation';
 import { formatRelativeOrAbsolute } from 'common';
-import { useLanguage, parseApiError } from 'common/utils';
-import { useApiOptions } from '@/app/providers/ApiProvider';
+import { useLanguage } from 'common/utils';
 import {
   DetailPreviewPanel,
   FilterSelect,
@@ -20,108 +11,45 @@ import {
   PostDetailRenderer,
 } from 'common/components';
 import { PaginationFooter, Toolbar, Button, ConfirmDialog } from 'common/ui';
-import type { Topic, Comment, Board } from 'common/types';
 import { Table } from './_components';
+import { useTopicContext } from './_hooks/useTopicContext';
 
 export default function TopicsPage() {
   const params = useParams();
-  const router = useRouter();
   const boardId = params.boardId as string;
-  const options = useApiOptions();
   const { t } = useLanguage();
 
-  const [board, setBoard] = useState<Board | null>(null);
-  const [data, setData] = useState<{
-    content: Topic[];
-    totalElements: number;
-    totalPages: number;
-    first: boolean;
-    last: boolean;
-  } | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(0);
-  const [size, setSize] = useState(10);
-  const [search, setSearch] = useState('');
-  const [isPublic, setIsPublic] = useState<boolean | undefined>(undefined);
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [pendingDelete, setPendingDelete] = useState<{ ids: string[]; isBatch: boolean } | null>(null);
-  const [selectedTopicId, setSelectedTopicId] = useState<string | null>(null);
-  const [previewTopic, setPreviewTopic] = useState<Topic | null>(null);
-  const [previewComments, setPreviewComments] = useState<Comment[]>([]);
-  const [previewLoading, setPreviewLoading] = useState(false);
-
-  // 게시판 정보 로드
-  useEffect(() => {
-    getBoard(options, boardId)
-      .then(setBoard)
-      .catch(() => setBoard(null));
-  }, [options.baseUrl, options.channel, boardId]);
-
-  const load = useCallback(() => {
-    getTopics(options, {
-      page,
-      size,
-      boardId,
-      q: search.trim() || undefined,
-      isPublic,
-    })
-      .then(setData)
-      .catch((e) => {
-        const { messageKey, fallback } = parseApiError(e);
-        setError(t(messageKey) || fallback);
-      });
-  }, [options.baseUrl, options.channel, boardId, page, size, search, isPublic]);
-
-  useEffect(() => {
-    load();
-  }, [load]);
-
-  useEffect(() => {
-    if (!selectedTopicId) {
-      setPreviewTopic(null);
-      setPreviewComments([]);
-      return;
-    }
-    let cancelled = false;
-    setPreviewLoading(true);
-    Promise.all([
-      getTopic(options, selectedTopicId),
-      getComments(options, { topicId: selectedTopicId, size: 50 }),
-    ])
-      .then(([t, res]) => {
-        if (!cancelled) {
-          setPreviewTopic(t);
-          setPreviewComments(res.content);
-        }
-      })
-      .catch(() => {
-        if (!cancelled) setPreviewTopic(null);
-      })
-      .finally(() => {
-        if (!cancelled) setPreviewLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [options.baseUrl, options.channel, selectedTopicId]);
-
-  const handleDelete = (id: string) => {
-    setPendingDelete({ ids: [id], isBatch: false });
-  };
-
-  const handleBatchDelete = () => {
-    setPendingDelete({ ids: selectedIds, isBatch: true });
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!pendingDelete) return;
-    for (const id of pendingDelete.ids) {
-      await deleteTopic(options, id);
-    }
-    if (pendingDelete.isBatch) setSelectedIds([]);
-    setPendingDelete(null);
-    load();
-  };
+  const {
+    board,
+    data,
+    error,
+    page,
+    size,
+    search,
+    isPublic,
+    selectedIds,
+    pendingDelete,
+    selectedTopicId,
+    previewTopic,
+    previewComments,
+    previewLoading,
+    setPage,
+    setSelectedIds,
+    setSelectedTopicId,
+    handleDelete,
+    handleBatchDelete,
+    handleDeleteConfirm,
+    handleDeleteCancel,
+    handleSearchChange,
+    handleIsPublicChange,
+    handleSizeChange,
+    navigateToCreate,
+    navigateToEdit,
+    navigateToDetail,
+    options,
+    isNormal,
+    hasPreview,
+  } = useTopicContext(boardId);
 
   if (error) {
     return (
@@ -139,13 +67,9 @@ export default function TopicsPage() {
       isOpen={pendingDelete !== null}
       message={t('message.confirmDelete')}
       onConfirm={handleDeleteConfirm}
-      onCancel={() => setPendingDelete(null)}
+      onCancel={handleDeleteCancel}
     />
   );
-
-  const hasPreview = selectedTopicId != null;
-  const boardType = board?.type ?? 'normal';
-  const isNormal = boardType === 'normal';
 
   return (
     <>
@@ -171,19 +95,13 @@ export default function TopicsPage() {
                       totalElements: data.totalElements,
                       totalPages: data.totalPages,
                       onPageChange: setPage,
-                      onSizeChange: (s) => {
-                        setSize(s);
-                        setPage(0);
-                      },
+                      onSizeChange: handleSizeChange,
                     }
                   : undefined
               }
               search={{
                 value: search,
-                onChange: (v) => {
-                  setSearch(v);
-                  setPage(0);
-                },
+                onChange: handleSearchChange,
                 placeholder: t('form.placeholder.search_title_content', { defaultValue: '제목·내용 검색' }),
               }}
               filterSlot={
@@ -195,16 +113,13 @@ export default function TopicsPage() {
                     { value: 'false', label: t('common.private', { defaultValue: '비공개' }) },
                   ]}
                   placeholder={t('common.all', { defaultValue: '전체' })}
-                  onChange={(v) => {
-                    setIsPublic(v === '' ? undefined : v === 'true');
-                    setPage(0);
-                  }}
+                  onChange={handleIsPublicChange}
                 />
               }
               selection={{ selectedIds, onSelectionChange: setSelectedIds }}
               onBatchDelete={selectedIds.length ? handleBatchDelete : undefined}
-              onAdd={() => router.push(`/boards/${boardId}/topics/create`)}
-              onEdit={(row) => router.push(`/boards/${boardId}/topics/${row.id}/edit`)}
+              onAdd={navigateToCreate}
+              onEdit={(row) => navigateToEdit(row.id)}
               onDelete={handleDelete}
               onRowClick={(row) => setSelectedTopicId(row.id)}
               selectedRowId={selectedTopicId}
@@ -257,7 +172,7 @@ export default function TopicsPage() {
           <Toolbar
             search={{
               value: search,
-              onChange: (v) => { setSearch(v); setPage(0); },
+              onChange: handleSearchChange,
               placeholder: t('form.placeholder.search_title_content', { defaultValue: '제목·내용 검색' }),
             }}
             filterSlot={
@@ -269,10 +184,7 @@ export default function TopicsPage() {
                   { value: 'false', label: t('common.private', { defaultValue: '비공개' }) },
                 ]}
                 placeholder={t('common.all', { defaultValue: '전체' })}
-                onChange={(v) => {
-                  setIsPublic(v === '' ? undefined : v === 'true');
-                  setPage(0);
-                }}
+                onChange={handleIsPublicChange}
               />
             }
             rightSlot={
@@ -282,7 +194,7 @@ export default function TopicsPage() {
                     {t('ui.button.deleteSelected', { defaultValue: '선택 삭제 ({{count}})', count: selectedIds.length })}
                   </Button>
                 )}
-                <Button size="sm" onClick={() => router.push(`/boards/${boardId}/topics/create`)}>
+                <Button size="sm" onClick={navigateToCreate}>
                   {t('ui.button.add', { defaultValue: '추가' })} {t('board.topic.title', { defaultValue: '게시글' })}
                 </Button>
               </>
@@ -295,7 +207,7 @@ export default function TopicsPage() {
               board={board}
               topics={data.content}
               apiOptions={options}
-              onTopicClick={(topic) => router.push(`/boards/${boardId}/topics/${topic.id}`)}
+              onTopicClick={(topic) => navigateToDetail(topic.id)}
             />
           ) : (
             <div className="py-8 text-center text-muted-foreground">{t('common.loading', { defaultValue: '로딩 중...' })}</div>
@@ -309,7 +221,7 @@ export default function TopicsPage() {
               totalElements={data.totalElements}
               totalPages={data.totalPages}
               onPageChange={setPage}
-              onSizeChange={(s) => { setSize(s); setPage(0); }}
+              onSizeChange={handleSizeChange}
               currentCount={data.content.length}
             />
           )}
