@@ -453,6 +453,31 @@
             "title": "게시판 관리",
             "create": "게시판 생성",
             "edit": "게시판 수정"
+        },
+        "landing": {
+            "title": "랜딩 관리",
+            "section": {
+                "create": "섹션 생성",
+                "edit": "섹션 수정",
+                "type": "섹션 타입",
+                "active": "활성",
+                "order": "순서"
+            },
+            "cta": {
+                "title": "CTA 버튼 관리",
+                "create": "CTA 추가",
+                "edit": "CTA 수정",
+                "type": "버튼 타입",
+                "label": "버튼 텍스트",
+                "href": "링크 주소",
+                "className": "스타일 클래스",
+                "positionTop": "위치 Top (%)",
+                "positionLeft": "위치 Left (%)",
+                "positionBottom": "위치 Bottom (%)",
+                "positionRight": "위치 Right (%)",
+                "positionTransform": "Transform",
+                "noSection": "섹션을 선택하면 CTA 목록이 표시됩니다."
+            }
         }
     },
     "nav": {
@@ -552,6 +577,20 @@
             "in_progress": "처리 중",
             "answered": "답변 완료",
             "closed": "종료"
+        }
+    },
+    "landing": {
+        "hero": {
+            "signup": "회원가입",
+            "learn_more": "더 알아보기"
+        },
+        "board_top": {
+            "title": "최신 게시글",
+            "no_posts": "게시글이 없습니다."
+        },
+        "placeholder": {
+            "title": "준비 중입니다",
+            "desc": "곧 멋진 콘텐츠가 공개됩니다."
         }
     },
     "contact": {

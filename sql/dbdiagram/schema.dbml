@@ -307,3 +307,60 @@ Ref: audit_log.actor_user_id > user.id
 Ref: notification.user_id > user.id
 Ref: notification.type_category_code > code_category.code
 Ref: notification.(type_category_code, type) > code.(category_code, code)
+
+Table landing_section {
+  id                 uuid         [pk, not null, note: "Section ID"]
+  type_category_code varchar(40)  [not null, default: 'landing_section_type', note: "Section Type Category Code"]
+  type               varchar(40)  [not null, note: "Section Type (hero/image/board_top/image_link)"]
+  title              varchar(255) [note: "Section Title"]
+  description        text         [note: "Section Description"]
+  board_id           uuid         [note: "Connected Board ID"]
+  is_active          boolean      [not null, default: true, note: "Visibility flag"]
+  order              int          [not null, default: 0, note: "Display sorting step"]
+  extra_config       jsonb        [not null, default: `'{}'`, note: "Flexible extra config (slider ms, etc)"]
+  created_at         timestamp    [not null, default: `now()`, note: "Created timestamp"]
+  updated_at         timestamp    [not null, default: `now()`, note: "Updated timestamp"]
+  deleted_at         timestamp    [note: "Deleted timestamp"]
+}
+
+Table landing_cta {
+  id                 uuid          [pk, not null, note: "CTA primary ID"]
+  section_id         uuid          [not null, note: "Ref ID of parent section"]
+  type_category_code varchar(40)   [not null, default: 'landing_cta_type', note: "CTA Type Category Code"]
+  type               varchar(40)   [not null, default: 'button', note: "CTA Form (text/button/image)"]
+  label              varchar(255)  [note: "Standard text or translation keys"]
+  href               varchar(1000) [not null, note: "Click URL Location"]
+  class_name         text          [note: "Tailwind Classes string"]
+  position_top       decimal(6,2)  [note: "Top offset (%)"]
+  position_left      decimal(6,2)  [note: "Left offset (%)"]
+  position_bottom    decimal(6,2)  [note: "Bottom offset (%)"]
+  position_right     decimal(6,2)  [note: "Right offset (%)"]
+  position_transform varchar(255)  [note: "CSS transform value"]
+  image_file_id      uuid          [note: "CTA image target ID"]
+  order              int           [not null, default: 0, note: "Sorting sequence logic"]
+  is_active          boolean       [not null, default: true, note: "Flag to disable/enable"]
+  created_at         timestamp     [not null, default: `now()`, note: "Created Timestamp"]
+  updated_at         timestamp     [not null, default: `now()`, note: "Updated Timestamp"]
+  deleted_at         timestamp     [note: "Deleted Timestamp"]
+}
+
+Table rel__landing_section_file {
+  id         uuid      [pk, not null, note: "Relation Matrix ID"]
+  section_id uuid      [not null, note: "Target Section ID"]
+  file_id    uuid      [not null, note: "Target File ID"]
+  order      int       [not null, default: 0, note: "Sequential mapping"]
+  is_main    boolean   [not null, default: false, note: "Is main indicator flag"]
+  created_at timestamp [not null, default: `now()`, note: "Created Timestamp"]
+}
+
+Ref: landing_section.board_id > board.id
+Ref: landing_section.type_category_code > code_category.code
+Ref: landing_section.(type_category_code, type) > code.(category_code, code)
+
+Ref: landing_cta.section_id > landing_section.id
+Ref: landing_cta.image_file_id > common_file.id
+Ref: landing_cta.type_category_code > code_category.code
+Ref: landing_cta.(type_category_code, type) > code.(category_code, code)
+
+Ref: rel__landing_section_file.section_id > landing_section.id
+Ref: rel__landing_section_file.file_id > common_file.id

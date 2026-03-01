@@ -445,6 +445,31 @@
             "title": "掲示板管理",
             "create": "掲示板作成",
             "edit": "掲示板編集"
+        },
+        "landing": {
+            "title": "ランディング管理",
+            "section": {
+                "create": "セクション作成",
+                "edit": "セクション編集",
+                "type": "セクションタイプ",
+                "active": "有効",
+                "order": "順序"
+            },
+            "cta": {
+                "title": "CTAボタン管理",
+                "create": "CTA追加",
+                "edit": "CTA編集",
+                "type": "ボタンタイプ",
+                "label": "ボタンテキスト",
+                "href": "リンク先URL",
+                "className": "スタイルクラス",
+                "positionTop": "位置 Top (%)",
+                "positionLeft": "位置 Left (%)",
+                "positionBottom": "位置 Bottom (%)",
+                "positionRight": "位置 Right (%)",
+                "positionTransform": "Transform",
+                "noSection": "セクションを選択するとCTA一覧が表示されます。"
+            }
         }
     },
     "nav": {
@@ -520,6 +545,20 @@
             "in_progress": "対応中",
             "answered": "回答済み",
             "closed": "終了"
+        }
+    },
+    "landing": {
+        "hero": {
+            "signup": "会員登録",
+            "learn_more": "もっと見る"
+        },
+        "board_top": {
+            "title": "最新投稿",
+            "no_posts": "投稿がありません。"
+        },
+        "placeholder": {
+            "title": "準備中",
+            "desc": "素晴らしいコンテンツがもうすぐ公開されます。"
         }
     },
     "contact": {

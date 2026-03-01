@@ -445,6 +445,31 @@
             "title": "Board Management",
             "create": "Create Board",
             "edit": "Edit Board"
+        },
+        "landing": {
+            "title": "Landing Management",
+            "section": {
+                "create": "Create Section",
+                "edit": "Edit Section",
+                "type": "Section Type",
+                "active": "Active",
+                "order": "Order"
+            },
+            "cta": {
+                "title": "CTA Button Management",
+                "create": "Add CTA",
+                "edit": "Edit CTA",
+                "type": "Button Type",
+                "label": "Button Text",
+                "href": "Link URL",
+                "className": "Style Class",
+                "positionTop": "Position Top (%)",
+                "positionLeft": "Position Left (%)",
+                "positionBottom": "Position Bottom (%)",
+                "positionRight": "Position Right (%)",
+                "positionTransform": "Transform",
+                "noSection": "Select a section to view CTA list."
+            }
         }
     },
     "nav": {
@@ -520,6 +545,20 @@
             "in_progress": "In Progress",
             "answered": "Answered",
             "closed": "Closed"
+        }
+    },
+    "landing": {
+        "hero": {
+            "signup": "Sign Up",
+            "learn_more": "Learn More"
+        },
+        "board_top": {
+            "title": "Latest Posts",
+            "no_posts": "No posts available."
+        },
+        "placeholder": {
+            "title": "Coming Soon",
+            "desc": "Great content will be available soon."
         }
     },
     "contact": {
