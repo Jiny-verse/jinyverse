@@ -456,12 +456,28 @@
         },
         "landing": {
             "title": "랜딩 관리",
+            "save": "저장",
+            "discard": "되돌리기",
+            "unsaved": "저장되지 않은 변경사항",
+            "selectSection": "섹션을 선택하여 편집하세요",
+            "addSection": "섹션 추가",
+            "addCta": "CTA 추가",
+            "backToSection": "섹션으로 돌아가기",
+            "ctaHrefPlaceholder": "링크 URL 입력",
+            "imageLinkHint": "이미지 링크 섹션에서는 CTA를 이미지 타입으로 추가하면 각 이미지가 클릭 가능한 링크가 됩니다.",
             "section": {
                 "create": "섹션 생성",
                 "edit": "섹션 수정",
                 "type": "섹션 타입",
                 "active": "활성",
-                "order": "순서"
+                "order": "순서",
+                "dragHandle": "드래그하여 순서 변경",
+                "image": "섹션 이미지",
+                "uploadImage": "이미지 업로드",
+                "removeImage": "이미지 삭제",
+                "boardSelect": "게시판 선택",
+                "postLimit": "게시글 개수",
+                "linkUrl": "링크 URL"
             },
             "cta": {
                 "title": "CTA 버튼 관리",
@@ -476,7 +492,18 @@
                 "positionBottom": "위치 Bottom (%)",
                 "positionRight": "위치 Right (%)",
                 "positionTransform": "Transform",
-                "noSection": "섹션을 선택하면 CTA 목록이 표시됩니다."
+                "noSection": "섹션을 선택하면 CTA 목록이 표시됩니다.",
+                "imageUpload": "이미지 업로드",
+                "imagePreview": "이미지 미리보기",
+                "removeImage": "이미지 삭제",
+                "style": {
+                    "title": "스타일",
+                    "shape": "모양",
+                    "color": "색상",
+                    "size": "크기",
+                    "weight": "굵기",
+                    "advanced": "고급 (직접 입력)"
+                }
             }
         }
     },

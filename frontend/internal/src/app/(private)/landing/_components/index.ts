@@ -1,6 +1,9 @@
-export { SectionTable } from './SectionTable';
-export { CreateSectionDialog } from './CreateSectionDialog';
-export { UpdateSectionDialog } from './UpdateSectionDialog';
-export { CtaPanel } from './CtaPanel';
-export { CreateCtaDialog } from './CreateCtaDialog';
-export { UpdateCtaDialog } from './UpdateCtaDialog';
+export { LandingHeader } from './LandingHeader';
+export { LandingCanvas } from './LandingCanvas';
+export { SectionBlock } from './SectionBlock';
+export { SectionPreview } from './SectionPreview';
+export { CtaOverlay } from './CtaOverlay';
+export { RightPanel } from './RightPanel';
+export { SectionFormPanel } from './SectionFormPanel';
+export { CtaFormPanel } from './CtaFormPanel';
+export { AddSectionTypeModal } from './AddSectionTypeModal';

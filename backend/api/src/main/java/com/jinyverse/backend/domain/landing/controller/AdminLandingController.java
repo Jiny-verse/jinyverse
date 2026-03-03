@@ -5,6 +5,7 @@ import com.jinyverse.backend.domain.landing.dto.LandingCtaRequestDto;
 import com.jinyverse.backend.domain.landing.dto.LandingCtaResponseDto;
 import com.jinyverse.backend.domain.landing.dto.LandingSectionRequestDto;
 import com.jinyverse.backend.domain.landing.dto.LandingSectionResponseDto;
+import com.jinyverse.backend.domain.landing.dto.ReorderFilesRequest;
 import com.jinyverse.backend.domain.landing.service.LandingCtaService;
 import com.jinyverse.backend.domain.landing.service.LandingSectionService;
 import jakarta.validation.Valid;
@@ -94,5 +95,14 @@ public class AdminLandingController {
     ) {
         landingSectionService.removeFile(id, fileId, ctx);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/sections/{id}/files/reorder")
+    public ResponseEntity<LandingSectionResponseDto> reorderFiles(
+            @PathVariable UUID id,
+            @RequestBody ReorderFilesRequest body,
+            RequestContext ctx
+    ) {
+        return ResponseEntity.ok(landingSectionService.reorderFiles(id, body.getFileIds(), ctx));
     }
 }

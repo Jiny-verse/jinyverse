@@ -448,12 +448,28 @@
         },
         "landing": {
             "title": "Landing Management",
+            "save": "Save",
+            "discard": "Discard",
+            "unsaved": "Unsaved changes",
+            "selectSection": "Select a section to edit",
+            "addSection": "Add Section",
+            "addCta": "Add CTA",
+            "backToSection": "Back to Section",
+            "ctaHrefPlaceholder": "Enter link URL",
+            "imageLinkHint": "For image link sections, add a CTA of image type to make each image a clickable link.",
             "section": {
                 "create": "Create Section",
                 "edit": "Edit Section",
                 "type": "Section Type",
                 "active": "Active",
-                "order": "Order"
+                "order": "Order",
+                "dragHandle": "Drag to reorder",
+                "image": "Section Image",
+                "uploadImage": "Upload Image",
+                "removeImage": "Remove Image",
+                "boardSelect": "Select Board",
+                "postLimit": "Post Limit",
+                "linkUrl": "Link URL"
             },
             "cta": {
                 "title": "CTA Button Management",
@@ -468,7 +484,18 @@
                 "positionBottom": "Position Bottom (%)",
                 "positionRight": "Position Right (%)",
                 "positionTransform": "Transform",
-                "noSection": "Select a section to view CTA list."
+                "noSection": "Select a section to view CTA list.",
+                "imageUpload": "Upload Image",
+                "imagePreview": "Image Preview",
+                "removeImage": "Remove Image",
+                "style": {
+                    "title": "Style",
+                    "shape": "Shape",
+                    "color": "Color",
+                    "size": "Size",
+                    "weight": "Weight",
+                    "advanced": "Advanced (raw class)"
+                }
             }
         }
     },

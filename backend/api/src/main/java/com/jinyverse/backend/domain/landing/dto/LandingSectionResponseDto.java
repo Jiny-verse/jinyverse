@@ -21,8 +21,6 @@ public class LandingSectionResponseDto {
     private UUID id;
     private String typeCategoryCode;
     private String type;
-    private String title;
-    private String description;
     private UUID boardId;
     private Boolean isActive;
     private Integer order;

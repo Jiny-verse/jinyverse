@@ -448,12 +448,28 @@
         },
         "landing": {
             "title": "ランディング管理",
+            "save": "保存",
+            "discard": "破棄",
+            "unsaved": "未保存の変更",
+            "selectSection": "セクションを選択して編集",
+            "addSection": "セクション追加",
+            "addCta": "CTA追加",
+            "backToSection": "セクションへ戻る",
+            "ctaHrefPlaceholder": "リンクURLを入力",
+            "imageLinkHint": "画像リンクセクションでは、CTAを画像タイプで追加すると各画像がクリック可能なリンクになります。",
             "section": {
                 "create": "セクション作成",
                 "edit": "セクション編集",
                 "type": "セクションタイプ",
                 "active": "有効",
-                "order": "順序"
+                "order": "順序",
+                "dragHandle": "ドラッグで並び替え",
+                "image": "セクション画像",
+                "uploadImage": "画像アップロード",
+                "removeImage": "画像削除",
+                "boardSelect": "掲示板選択",
+                "postLimit": "投稿件数",
+                "linkUrl": "リンクURL"
             },
             "cta": {
                 "title": "CTAボタン管理",
@@ -468,7 +484,18 @@
                 "positionBottom": "位置 Bottom (%)",
                 "positionRight": "位置 Right (%)",
                 "positionTransform": "Transform",
-                "noSection": "セクションを選択するとCTA一覧が表示されます。"
+                "noSection": "セクションを選択するとCTA一覧が表示されます。",
+                "imageUpload": "画像アップロード",
+                "imagePreview": "画像プレビュー",
+                "removeImage": "画像削除",
+                "style": {
+                    "title": "スタイル",
+                    "shape": "形状",
+                    "color": "色",
+                    "size": "サイズ",
+                    "weight": "太さ",
+                    "advanced": "詳細（直接入力）"
+                }
             }
         }
     },

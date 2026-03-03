@@ -110,6 +110,31 @@ public class LandingSectionService {
         sectionFileRepository.deleteBySectionIdAndFileId(sectionId, fileId);
     }
 
+    @Transactional
+    public LandingSectionResponseDto reorderFiles(UUID sectionId, List<UUID> fileIds, RequestContext ctx) {
+        requireAdmin(ctx);
+        findActive(sectionId); // validate exists
+        List<LandingSectionFile> files = sectionFileRepository.findAllBySectionIdOrderByOrderAsc(sectionId);
+        // Build a map from fileId -> entity for quick lookup
+        java.util.Map<UUID, LandingSectionFile> fileMap = new java.util.HashMap<>();
+        for (LandingSectionFile f : files) {
+            fileMap.put(f.getFileId(), f);
+        }
+        for (int i = 0; i < fileIds.size(); i++) {
+            LandingSectionFile f = fileMap.get(fileIds.get(i));
+            if (f != null) {
+                f.setOrder(i);
+            }
+        }
+        sectionFileRepository.saveAll(files);
+        LandingSection reloaded = findActive(sectionId);
+        List<LandingCtaResponseDto> ctas = reloaded.getCtas().stream()
+                .filter(c -> c.getDeletedAt() == null)
+                .map(c -> c.toResponseDto())
+                .toList();
+        return reloaded.toResponseDto(ctas);
+    }
+
     private LandingSection findActive(UUID id) {
         return sectionRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new ResourceNotFoundException("LandingSection", id));

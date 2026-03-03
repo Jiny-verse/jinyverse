@@ -40,12 +40,6 @@ public class LandingSection extends BaseEntity {
     @Column(name = "type", length = 40, nullable = false)
     private String type;
 
-    @Column(name = "title", length = 255)
-    private String title;
-
-    @Column(name = "description", columnDefinition = "TEXT")
-    private String description;
-
     @Column(name = "board_id", columnDefinition = "UUID")
     private UUID boardId;
 
@@ -74,8 +68,6 @@ public class LandingSection extends BaseEntity {
         return LandingSection.builder()
                 .typeCategoryCode("landing_section_type")
                 .type(dto.getType())
-                .title(dto.getTitle())
-                .description(dto.getDescription())
                 .boardId(dto.getBoardId())
                 .isActive(dto.getIsActive() != null ? dto.getIsActive() : true)
                 .order(dto.getOrder() != null ? dto.getOrder() : 0)
@@ -85,8 +77,6 @@ public class LandingSection extends BaseEntity {
 
     public void applyUpdate(LandingSectionRequestDto dto) {
         if (dto.getType() != null) this.type = dto.getType();
-        if (dto.getTitle() != null) this.title = dto.getTitle();
-        if (dto.getDescription() != null) this.description = dto.getDescription();
         if (dto.getBoardId() != null) this.boardId = dto.getBoardId();
         if (dto.getIsActive() != null) this.isActive = dto.getIsActive();
         if (dto.getOrder() != null) this.order = dto.getOrder();
@@ -98,8 +88,6 @@ public class LandingSection extends BaseEntity {
                 .id(this.id)
                 .typeCategoryCode(this.typeCategoryCode)
                 .type(this.type)
-                .title(this.title)
-                .description(this.description)
                 .boardId(this.boardId)
                 .isActive(this.isActive)
                 .order(this.order)

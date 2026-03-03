@@ -37,8 +37,6 @@ export const landingSectionSchema = z.object({
   id: uuid,
   typeCategoryCode: z.string(),
   type: z.string(),
-  title: z.string().nullable().optional(),
-  description: z.string().nullable().optional(),
   boardId: optionalUuid,
   isActive: z.boolean(),
   order: z.number().int(),
@@ -55,8 +53,6 @@ export type LandingSection = z.infer<typeof landingSectionSchema>;
 /** 섹션 생성/수정 요청 */
 export const landingSectionCreateSchema = z.object({
   type: z.string().min(1),
-  title: z.string().max(255).optional(),
-  description: z.string().optional(),
   boardId: uuid.optional(),
   isActive: z.boolean().optional(),
   order: z.number().int().optional(),

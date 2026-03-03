@@ -17,6 +17,7 @@ export function DynamicLandingRenderer({ sections, apiBaseUrl }: DynamicLandingR
           case 'hero':
             return <HeroSection key={section.id} section={section} apiBaseUrl={apiBaseUrl} />;
           case 'image':
+          case 'image_link':
             return (
               <DescriptionImageSection
                 key={section.id}
@@ -25,9 +26,9 @@ export function DynamicLandingRenderer({ sections, apiBaseUrl }: DynamicLandingR
               />
             );
           case 'board_top':
-            return <BoardTopSection key={section.id} section={section} />;
-          case 'image_link':
-            return <ImageLinkSection key={section.id} section={section} apiBaseUrl={apiBaseUrl} />;
+            return (
+              <BoardTopSection key={section.id} section={section} apiBaseUrl={apiBaseUrl} />
+            );
           default:
             return null;
         }

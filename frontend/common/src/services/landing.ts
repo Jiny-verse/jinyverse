@@ -82,3 +82,38 @@ export async function updateLandingCta(
 export async function deleteLandingCta(options: ApiOptions, id: string): Promise<void> {
   await apiDelete(options, `/api/admin/landing/ctas/${id}`);
 }
+
+export async function addSectionFile(
+  options: ApiOptions,
+  sectionId: string,
+  fileId: string,
+  isMain = false
+): Promise<LandingSection> {
+  const data = await apiPost<LandingSection>(
+    options,
+    `/api/admin/landing/sections/${sectionId}/files?fileId=${encodeURIComponent(fileId)}&isMain=${isMain}`,
+    {}
+  );
+  return landingSectionSchema.parse(data);
+}
+
+export async function removeSectionFile(
+  options: ApiOptions,
+  sectionId: string,
+  fileId: string
+): Promise<void> {
+  await apiDelete(options, `/api/admin/landing/sections/${sectionId}/files/${fileId}`);
+}
+
+export async function reorderSectionFiles(
+  options: ApiOptions,
+  sectionId: string,
+  fileIds: string[]
+): Promise<LandingSection> {
+  const data = await apiPost<LandingSection>(
+    options,
+    `/api/admin/landing/sections/${sectionId}/files/reorder`,
+    { fileIds }
+  );
+  return landingSectionSchema.parse(data);
+}

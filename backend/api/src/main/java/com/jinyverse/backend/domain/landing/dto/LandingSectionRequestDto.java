@@ -20,10 +20,6 @@ public class LandingSectionRequestDto {
     @NotBlank(message = "섹션 타입은 필수입니다")
     private String type;
 
-    private String title;
-
-    private String description;
-
     private UUID boardId;
 
     private Boolean isActive;

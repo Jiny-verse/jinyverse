@@ -1,35 +1,52 @@
 'use client';
 
-import React, { createContext, useContext, useState, useRef, useCallback, ReactNode } from 'react';
-import { useDomainContext } from 'common';
-import {
-  createLandingSection,
-  updateLandingSection,
-  deleteLandingSection,
-  createLandingCta,
-  updateLandingCta,
-  deleteLandingCta,
-  getAdminLandingSections,
-} from 'common/services';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
+import { useLandingDraft } from './useLandingDraft';
 import type { ApiOptions } from 'common/types';
 import type {
   LandingSection,
-  LandingCta,
-  LandingSectionCreateInput,
   LandingSectionUpdateInput,
-  LandingCtaCreateInput,
   LandingCtaUpdateInput,
 } from 'common/schemas';
 
-type SectionContextValue = ReturnType<
-  typeof useDomainContext<LandingSection, LandingSectionCreateInput, LandingSectionUpdateInput>
-> & {
-  selectedSection: LandingSection | null;
-  setSelectedSection: (section: LandingSection | null) => void;
-  ctaDomain: ReturnType<typeof useDomainContext<LandingCta, LandingCtaCreateInput, LandingCtaUpdateInput>>;
-};
+interface LandingContextValue {
+  // draft state
+  sections: LandingSection[];
+  isDirty: boolean;
+  isSaving: boolean;
 
-const LandingContext = createContext<SectionContextValue | null>(null);
+  // selection
+  selectedSection: LandingSection | null;
+  setSelectedSection: (s: LandingSection | null) => void;
+  selectedCtaId: string | null;
+  setSelectedCtaId: (id: string | null) => void;
+
+  // modal
+  isAddSectionModalOpen: boolean;
+  openAddSectionModal: () => void;
+  closeAddSectionModal: () => void;
+
+  // section actions
+  reorderSection: (from: number, to: number) => void;
+  updateSection: (id: string, patch: Partial<LandingSectionUpdateInput>) => void;
+  deleteSection: (id: string) => Promise<void>;
+  addSection: (type: string) => Promise<void>;
+  addSectionFile: (sectionId: string, fileId: string, isMain?: boolean) => Promise<void>;
+  removeSectionFile: (sectionId: string, fileId: string) => Promise<void>;
+  reorderSectionFiles: (sectionId: string, fileIds: string[]) => Promise<void>;
+
+  // CTA actions
+  updateCta: (sectionId: string, ctaId: string, patch: Partial<LandingCtaUpdateInput>) => void;
+  moveCta: (sectionId: string, ctaId: string, top: number, left: number) => void;
+  addCta: (sectionId: string, href: string) => Promise<void>;
+  deleteCta: (sectionId: string, ctaId: string) => Promise<void>;
+
+  // save
+  saveAll: () => Promise<void>;
+  discard: () => void;
+}
+
+const LandingContext = createContext<LandingContextValue | null>(null);
 
 export function LandingProvider({
   apiOptions,
@@ -38,65 +55,64 @@ export function LandingProvider({
   apiOptions: ApiOptions;
   children: ReactNode;
 }) {
-  const [selectedSection, setSelectedSection] = useState<LandingSection | null>(null);
-  const selectedSectionRef = useRef<LandingSection | null>(null);
-  selectedSectionRef.current = selectedSection;
-  const apiOptionsRef = useRef(apiOptions);
-  apiOptionsRef.current = apiOptions;
+  const draft = useLandingDraft(apiOptions);
+  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
+  const [selectedCtaId, setSelectedCtaId] = useState<string | null>(null);
+  const [isAddSectionModalOpen, setIsAddSectionModalOpen] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
-  // After CTA changes, reload sections and re-sync the selected section
-  const refreshSelectedSection = useCallback(async () => {
-    const current = selectedSectionRef.current;
-    if (!current) return;
-    try {
-      const sections = await getAdminLandingSections(apiOptionsRef.current);
-      const updated = sections.find((s) => s.id === current.id);
-      if (updated) setSelectedSection(updated);
-    } catch {
-      // ignore
-    }
+  // Derived: always reflects the latest sections state — no delay
+  const selectedSection = selectedSectionId
+    ? (draft.sections.find((s) => s.id === selectedSectionId) ?? null)
+    : null;
+
+  // Load sections on mount
+  useEffect(() => {
+    draft.load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const sectionDomain = useDomainContext<
-    LandingSection,
-    LandingSectionCreateInput,
-    LandingSectionUpdateInput
-  >({
-    apiOptions,
-    services: {
-      create: createLandingSection,
-      update: updateLandingSection,
-      delete: deleteLandingSection,
-    },
-  });
+  const setSelectedSection = useCallback((s: LandingSection | null) => {
+    setSelectedSectionId(s?.id ?? null);
+    setSelectedCtaId(null);
+  }, []);
 
-  const ctaDomain = useDomainContext<LandingCta, LandingCtaCreateInput, LandingCtaUpdateInput>({
-    apiOptions,
-    services: {
-      create: async (opts, input) => {
-        const section = selectedSectionRef.current;
-        if (!section) throw new Error('No section selected');
-        const result = await createLandingCta(opts, section.id, input);
-        await refreshSelectedSection();
-        return result;
-      },
-      update: async (opts, id, input) => {
-        const result = await updateLandingCta(opts, id, input);
-        await refreshSelectedSection();
-        return result;
-      },
-      delete: async (opts, id) => {
-        await deleteLandingCta(opts, id);
-        await refreshSelectedSection();
-      },
-    },
-  });
+  const openAddSectionModal = useCallback(() => setIsAddSectionModalOpen(true), []);
+  const closeAddSectionModal = useCallback(() => setIsAddSectionModalOpen(false), []);
 
-  const value: SectionContextValue = {
-    ...sectionDomain,
+  const saveAll = useCallback(async () => {
+    setIsSaving(true);
+    try {
+      await draft.saveAll();
+    } finally {
+      setIsSaving(false);
+    }
+  }, [draft]);
+
+  const value: LandingContextValue = {
+    sections: draft.sections,
+    isDirty: draft.isDirty,
+    isSaving,
     selectedSection,
     setSelectedSection,
-    ctaDomain,
+    selectedCtaId,
+    setSelectedCtaId,
+    isAddSectionModalOpen,
+    openAddSectionModal,
+    closeAddSectionModal,
+    reorderSection: draft.reorderSection,
+    updateSection: draft.updateSection,
+    deleteSection: draft.deleteSection,
+    addSection: draft.addSection,
+    addSectionFile: draft.addSectionFile,
+    removeSectionFile: draft.removeSectionFile,
+    reorderSectionFiles: draft.reorderSectionFiles,
+    updateCta: draft.updateCta,
+    moveCta: draft.moveCta,
+    addCta: draft.addCta,
+    deleteCta: draft.deleteCta,
+    saveAll,
+    discard: draft.discard,
   };
 
   return React.createElement(LandingContext.Provider, { value }, children);
