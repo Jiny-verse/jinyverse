@@ -94,6 +94,10 @@ export function CtaFormPanel() {
 
   const apiBaseUrl = apiOptions.baseUrl ?? '';
 
+  const sc = cta.styleConfig ?? {};
+  const updateStyleConfig = (patch: Record<string, unknown>) =>
+    updateCta(selectedSection.id, cta.id, { styleConfig: { ...sc, ...patch } });
+
   const handleDeleteConfirm = async () => {
     await deleteCta(selectedSection.id, cta.id);
     setSelectedCtaId(null);
@@ -256,7 +260,7 @@ export function CtaFormPanel() {
   };
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="flex flex-col h-full overflow-y-auto">
       <ConfirmDialog
         isOpen={pendingDelete}
         message={t('message.confirmDelete')}
@@ -264,187 +268,422 @@ export function CtaFormPanel() {
         onCancel={() => setPendingDelete(false)}
       />
 
-      <button
-        type="button"
-        onClick={() => setSelectedCtaId(null)}
-        className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-      >
-        ← {t('admin.landing.backToSection')}
-      </button>
-
-      <div>
-        <label className="block text-xs font-medium text-muted-foreground mb-1">
-          {t('admin.landing.cta.type')}
-        </label>
-        <Select
-          value={cta.type}
-          options={[
-            { value: 'button', label: 'button' },
-            { value: 'text', label: 'text' },
-            { value: 'image', label: 'image' },
-          ]}
-          onChange={(e) =>
-            updateCta(selectedSection.id, cta.id, {
-              type: e.target.value as 'button' | 'text' | 'image',
-            })
-          }
-        />
-      </div>
-
-      <div>
-        <label className="block text-xs font-medium text-muted-foreground mb-1">
-          {t('admin.landing.cta.label')}
-        </label>
-        <Input
-          value={cta.label ?? ''}
-          onChange={(e) => updateCta(selectedSection.id, cta.id, { label: e.target.value })}
-        />
-      </div>
-
-      <div>
-        <label className="block text-xs font-medium text-muted-foreground mb-1">
-          {t('admin.landing.cta.href')}
-        </label>
-        <Input
-          value={cta.href}
-          onChange={(e) => updateCta(selectedSection.id, cta.id, { href: e.target.value })}
-        />
-      </div>
-
-      {/* Type-specific style UI */}
-      <div className="pt-2 border-t border-border">
-        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-          {t('admin.landing.cta.style.title')}
-        </h4>
-        {cta.type === 'button' && renderButtonStyleUI()}
-        {cta.type === 'text' && renderTextStyleUI()}
-        {cta.type === 'image' && renderImageUI()}
-      </div>
-
-      {/* Advanced (raw className) */}
-      <div>
+      {/* Sticky colored header with back button */}
+      <div className="sticky top-0 z-10 px-4 py-3 border-b border-green-100 bg-green-50 shrink-0">
         <button
           type="button"
-          onClick={() => setShowAdvanced((v) => !v)}
-          className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          onClick={() => setSelectedCtaId(null)}
+          className="flex items-center gap-1 text-xs text-green-700 font-medium hover:underline"
         >
-          {showAdvanced ? '▾' : '▸'} {t('admin.landing.cta.style.advanced')}
+          ← {t('admin.landing.backToSection')}
         </button>
-        {showAdvanced && (
-          <Input
-            className="mt-1"
-            value={cta.className ?? ''}
-            onChange={(e) => updateCta(selectedSection.id, cta.id, { className: e.target.value })}
-            placeholder={t('admin.landing.cta.className')}
-          />
-        )}
+        <h2 className="text-sm font-bold text-green-800 mt-1">🎯 CTA</h2>
       </div>
 
-      {/* Position */}
-      <div className="pt-2 border-t border-border">
-        <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
-          Position
-        </h4>
-        <div className="grid grid-cols-2 gap-2">
-          <div>
-            <label className="block text-xs font-medium text-muted-foreground mb-1">
-              {t('admin.landing.cta.positionTop')}
-            </label>
-            <Input
-              type="number"
-              value={cta.positionTop ?? ''}
-              onChange={(e) =>
-                updateCta(selectedSection.id, cta.id, {
-                  positionTop: e.target.value ? Number(e.target.value) : undefined,
-                })
-              }
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-muted-foreground mb-1">
-              {t('admin.landing.cta.positionLeft')}
-            </label>
-            <Input
-              type="number"
-              value={cta.positionLeft ?? ''}
-              onChange={(e) =>
-                updateCta(selectedSection.id, cta.id, {
-                  positionLeft: e.target.value ? Number(e.target.value) : undefined,
-                })
-              }
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-muted-foreground mb-1">
-              {t('admin.landing.cta.positionBottom')}
-            </label>
-            <Input
-              type="number"
-              value={cta.positionBottom ?? ''}
-              onChange={(e) =>
-                updateCta(selectedSection.id, cta.id, {
-                  positionBottom: e.target.value ? Number(e.target.value) : undefined,
-                })
-              }
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-muted-foreground mb-1">
-              {t('admin.landing.cta.positionRight')}
-            </label>
-            <Input
-              type="number"
-              value={cta.positionRight ?? ''}
-              onChange={(e) =>
-                updateCta(selectedSection.id, cta.id, {
-                  positionRight: e.target.value ? Number(e.target.value) : undefined,
-                })
-              }
-            />
-          </div>
-        </div>
-        <div className="mt-2">
+      <div className="p-4 space-y-4">
+        <div>
           <label className="block text-xs font-medium text-muted-foreground mb-1">
-            {t('admin.landing.cta.positionTransform')}
+            {t('admin.landing.cta.type')}
           </label>
-          <Input
-            value={cta.positionTransform ?? ''}
+          <Select
+            value={cta.type}
+            options={[
+              { value: 'button', label: 'button' },
+              { value: 'text', label: 'text' },
+              { value: 'image', label: 'image' },
+            ]}
             onChange={(e) =>
-              updateCta(selectedSection.id, cta.id, { positionTransform: e.target.value })
+              updateCta(selectedSection.id, cta.id, {
+                type: e.target.value as 'button' | 'text' | 'image',
+              })
             }
           />
         </div>
-      </div>
 
-      <div>
-        <label className="block text-xs font-medium text-muted-foreground mb-1">
-          {t('admin.landing.section.order')}
-        </label>
-        <Input
-          type="number"
-          value={cta.order}
-          onChange={(e) =>
-            updateCta(selectedSection.id, cta.id, { order: Number(e.target.value) })
-          }
-        />
-      </div>
+        <div>
+          <label className="block text-xs font-medium text-muted-foreground mb-1">
+            {t('admin.landing.cta.name')}
+          </label>
+          <Input
+            value={(sc.name as string) ?? ''}
+            onChange={(e) => updateStyleConfig({ name: e.target.value || undefined })}
+            placeholder="CTA 이름"
+          />
+        </div>
 
-      <div className="flex items-center gap-2">
-        <Switch
-          checked={cta.isActive}
-          onChange={(e) => updateCta(selectedSection.id, cta.id, { isActive: e.target.checked })}
-        />
-        <span className="text-sm">{t('admin.landing.section.active')}</span>
-      </div>
+        <div>
+          <label className="block text-xs font-medium text-muted-foreground mb-1">
+            {t('admin.landing.cta.label')}
+          </label>
+          <Input
+            value={cta.label ?? ''}
+            onChange={(e) => updateCta(selectedSection.id, cta.id, { label: e.target.value })}
+          />
+        </div>
 
-      <div className="pt-2 border-t border-border">
-        <button
-          type="button"
-          onClick={() => setPendingDelete(true)}
-          className="w-full px-3 py-2 border border-destructive/40 text-destructive text-sm rounded hover:bg-destructive/10 transition-colors"
-        >
-          {t('ui.button.delete')} CTA
-        </button>
+        <div>
+          <label className="block text-xs font-medium text-muted-foreground mb-1">
+            {t('admin.landing.cta.href')}
+          </label>
+          <Input
+            value={cta.href}
+            onChange={(e) => updateCta(selectedSection.id, cta.id, { href: e.target.value })}
+          />
+        </div>
+
+        {/* Type-specific style UI */}
+        <div className="pt-2 border-t border-border">
+          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+            {t('admin.landing.cta.style.title')}
+          </h4>
+          {cta.type === 'button' && renderButtonStyleUI()}
+          {cta.type === 'text' && renderTextStyleUI()}
+          {cta.type === 'image' && renderImageUI()}
+        </div>
+
+        {/* CTA size override (styleConfig) */}
+        <div className="pt-2 border-t border-border">
+          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+            Size
+          </h4>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">
+                {t('admin.landing.cta.styleConfig.width')}
+              </label>
+              <Input
+                type="number"
+                placeholder="auto"
+                value={(cta.styleConfig?.width as number) ?? ''}
+                onChange={(e) =>
+                  updateCta(selectedSection.id, cta.id, {
+                    styleConfig: {
+                      ...(cta.styleConfig ?? {}),
+                      width: Number(e.target.value) || undefined,
+                    },
+                  })
+                }
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">
+                {t('admin.landing.cta.styleConfig.height')}
+              </label>
+              <Input
+                type="number"
+                placeholder="auto"
+                value={(cta.styleConfig?.height as number) ?? ''}
+                onChange={(e) =>
+                  updateCta(selectedSection.id, cta.id, {
+                    styleConfig: {
+                      ...(cta.styleConfig ?? {}),
+                      height: Number(e.target.value) || undefined,
+                    },
+                  })
+                }
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Advanced style config (color, typography, etc.) */}
+        <div className="pt-2 border-t border-border">
+          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
+            {t('admin.landing.cta.styleConfig.title')}
+          </h4>
+
+          {cta.type === 'button' && (
+            <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">
+                    {t('admin.landing.cta.styleConfig.bgColor')}
+                  </label>
+                  <input
+                    type="color"
+                    value={(sc.bgColor as string) || '#000000'}
+                    onChange={(e) => updateStyleConfig({ bgColor: e.target.value })}
+                    className="w-full h-8 rounded border border-border cursor-pointer"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">
+                    {t('admin.landing.cta.styleConfig.textColor')}
+                  </label>
+                  <input
+                    type="color"
+                    value={(sc.textColor as string) || '#ffffff'}
+                    onChange={(e) => updateStyleConfig({ textColor: e.target.value })}
+                    className="w-full h-8 rounded border border-border cursor-pointer"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">
+                    {t('admin.landing.cta.styleConfig.borderColor')}
+                  </label>
+                  <input
+                    type="color"
+                    value={(sc.borderColor as string) || '#000000'}
+                    onChange={(e) => updateStyleConfig({ borderColor: e.target.value })}
+                    className="w-full h-8 rounded border border-border cursor-pointer"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">
+                    {t('admin.landing.cta.styleConfig.borderWidth')}
+                  </label>
+                  <Input
+                    type="number"
+                    min={0}
+                    placeholder="0"
+                    value={(sc.borderWidth as number) ?? ''}
+                    onChange={(e) => updateStyleConfig({ borderWidth: Number(e.target.value) || undefined })}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">
+                  {t('admin.landing.cta.styleConfig.opacity')}
+                </label>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={(sc.opacity as number) ?? 100}
+                  onChange={(e) => updateStyleConfig({ opacity: Number(e.target.value) })}
+                  className="w-full"
+                />
+                <span className="text-xs text-muted-foreground">{(sc.opacity as number) ?? 100}</span>
+              </div>
+            </div>
+          )}
+
+          {cta.type === 'text' && (
+            <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">
+                    {t('admin.landing.cta.styleConfig.lineHeight')}
+                  </label>
+                  <Input
+                    type="number"
+                    step={0.1}
+                    placeholder="1.5"
+                    value={(sc.lineHeight as number) ?? ''}
+                    onChange={(e) => updateStyleConfig({ lineHeight: Number(e.target.value) || undefined })}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1">
+                    {t('admin.landing.cta.styleConfig.letterSpacing')}
+                  </label>
+                  <Input
+                    type="number"
+                    step={0.01}
+                    placeholder="0"
+                    value={(sc.letterSpacing as number) ?? ''}
+                    onChange={(e) => updateStyleConfig({ letterSpacing: Number(e.target.value) || undefined })}
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">
+                  {t('admin.landing.cta.styleConfig.fontFamily')}
+                </label>
+                <select
+                  className="w-full rounded border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  value={(sc.fontFamily as string) ?? ''}
+                  onChange={(e) => updateStyleConfig({ fontFamily: e.target.value || undefined })}
+                >
+                  <option value="">— default —</option>
+                  <option value="sans">Sans-serif</option>
+                  <option value="serif">Serif</option>
+                  <option value="mono">Monospace</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">
+                  {t('admin.landing.cta.styleConfig.color')}
+                </label>
+                <input
+                  type="color"
+                  value={(sc.color as string) || '#000000'}
+                  onChange={(e) => updateStyleConfig({ color: e.target.value })}
+                  className="w-full h-8 rounded border border-border cursor-pointer"
+                />
+              </div>
+            </div>
+          )}
+
+          {cta.type === 'image' && (
+            <div className="space-y-2">
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">
+                  {t('admin.landing.cta.styleConfig.opacity')}
+                </label>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={(sc.opacity as number) ?? 100}
+                  onChange={(e) => updateStyleConfig({ opacity: Number(e.target.value) })}
+                  className="w-full"
+                />
+                <span className="text-xs text-muted-foreground">{(sc.opacity as number) ?? 100}</span>
+              </div>
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={!!(sc.shadow)}
+                  onChange={(e) => updateStyleConfig({ shadow: e.target.checked || undefined })}
+                  className="rounded"
+                />
+                <span className="text-sm">{t('admin.landing.cta.styleConfig.shadow')}</span>
+              </label>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1">
+                  {t('admin.landing.cta.styleConfig.aspectRatio')}
+                </label>
+                <select
+                  className="w-full rounded border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  value={(sc.aspectRatio as string) ?? 'free'}
+                  onChange={(e) => updateStyleConfig({ aspectRatio: e.target.value === 'free' ? undefined : e.target.value })}
+                >
+                  <option value="free">Free</option>
+                  <option value="16/9">16:9</option>
+                  <option value="4/3">4:3</option>
+                  <option value="1/1">1:1</option>
+                </select>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Advanced (raw className) */}
+        <div>
+          <button
+            type="button"
+            onClick={() => setShowAdvanced((v) => !v)}
+            className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {showAdvanced ? '▾' : '▸'} {t('admin.landing.cta.style.advanced')}
+          </button>
+          {showAdvanced && (
+            <Input
+              className="mt-1"
+              value={cta.className ?? ''}
+              onChange={(e) => updateCta(selectedSection.id, cta.id, { className: e.target.value })}
+              placeholder={t('admin.landing.cta.className')}
+            />
+          )}
+        </div>
+
+        {/* Position */}
+        <div className="pt-2 border-t border-border">
+          <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">
+            Position
+          </h4>
+          <div className="grid grid-cols-2 gap-2">
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">
+                {t('admin.landing.cta.positionTop')}
+              </label>
+              <Input
+                type="number"
+                value={cta.positionTop ?? ''}
+                onChange={(e) =>
+                  updateCta(selectedSection.id, cta.id, {
+                    positionTop: e.target.value ? Number(e.target.value) : undefined,
+                  })
+                }
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">
+                {t('admin.landing.cta.positionLeft')}
+              </label>
+              <Input
+                type="number"
+                value={cta.positionLeft ?? ''}
+                onChange={(e) =>
+                  updateCta(selectedSection.id, cta.id, {
+                    positionLeft: e.target.value ? Number(e.target.value) : undefined,
+                  })
+                }
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">
+                {t('admin.landing.cta.positionBottom')}
+              </label>
+              <Input
+                type="number"
+                value={cta.positionBottom ?? ''}
+                onChange={(e) =>
+                  updateCta(selectedSection.id, cta.id, {
+                    positionBottom: e.target.value ? Number(e.target.value) : undefined,
+                  })
+                }
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-medium text-muted-foreground mb-1">
+                {t('admin.landing.cta.positionRight')}
+              </label>
+              <Input
+                type="number"
+                value={cta.positionRight ?? ''}
+                onChange={(e) =>
+                  updateCta(selectedSection.id, cta.id, {
+                    positionRight: e.target.value ? Number(e.target.value) : undefined,
+                  })
+                }
+              />
+            </div>
+          </div>
+          <div className="mt-2">
+            <label className="block text-xs font-medium text-muted-foreground mb-1">
+              {t('admin.landing.cta.positionTransform')}
+            </label>
+            <Input
+              value={cta.positionTransform ?? ''}
+              onChange={(e) =>
+                updateCta(selectedSection.id, cta.id, { positionTransform: e.target.value })
+              }
+            />
+          </div>
+        </div>
+
+        <div>
+          <label className="block text-xs font-medium text-muted-foreground mb-1">
+            {t('admin.landing.section.order')}
+          </label>
+          <Input
+            type="number"
+            value={cta.order}
+            onChange={(e) =>
+              updateCta(selectedSection.id, cta.id, { order: Number(e.target.value) })
+            }
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Switch
+            checked={cta.isActive}
+            onChange={(e) => updateCta(selectedSection.id, cta.id, { isActive: e.target.checked })}
+          />
+          <span className="text-sm">{t('admin.landing.section.active')}</span>
+        </div>
+
+        <div className="pt-2 border-t border-border">
+          <button
+            type="button"
+            onClick={() => setPendingDelete(true)}
+            className="w-full px-3 py-2 border border-destructive/40 text-destructive text-sm rounded hover:bg-destructive/10 transition-colors"
+          >
+            {t('ui.button.delete')} CTA
+          </button>
+        </div>
       </div>
     </div>
   );

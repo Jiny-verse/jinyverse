@@ -18,14 +18,7 @@ export function RightPanel() {
   }
 
   return (
-    <aside className="w-80 shrink-0 border-l border-border overflow-y-auto">
-      <div className="px-4 py-3 border-b border-border">
-        <h3 className="text-sm font-semibold truncate">
-          {selectedCtaId
-            ? `CTA — ${selectedSection.ctas.find((c) => c.id === selectedCtaId)?.label || selectedCtaId.slice(0, 8)}`
-            : selectedSection.type}
-        </h3>
-      </div>
+    <aside className="w-80 shrink-0 border-l border-border flex flex-col overflow-hidden">
       {selectedCtaId ? <CtaFormPanel /> : <SectionFormPanel />}
     </aside>
   );

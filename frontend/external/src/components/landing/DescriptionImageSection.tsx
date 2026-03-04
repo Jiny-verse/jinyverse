@@ -32,7 +32,8 @@ interface DescriptionImageSectionProps {
 export function DescriptionImageSection({ section, apiBaseUrl }: DescriptionImageSectionProps) {
   const imgFileId = section.fileIds?.[0];
   const imgUrl = imgFileId ? `${apiBaseUrl}/api/files/${imgFileId}/download` : null;
-  const hrefRaw = section.extraConfig?.href as string | undefined;
+  const fileLinks = (section.extraConfig?.fileLinks ?? {}) as Record<string, string>;
+  const hrefRaw = imgFileId ? fileLinks[imgFileId] : undefined;
 
   const imageContent = imgUrl ? (
     <Image
@@ -76,6 +77,7 @@ export function DescriptionImageSection({ section, apiBaseUrl }: DescriptionImag
           imageUrl={cta.imageFileId ? `${apiBaseUrl}/api/files/${cta.imageFileId}/download` : undefined}
           className={cta.className || ''}
           positionStyle={buildPositionStyle(cta)}
+          styleConfig={cta.styleConfig as Record<string, unknown> | null | undefined}
         />
       ))}
     </section>

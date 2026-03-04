@@ -477,13 +477,18 @@
                 "removeImage": "이미지 삭제",
                 "boardSelect": "게시판 선택",
                 "postLimit": "게시글 개수",
-                "linkUrl": "링크 URL"
+                "linkUrl": "링크 URL",
+                "imageLink": "이미지 링크 URL",
+                "customHeight": "높이 (px, 비워두면 auto)",
+                "customWidth": "너비 (px, 비워두면 auto)",
+                "linkUrlHint": "이미지 링크가 있으면 그 이미지에는 위 링크 대신 이미지 링크가 적용됩니다."
             },
             "cta": {
                 "title": "CTA 버튼 관리",
                 "create": "CTA 추가",
                 "edit": "CTA 수정",
                 "type": "버튼 타입",
+                "name": "CTA 이름",
                 "label": "버튼 텍스트",
                 "href": "링크 주소",
                 "className": "스타일 클래스",
@@ -503,7 +508,36 @@
                     "size": "크기",
                     "weight": "굵기",
                     "advanced": "고급 (직접 입력)"
+                },
+                "styleConfig": {
+                    "width": "너비 (px)",
+                    "height": "높이 (px)",
+                    "title": "세부 스타일",
+                    "bgColor": "배경색",
+                    "textColor": "글자색",
+                    "borderColor": "테두리 색",
+                    "borderWidth": "테두리 굵기 (px)",
+                    "opacity": "불투명도 (0-100)",
+                    "lineHeight": "줄 간격",
+                    "letterSpacing": "자간 (em)",
+                    "fontFamily": "폰트",
+                    "color": "색상 오버라이드",
+                    "shadow": "그림자",
+                    "aspectRatio": "비율"
                 }
+            },
+            "viewport": {
+                "desktop": "데스크톱",
+                "mobile": "모바일"
+            },
+            "undo": "실행 취소",
+            "redo": "다시 실행",
+            "slider": {
+                "enabled": "슬라이더 활성화",
+                "autoPlay": "자동 재생",
+                "interval": "전환 간격 (ms)",
+                "showControls": "컨트롤 표시",
+                "showIndicators": "인디케이터 표시"
             }
         }
     },

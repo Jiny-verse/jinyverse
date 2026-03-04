@@ -102,6 +102,7 @@ export function BoardTopSection({ section, apiBaseUrl }: BoardTopSectionProps) {
           imageUrl={cta.imageFileId ? `${apiBaseUrl}/api/files/${cta.imageFileId}/download` : undefined}
           className={cta.className || ''}
           positionStyle={buildPositionStyle(cta)}
+          styleConfig={cta.styleConfig as Record<string, unknown> | null | undefined}
         />
       ))}
     </section>

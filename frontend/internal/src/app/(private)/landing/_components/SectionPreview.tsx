@@ -1,12 +1,20 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { LandingSection } from 'common/schemas';
 import { useLandingContext } from '../_hooks/useLandingContext';
 
 interface SectionPreviewProps {
   section: LandingSection;
-  apiBaseUrl: string;
+  apiBaseUrl: string | undefined;
+}
+
+interface SlideSettings {
+  enabled: boolean;
+  autoPlay: boolean;
+  interval: number;
+  showControls: boolean;
+  showIndicators: boolean;
 }
 
 const FILMSTRIP_TYPES = ['hero', 'image', 'image_link'];
@@ -73,6 +81,7 @@ function ImageFilmstrip({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
+            key={fileId}
             src={`${apiBaseUrl}/api/files/${fileId}/download`}
             alt=""
             className="w-full h-full object-cover"
@@ -88,35 +97,159 @@ function ImageFilmstrip({
   );
 }
 
+function HeroCarousel({
+  section,
+  apiBaseUrl,
+  slideSettings,
+}: {
+  section: LandingSection;
+  apiBaseUrl: string;
+  slideSettings: SlideSettings;
+}) {
+  const fileIds = section.fileIds ?? [];
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  useEffect(() => {
+    if (!slideSettings.autoPlay || fileIds.length <= 1) return;
+    const timer = setInterval(() => {
+      setActiveIdx((prev) => (prev + 1) % fileIds.length);
+    }, slideSettings.interval || 3000);
+    return () => clearInterval(timer);
+  }, [slideSettings.autoPlay, slideSettings.interval, fileIds.length]);
+
+  const prev = () => setActiveIdx((i) => (i - 1 + fileIds.length) % fileIds.length);
+  const next = () => setActiveIdx((i) => (i + 1) % fileIds.length);
+
+  return (
+    <>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        key={fileIds[activeIdx]}
+        src={`${apiBaseUrl}/api/files/${fileIds[activeIdx]}/download`}
+        alt=""
+        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
+      />
+      {slideSettings.showControls && fileIds.length > 1 && (
+        <>
+          <button
+            type="button"
+            onClick={prev}
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-30 w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70"
+          >
+            ‹
+          </button>
+          <button
+            type="button"
+            onClick={next}
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-30 w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70"
+          >
+            ›
+          </button>
+        </>
+      )}
+      {slideSettings.showIndicators && fileIds.length > 1 && (
+        <div className="absolute bottom-10 left-0 right-0 flex justify-center gap-1.5 z-30">
+          {fileIds.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              onClick={() => setActiveIdx(i)}
+              className={`w-2 h-2 rounded-full transition-colors ${
+                i === activeIdx ? 'bg-white' : 'bg-white/40'
+              }`}
+            />
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
 export function SectionPreview({ section, apiBaseUrl }: SectionPreviewProps) {
-  const bgImage =
-    section.fileIds && section.fileIds.length > 0
-      ? `${apiBaseUrl}/api/files/${section.fileIds[0]}/download`
-      : null;
+  const base = apiBaseUrl ?? '';
+  const fileIds = section.fileIds ?? [];
+  const bgImage = fileIds.length > 0 ? `${base}/api/files/${fileIds[0]}/download` : null;
 
   const showFilmstrip = FILMSTRIP_TYPES.includes(section.type);
+  const customHeight = section.extraConfig?.customHeight as number | undefined;
+  const customWidth = section.extraConfig?.customWidth as number | undefined;
+  const href = section.extraConfig?.href as string | undefined;
+  const slideSettings = section.extraConfig?.slideSettings as SlideSettings | undefined;
+
+  const widthStyle: React.CSSProperties = customWidth
+    ? { width: `${customWidth}px`, maxWidth: '100%' }
+    : {};
+
+  const resolveHref = (h: string) => {
+    if (!h) return h;
+    if (h.startsWith('http://') || h.startsWith('https://') || h.startsWith('/')) return h;
+    return `https://${h}`;
+  };
+
+  const wrapWithLink = (content: React.ReactElement, extraClass = '') => {
+    if (!href) {
+      if (extraClass) return <div className={extraClass}>{content}</div>;
+      return content;
+    }
+    return (
+      <a
+        href={resolveHref(href)}
+        target={href.startsWith('/') ? undefined : '_blank'}
+        rel="noopener noreferrer"
+        className={`block ${extraClass}`}
+      >
+        {content}
+      </a>
+    );
+  };
 
   if (section.type === 'hero') {
+    const isCarousel = slideSettings?.enabled && fileIds.length > 1;
+    const heightStyle = customHeight ? { height: `${customHeight}px` } : { height: '400px' };
     return (
       <div
-        className="h-[400px] w-full relative overflow-hidden"
-        style={
-          bgImage
-            ? { backgroundImage: `url(${bgImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-            : { background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }
-        }
+        className="w-full relative overflow-hidden"
+        style={{ ...heightStyle, ...widthStyle }}
       >
-        {showFilmstrip && <ImageFilmstrip section={section} apiBaseUrl={apiBaseUrl} />}
+        {isCarousel ? (
+          <HeroCarousel section={section} apiBaseUrl={base} slideSettings={slideSettings!} />
+        ) : bgImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            key={fileIds[0]}
+            src={bgImage}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <div
+            className="absolute inset-0"
+            style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
+          />
+        )}
+        {href && (
+          <a
+            href={resolveHref(href)}
+            target={href.startsWith('/') ? undefined : '_blank'}
+            rel="noopener noreferrer"
+            className="absolute inset-0 z-10"
+          />
+        )}
+        {showFilmstrip && <ImageFilmstrip section={section} apiBaseUrl={base} />}
       </div>
     );
   }
 
   if (section.type === 'image') {
-    return (
-      <div className="h-[300px] w-full flex overflow-hidden relative">
+    return wrapWithLink(
+      <div
+        className="w-full flex overflow-hidden relative"
+        style={{ ...(customHeight ? { height: `${customHeight}px` } : { height: '300px' }), ...widthStyle }}
+      >
         <div className="w-1/2 bg-gray-200 flex items-center justify-center relative overflow-hidden">
           {bgImage ? (
-            <img src={bgImage} alt="" className="w-full h-full object-cover" />
+            // eslint-disable-next-line @next/next/no-img-element
+            <img key={fileIds[0]} src={bgImage} alt="" className="w-full h-full object-cover" />
           ) : (
             <span className="text-gray-400 text-sm">Image</span>
           )}
@@ -127,14 +260,17 @@ export function SectionPreview({ section, apiBaseUrl }: SectionPreviewProps) {
           <div className="h-3 bg-gray-100 rounded mb-2 w-5/6" />
           <div className="h-3 bg-gray-100 rounded w-4/6" />
         </div>
-        {showFilmstrip && <ImageFilmstrip section={section} apiBaseUrl={apiBaseUrl} />}
+        {showFilmstrip && <ImageFilmstrip section={section} apiBaseUrl={base} />}
       </div>
     );
   }
 
   if (section.type === 'board_top') {
     return (
-      <div className="h-[240px] w-full p-4 bg-background">
+      <div
+        className="w-full p-4 bg-background"
+        style={{ ...(customHeight ? { height: `${customHeight}px` } : { height: '240px' }), ...widthStyle }}
+      >
         <div className="h-5 bg-gray-200 rounded mb-4 w-1/3" />
         {[0, 1, 2].map((i) => (
           <div key={i} className="flex items-center gap-3 mb-3">
@@ -151,7 +287,10 @@ export function SectionPreview({ section, apiBaseUrl }: SectionPreviewProps) {
 
   if (section.type === 'image_link') {
     return (
-      <div className="h-[300px] w-full flex gap-2 p-4 bg-background relative">
+      <div
+        className="w-full flex gap-2 p-4 bg-background relative"
+        style={{ ...(customHeight ? { height: `${customHeight}px` } : { height: '300px' }), ...widthStyle }}
+      >
         {[0, 1, 2].map((i) => (
           <div
             key={i}
@@ -160,7 +299,7 @@ export function SectionPreview({ section, apiBaseUrl }: SectionPreviewProps) {
             Image {i + 1}
           </div>
         ))}
-        {showFilmstrip && <ImageFilmstrip section={section} apiBaseUrl={apiBaseUrl} />}
+        {showFilmstrip && <ImageFilmstrip section={section} apiBaseUrl={base} />}
       </div>
     );
   }

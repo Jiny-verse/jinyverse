@@ -469,13 +469,18 @@
                 "removeImage": "画像削除",
                 "boardSelect": "掲示板選択",
                 "postLimit": "投稿件数",
-                "linkUrl": "リンクURL"
+                "linkUrl": "リンクURL",
+                "imageLink": "画像リンクURL",
+                "customHeight": "高さ (px、空白でauto)",
+                "customWidth": "幅 (px、空白でauto)",
+                "linkUrlHint": "画像に個別リンクが設定されている場合、そちらが上のセクションリンクより優先されます。"
             },
             "cta": {
                 "title": "CTAボタン管理",
                 "create": "CTA追加",
                 "edit": "CTA編集",
                 "type": "ボタンタイプ",
+                "name": "CTA名",
                 "label": "ボタンテキスト",
                 "href": "リンク先URL",
                 "className": "スタイルクラス",
@@ -495,7 +500,36 @@
                     "size": "サイズ",
                     "weight": "太さ",
                     "advanced": "詳細（直接入力）"
+                },
+                "styleConfig": {
+                    "width": "幅 (px)",
+                    "height": "高さ (px)",
+                    "title": "詳細スタイル",
+                    "bgColor": "背景色",
+                    "textColor": "文字色",
+                    "borderColor": "ボーダー色",
+                    "borderWidth": "ボーダー幅 (px)",
+                    "opacity": "不透明度 (0-100)",
+                    "lineHeight": "行間",
+                    "letterSpacing": "字間 (em)",
+                    "fontFamily": "フォント",
+                    "color": "色オーバーライド",
+                    "shadow": "シャドウ",
+                    "aspectRatio": "アスペクト比"
                 }
+            },
+            "viewport": {
+                "desktop": "デスクトップ",
+                "mobile": "モバイル"
+            },
+            "undo": "元に戻す",
+            "redo": "やり直す",
+            "slider": {
+                "enabled": "スライダー有効",
+                "autoPlay": "自動再生",
+                "interval": "切替間隔 (ms)",
+                "showControls": "コントロール表示",
+                "showIndicators": "インジケーター表示"
             }
         }
     },

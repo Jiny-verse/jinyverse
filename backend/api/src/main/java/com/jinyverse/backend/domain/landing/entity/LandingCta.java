@@ -11,12 +11,15 @@ import lombok.Setter;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @Entity
@@ -90,6 +93,10 @@ public class LandingCta {
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "style_config", columnDefinition = "jsonb")
+    private Map<String, Object> styleConfig;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "section_id", insertable = false, updatable = false)
     private LandingSection section;
@@ -110,6 +117,7 @@ public class LandingCta {
                 .imageFileId(dto.getImageFileId())
                 .order(dto.getOrder() != null ? dto.getOrder() : 0)
                 .isActive(dto.getIsActive() != null ? dto.getIsActive() : true)
+                .styleConfig(dto.getStyleConfig())
                 .build();
     }
 
@@ -126,6 +134,7 @@ public class LandingCta {
         if (dto.getImageFileId() != null) this.imageFileId = dto.getImageFileId();
         if (dto.getOrder() != null) this.order = dto.getOrder();
         if (dto.getIsActive() != null) this.isActive = dto.getIsActive();
+        if (dto.getStyleConfig() != null) this.styleConfig = dto.getStyleConfig();
     }
 
     public LandingCtaResponseDto toResponseDto() {
@@ -145,6 +154,7 @@ public class LandingCta {
                 .imageFileId(this.imageFileId)
                 .order(this.order)
                 .isActive(this.isActive)
+                .styleConfig(this.styleConfig)
                 .createdAt(this.createdAt)
                 .updatedAt(this.updatedAt)
                 .build();

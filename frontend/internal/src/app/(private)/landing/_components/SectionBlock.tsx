@@ -1,6 +1,6 @@
 'use client';
 
-import { RefObject, useState } from 'react';
+import { useRef, useState } from 'react';
 import { ConfirmDialog } from 'common/ui';
 import { useLanguage } from 'common/utils';
 import type { LandingSection } from 'common/schemas';
@@ -13,7 +13,6 @@ interface SectionBlockProps {
   section: LandingSection;
   index: number;
   isDragOver: boolean;
-  canvasRef: RefObject<HTMLDivElement | null>;
   onDragStart: (index: number, e: React.DragEvent) => void;
   onDragOver: (index: number, e: React.DragEvent) => void;
   onDrop: (index: number) => void;
@@ -23,7 +22,6 @@ export function SectionBlock({
   section,
   index,
   isDragOver,
-  canvasRef,
   onDragStart,
   onDragOver,
   onDrop,
@@ -32,6 +30,8 @@ export function SectionBlock({
   const { selectedSection, selectedCtaId, setSelectedSection, deleteSection } = useLandingContext();
   const apiOptions = useApiOptions();
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+  const [snapGuide, setSnapGuide] = useState({ h: false, v: false });
+  const sectionRef = useRef<HTMLDivElement>(null);
 
   const isSelected = selectedSection?.id === section.id;
 
@@ -50,6 +50,7 @@ export function SectionBlock({
         onCancel={() => setPendingDeleteId(null)}
       />
       <div
+        ref={sectionRef}
         className={`relative group border-2 transition-colors ${
           isSelected ? 'border-primary' : 'border-transparent'
         } ${isDragOver ? 'border-t-4 border-t-primary' : ''}`}
@@ -95,6 +96,14 @@ export function SectionBlock({
         {/* Section preview */}
         <SectionPreview section={section} apiBaseUrl={apiOptions.baseUrl} />
 
+        {/* Snap guide lines */}
+        {snapGuide.h && (
+          <div className="absolute inset-x-0 top-1/2 h-px bg-red-500 z-30 pointer-events-none" />
+        )}
+        {snapGuide.v && (
+          <div className="absolute inset-y-0 left-1/2 w-px bg-red-500 z-30 pointer-events-none" />
+        )}
+
         {/* CTA overlays */}
         {section.ctas
           .filter((cta) => cta.isActive)
@@ -104,7 +113,8 @@ export function SectionBlock({
               cta={cta}
               sectionId={section.id}
               isSelected={selectedCtaId === cta.id}
-              canvasRef={canvasRef}
+              sectionRef={sectionRef}
+              onSnap={(h, v) => setSnapGuide({ h, v })}
             />
           ))}
       </div>

@@ -32,7 +32,7 @@ export default async function LandingPage() {
   }
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="-mx-[4%] flex flex-col">
       <DynamicLandingRenderer sections={sections} apiBaseUrl={apiBaseUrl} />
     </div>
   );

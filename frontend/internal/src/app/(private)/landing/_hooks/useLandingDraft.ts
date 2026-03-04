@@ -16,6 +16,7 @@ import {
 import type { ApiOptions } from 'common/types';
 import type {
   LandingSection,
+  LandingCta,
   LandingSectionUpdateInput,
   LandingCtaUpdateInput,
 } from 'common/schemas';
@@ -30,14 +31,49 @@ export function useLandingDraft(apiOptions: ApiOptions) {
   const sectionsRef = useRef(sections);
   sectionsRef.current = sections;
 
+  // Undo/redo stacks
+  const undoStackRef = useRef<LandingSection[][]>([]);
+  const redoStackRef = useRef<LandingSection[][]>([]);
+
+  const pushHistory = useCallback(() => {
+    undoStackRef.current = [...undoStackRef.current, sectionsRef.current].slice(-50);
+    redoStackRef.current = [];
+  }, []);
+
   const load = useCallback(async () => {
     const data = await getAdminLandingSections(apiOptionsRef.current);
     setSections(data);
     setOriginal(data);
     setIsDirty(false);
+    undoStackRef.current = [];
+    redoStackRef.current = [];
   }, []);
 
+  const undo = useCallback(() => {
+    const stack = undoStackRef.current;
+    if (stack.length === 0) return;
+    redoStackRef.current = [...redoStackRef.current, sectionsRef.current];
+    const prev = stack[stack.length - 1];
+    undoStackRef.current = stack.slice(0, -1);
+    setSections(prev);
+    setIsDirty(true);
+  }, []);
+
+  const redo = useCallback(() => {
+    const stack = redoStackRef.current;
+    if (stack.length === 0) return;
+    undoStackRef.current = [...undoStackRef.current, sectionsRef.current];
+    const next = stack[stack.length - 1];
+    redoStackRef.current = stack.slice(0, -1);
+    setSections(next);
+    setIsDirty(true);
+  }, []);
+
+  const canUndo = undoStackRef.current.length > 0;
+  const canRedo = redoStackRef.current.length > 0;
+
   const reorderSection = useCallback((fromIndex: number, toIndex: number) => {
+    pushHistory();
     setSections((prev) => {
       const next = [...prev];
       const [moved] = next.splice(fromIndex, 1);
@@ -46,12 +82,13 @@ export function useLandingDraft(apiOptions: ApiOptions) {
       return next.map((s, i) => ({ ...s, order: i + 1 }));
     });
     setIsDirty(true);
-  }, []);
+  }, [pushHistory]);
 
   const updateSection = useCallback((id: string, patch: Partial<LandingSectionUpdateInput>) => {
+    pushHistory();
     setSections((prev) => prev.map((s) => (s.id === id ? { ...s, ...patch } : s)));
     setIsDirty(true);
-  }, []);
+  }, [pushHistory]);
 
   const deleteSection = useCallback(async (id: string) => {
     await deleteLandingSection(apiOptionsRef.current, id);
@@ -73,6 +110,7 @@ export function useLandingDraft(apiOptions: ApiOptions) {
 
   const updateCta = useCallback(
     (sectionId: string, ctaId: string, patch: Partial<LandingCtaUpdateInput>) => {
+      pushHistory();
       setSections((prev) =>
         prev.map((s) =>
           s.id === sectionId
@@ -82,17 +120,30 @@ export function useLandingDraft(apiOptions: ApiOptions) {
       );
       setIsDirty(true);
     },
-    []
+    [pushHistory]
   );
 
   const moveCta = useCallback(
     (sectionId: string, ctaId: string, top: number, left: number) => {
-      updateCta(sectionId, ctaId, { positionTop: top, positionLeft: left });
+      // moveCta doesn't push history (too frequent during drag)
+      setSections((prev) =>
+        prev.map((s) =>
+          s.id === sectionId
+            ? {
+                ...s,
+                ctas: s.ctas.map((c) =>
+                  c.id === ctaId ? { ...c, positionTop: top, positionLeft: left } : c
+                ),
+              }
+            : s
+        )
+      );
+      setIsDirty(true);
     },
-    [updateCta]
+    []
   );
 
-  const addCta = useCallback(async (sectionId: string, href: string) => {
+  const addCta = useCallback(async (sectionId: string, href: string): Promise<LandingCta> => {
     const created = await createLandingCta(apiOptionsRef.current, sectionId, {
       href,
       positionTop: 50,
@@ -105,6 +156,7 @@ export function useLandingDraft(apiOptions: ApiOptions) {
     setOriginal((prev) =>
       prev.map((s) => (s.id === sectionId ? { ...s, ctas: [...s.ctas, created] } : s))
     );
+    return created;
   }, []);
 
   const deleteCta = useCallback(async (sectionId: string, ctaId: string) => {
@@ -121,30 +173,29 @@ export function useLandingDraft(apiOptions: ApiOptions) {
     );
   }, []);
 
-  const addSectionFile = useCallback(async (sectionId: string, fileId: string, isMain = false) => {
-    const updated = await addSectionFileService(apiOptionsRef.current, sectionId, fileId, isMain);
-    setSections((prev) => prev.map((s) => (s.id === sectionId ? updated : s)));
-    setOriginal((prev) => prev.map((s) => (s.id === sectionId ? updated : s)));
+  const addSectionFile = useCallback((sectionId: string, fileId: string) => {
+    setSections((prev) =>
+      prev.map((s) =>
+        s.id === sectionId ? { ...s, fileIds: [...(s.fileIds ?? []), fileId] } : s
+      )
+    );
+    setIsDirty(true);
   }, []);
 
-  const removeSectionFile = useCallback(async (sectionId: string, fileId: string) => {
-    await removeSectionFileService(apiOptionsRef.current, sectionId, fileId);
+  const removeSectionFile = useCallback((sectionId: string, fileId: string) => {
     setSections((prev) =>
       prev.map((s) =>
         s.id === sectionId ? { ...s, fileIds: (s.fileIds ?? []).filter((id) => id !== fileId) } : s
       )
     );
-    setOriginal((prev) =>
-      prev.map((s) =>
-        s.id === sectionId ? { ...s, fileIds: (s.fileIds ?? []).filter((id) => id !== fileId) } : s
-      )
-    );
+    setIsDirty(true);
   }, []);
 
-  const reorderSectionFiles = useCallback(async (sectionId: string, fileIds: string[]) => {
-    const updated = await reorderSectionFilesService(apiOptionsRef.current, sectionId, fileIds);
-    setSections((prev) => prev.map((s) => (s.id === sectionId ? updated : s)));
-    setOriginal((prev) => prev.map((s) => (s.id === sectionId ? updated : s)));
+  const reorderSectionFiles = useCallback((sectionId: string, fileIds: string[]) => {
+    setSections((prev) =>
+      prev.map((s) => (s.id === sectionId ? { ...s, fileIds } : s))
+    );
+    setIsDirty(true);
   }, []);
 
   const saveAll = useCallback(async () => {
@@ -193,7 +244,8 @@ export function useLandingDraft(apiOptions: ApiOptions) {
           cta.positionTransform !== origCta.positionTransform ||
           cta.isActive !== origCta.isActive ||
           cta.order !== origCta.order ||
-          cta.imageFileId !== origCta.imageFileId;
+          cta.imageFileId !== origCta.imageFileId ||
+          JSON.stringify(cta.styleConfig) !== JSON.stringify(origCta.styleConfig);
 
         if (ctaChanged) {
           savePromises.push(
@@ -208,6 +260,7 @@ export function useLandingDraft(apiOptions: ApiOptions) {
               positionRight: cta.positionRight ?? undefined,
               positionTransform: cta.positionTransform ?? undefined,
               imageFileId: cta.imageFileId ?? undefined,
+              styleConfig: cta.styleConfig ?? undefined,
               isActive: cta.isActive,
               order: cta.order,
             })
@@ -217,18 +270,47 @@ export function useLandingDraft(apiOptions: ApiOptions) {
     }
 
     await Promise.all(savePromises);
+
+    // File diff: remove → add → reorder per section
+    for (const section of sections) {
+      const orig = originalMap.get(section.id);
+      if (!orig) continue;
+      const origFileIds = orig.fileIds ?? [];
+      const currFileIds = section.fileIds ?? [];
+      const toRemove = origFileIds.filter((id) => !currFileIds.includes(id));
+      const toAdd = currFileIds.filter((id) => !origFileIds.includes(id));
+      for (const fileId of toRemove) {
+        await removeSectionFileService(apiOptionsRef.current, section.id, fileId);
+      }
+      for (const fileId of toAdd) {
+        await addSectionFileService(apiOptionsRef.current, section.id, fileId, false);
+      }
+      if (
+        currFileIds.length > 0 &&
+        (toAdd.length > 0 || toRemove.length > 0 || currFileIds.join(',') !== origFileIds.join(','))
+      ) {
+        await reorderSectionFilesService(apiOptionsRef.current, section.id, currFileIds);
+      }
+    }
+
     await load();
   }, [sections, original, load]);
 
   const discard = useCallback(() => {
     setSections([...original]);
     setIsDirty(false);
+    undoStackRef.current = [];
+    redoStackRef.current = [];
   }, [original]);
 
   return {
     sections,
     isDirty,
+    canUndo,
+    canRedo,
     load,
+    undo,
+    redo,
     reorderSection,
     updateSection,
     deleteSection,

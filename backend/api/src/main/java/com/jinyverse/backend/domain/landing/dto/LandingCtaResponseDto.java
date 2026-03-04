@@ -8,6 +8,7 @@ import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.UUID;
 
 @Getter
@@ -32,6 +33,7 @@ public class LandingCtaResponseDto {
     private UUID imageFileId;
     private Integer order;
     private Boolean isActive;
+    private Map<String, Object> styleConfig;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

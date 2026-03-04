@@ -7,6 +7,7 @@ import type {
   LandingSection,
   LandingSectionUpdateInput,
   LandingCtaUpdateInput,
+  LandingCta,
 } from 'common/schemas';
 
 interface LandingContextValue {
@@ -14,6 +15,16 @@ interface LandingContextValue {
   sections: LandingSection[];
   isDirty: boolean;
   isSaving: boolean;
+
+  // viewport
+  viewportMode: 'desktop' | 'mobile';
+  setViewportMode: (mode: 'desktop' | 'mobile') => void;
+
+  // undo/redo
+  canUndo: boolean;
+  canRedo: boolean;
+  undo: () => void;
+  redo: () => void;
 
   // selection
   selectedSection: LandingSection | null;
@@ -31,14 +42,14 @@ interface LandingContextValue {
   updateSection: (id: string, patch: Partial<LandingSectionUpdateInput>) => void;
   deleteSection: (id: string) => Promise<void>;
   addSection: (type: string) => Promise<void>;
-  addSectionFile: (sectionId: string, fileId: string, isMain?: boolean) => Promise<void>;
-  removeSectionFile: (sectionId: string, fileId: string) => Promise<void>;
-  reorderSectionFiles: (sectionId: string, fileIds: string[]) => Promise<void>;
+  addSectionFile: (sectionId: string, fileId: string) => void;
+  removeSectionFile: (sectionId: string, fileId: string) => void;
+  reorderSectionFiles: (sectionId: string, fileIds: string[]) => void;
 
   // CTA actions
   updateCta: (sectionId: string, ctaId: string, patch: Partial<LandingCtaUpdateInput>) => void;
   moveCta: (sectionId: string, ctaId: string, top: number, left: number) => void;
-  addCta: (sectionId: string, href: string) => Promise<void>;
+  addCta: (sectionId: string, href: string) => Promise<LandingCta>;
   deleteCta: (sectionId: string, ctaId: string) => Promise<void>;
 
   // save
@@ -60,6 +71,7 @@ export function LandingProvider({
   const [selectedCtaId, setSelectedCtaId] = useState<string | null>(null);
   const [isAddSectionModalOpen, setIsAddSectionModalOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [viewportMode, setViewportMode] = useState<'desktop' | 'mobile'>('desktop');
 
   // Derived: always reflects the latest sections state — no delay
   const selectedSection = selectedSectionId
@@ -93,6 +105,12 @@ export function LandingProvider({
     sections: draft.sections,
     isDirty: draft.isDirty,
     isSaving,
+    viewportMode,
+    setViewportMode,
+    canUndo: draft.canUndo,
+    canRedo: draft.canRedo,
+    undo: draft.undo,
+    redo: draft.redo,
     selectedSection,
     setSelectedSection,
     selectedCtaId,

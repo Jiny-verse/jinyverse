@@ -469,13 +469,18 @@
                 "removeImage": "Remove Image",
                 "boardSelect": "Select Board",
                 "postLimit": "Post Limit",
-                "linkUrl": "Link URL"
+                "linkUrl": "Link URL",
+                "imageLink": "Image Link URL",
+                "customHeight": "Height (px, leave empty for auto)",
+                "customWidth": "Width (px, leave empty for auto)",
+                "linkUrlHint": "If an image has its own link, that link takes priority over the section link above."
             },
             "cta": {
                 "title": "CTA Button Management",
                 "create": "Add CTA",
                 "edit": "Edit CTA",
                 "type": "Button Type",
+                "name": "CTA Name",
                 "label": "Button Text",
                 "href": "Link URL",
                 "className": "Style Class",
@@ -495,7 +500,36 @@
                     "size": "Size",
                     "weight": "Weight",
                     "advanced": "Advanced (raw class)"
+                },
+                "styleConfig": {
+                    "width": "Width (px)",
+                    "height": "Height (px)",
+                    "title": "Advanced Style",
+                    "bgColor": "Background Color",
+                    "textColor": "Text Color",
+                    "borderColor": "Border Color",
+                    "borderWidth": "Border Width (px)",
+                    "opacity": "Opacity (0-100)",
+                    "lineHeight": "Line Height",
+                    "letterSpacing": "Letter Spacing (em)",
+                    "fontFamily": "Font Family",
+                    "color": "Color (override)",
+                    "shadow": "Shadow",
+                    "aspectRatio": "Aspect Ratio"
                 }
+            },
+            "viewport": {
+                "desktop": "Desktop",
+                "mobile": "Mobile"
+            },
+            "undo": "Undo",
+            "redo": "Redo",
+            "slider": {
+                "enabled": "Enable Slider",
+                "autoPlay": "Auto Play",
+                "interval": "Interval (ms)",
+                "showControls": "Show Controls",
+                "showIndicators": "Show Indicators"
             }
         }
     },

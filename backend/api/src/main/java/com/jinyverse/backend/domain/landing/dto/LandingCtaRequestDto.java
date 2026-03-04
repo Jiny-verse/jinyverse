@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.Map;
 import java.util.UUID;
 
 @Getter
@@ -41,4 +42,6 @@ public class LandingCtaRequestDto {
     private Integer order;
 
     private Boolean isActive;
+
+    private Map<String, Object> styleConfig;
 }
