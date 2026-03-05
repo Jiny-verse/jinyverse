@@ -22,7 +22,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import static com.jinyverse.backend.domain.common.util.CommonSpecifications.PAGINATION_KEYS;
@@ -79,7 +78,6 @@ public class InquiryService {
 
     /** 관리자 목록 조회 */
     public Page<InquiryResponseDto> getAll(Map<String, Object> filter, Pageable pageable) {
-        Set<String> skipKeys = Set.of("page", "size", "sort", "q");
         Specification<Inquiry> spec = CommonSpecifications.and(
                 CommonSpecifications.notDeleted(),
                 CommonSpecifications.filterSpec(filter, PAGINATION_KEYS, "q", new String[]{"title"})

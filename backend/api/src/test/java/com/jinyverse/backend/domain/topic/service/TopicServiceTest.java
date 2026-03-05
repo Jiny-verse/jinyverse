@@ -7,7 +7,6 @@ import com.jinyverse.backend.domain.common.util.RequestContext;
 import com.jinyverse.backend.domain.common.util.Role;
 import com.jinyverse.backend.domain.topic.dto.TopicRequestDto;
 import com.jinyverse.backend.domain.topic.dto.TopicResponseDto;
-import com.jinyverse.backend.domain.topic.entity.RelTopicTag;
 import com.jinyverse.backend.domain.topic.entity.Topic;
 import com.jinyverse.backend.domain.topic.repository.RelTopicTagRepository;
 import com.jinyverse.backend.domain.topic.repository.TopicRepository;

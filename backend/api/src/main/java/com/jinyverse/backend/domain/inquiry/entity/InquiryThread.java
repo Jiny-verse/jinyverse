@@ -5,7 +5,7 @@ import com.jinyverse.backend.domain.inquiry.dto.InquiryThreadResponseDto;
 import com.jinyverse.backend.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -20,8 +20,7 @@ import java.util.UUID;
 public class InquiryThread extends BaseEntity {
 
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @UuidGenerator
     @Column(name = "id", columnDefinition = "UUID")
     private UUID id;
 

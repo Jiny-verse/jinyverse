@@ -2,7 +2,7 @@ package com.jinyverse.backend.domain.notification.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
@@ -20,8 +20,7 @@ import java.util.UUID;
 public class NotificationSetting {
 
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @UuidGenerator
     @Column(name = "id", columnDefinition = "UUID")
     private UUID id;
 

@@ -3,14 +3,13 @@ package com.jinyverse.backend.domain.topic.entity;
 import com.jinyverse.backend.domain.common.BaseEntity;
 import com.jinyverse.backend.domain.topic.dto.RelTopicTagDto;
 import com.jinyverse.backend.domain.tag.entity.Tag;
-import com.jinyverse.backend.domain.topic.entity.Topic;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 
 import java.util.UUID;
 
@@ -25,8 +24,7 @@ public class RelTopicTag extends BaseEntity {
 
     /** 게시글-태그 연결 ID */
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @UuidGenerator
     @Column(name = "id", columnDefinition = "UUID", nullable = false)
     private UUID id;
 

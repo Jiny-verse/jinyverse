@@ -2,7 +2,6 @@ package com.jinyverse.backend.domain.topic.entity;
 
 import com.jinyverse.backend.domain.file.entity.CommonFile;
 import com.jinyverse.backend.domain.topic.dto.RelTopicFileDto;
-import com.jinyverse.backend.domain.topic.entity.Topic;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,7 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.UuidGenerator;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -32,8 +31,7 @@ public class RelTopicFile {
 
     /** 게시글-파일 연결 ID */
     @Id
-    @GeneratedValue(generator = "uuid2")
-    @GenericGenerator(name = "uuid2", strategy = "uuid2")
+    @UuidGenerator
     @Column(name = "id", columnDefinition = "UUID", nullable = false)
     private UUID id;
 
