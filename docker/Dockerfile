@@ -25,6 +25,8 @@ ENTRYPOINT ["java", "-jar", "app.jar"]
 # --- Frontend External Stage ---
 FROM base-node AS external
 COPY . .
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 RUN pnpm install --no-frozen-lockfile
 RUN pnpm --filter @jinyverse/external build
 FROM base-node AS external-runner
@@ -40,6 +42,8 @@ CMD ["pnpm", "start"]
 # --- Frontend Internal Stage ---
 FROM base-node AS internal
 COPY . .
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 RUN pnpm install --no-frozen-lockfile
 RUN pnpm --filter @jinyverse/internal build
 FROM base-node AS internal-runner

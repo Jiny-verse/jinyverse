@@ -25,6 +25,7 @@ Thumbs.db
 # Project specific
 docs/
 .claude/
+docker-compose.local.yml
 
 # Environment variables & Secrets
 .env
@@ -35,6 +36,8 @@ docs/
 .env.development
 .env.test
 !.env.example
+!.env.prod.example
+!.env.local.example
 
 # Secrets & Credentials
 secrets/

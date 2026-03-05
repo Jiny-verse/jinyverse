@@ -25,6 +25,9 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-jinyverse}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-postgres}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-postgres}
+      FILE_STORAGE_BASE_PATH: /app/data/uploads
+    volumes:
+      - ${UPLOAD_DATA_PATH:-/srv/data/uploads}:/app/data/uploads
     depends_on:
       - postgres
 
@@ -33,6 +36,8 @@ services:
       context: .
       dockerfile: docker/Dockerfile
       target: external-runner
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
     ports:
       - '3000:3000'
     depends_on:
@@ -43,6 +48,8 @@ services:
       context: .
       dockerfile: docker/Dockerfile
       target: internal-runner
+      args:
+        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
     ports:
       - '3001:3001'
     depends_on:
