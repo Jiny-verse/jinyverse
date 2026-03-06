@@ -6,7 +6,7 @@ RUN corepack enable
 WORKDIR /app
 
 # --- Java Base Stage ---
-FROM eclipse-temurin:17-jdk-alpine AS base-java
+FROM eclipse-temurin:17-jdk-jammy AS base-java
 WORKDIR /app
 
 # --- Database Stage ---
@@ -17,7 +17,7 @@ FROM postgres:15-alpine AS database
 FROM base-java AS backend
 COPY backend .
 RUN ./gradlew :api:build -x test
-FROM eclipse-temurin:17-jre-alpine AS backend-runner
+FROM eclipse-temurin:17-jre-jammy AS backend-runner
 WORKDIR /app
 COPY --from=backend /app/api/build/libs/*.jar app.jar
 ENTRYPOINT ["java", "-jar", "app.jar"]
