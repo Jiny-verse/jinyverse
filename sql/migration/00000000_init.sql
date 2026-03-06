@@ -162,7 +162,7 @@ CREATE TABLE "user_session" (
 );
 
 CREATE TABLE "audit_log" (
-  "id" UUID PRIMARY KEY NOT NULL,
+  "id" UUID PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
   "target_type" VARCHAR(40) NOT NULL,
   "target_id" UUID,
   "action" VARCHAR(40) NOT NULL,
@@ -170,6 +170,7 @@ CREATE TABLE "audit_log" (
   "after_data" JSONB,
   "actor_user_id" UUID,
   "ip_address" VARCHAR(45),
+  "metadata" JSONB,
   "created_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
   "updated_at" TIMESTAMP NOT NULL DEFAULT (NOW()),
   "deleted_at" timestamp
@@ -487,6 +488,8 @@ COMMENT ON COLUMN "audit_log"."after_data" IS '변경 후 데이터';
 COMMENT ON COLUMN "audit_log"."actor_user_id" IS '행위자 사용자 ID';
 
 COMMENT ON COLUMN "audit_log"."ip_address" IS '요청 IP';
+
+COMMENT ON COLUMN "audit_log"."metadata" IS '추가 식별 메타데이터 (예: {"codeKey":"..."}, {"key":"..."})';
 
 COMMENT ON COLUMN "audit_log"."created_at" IS '행위 시점';
 
