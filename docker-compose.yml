@@ -12,7 +12,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     volumes:
       - ${POSTGRES_DATA_PATH:-postgres_data}:/var/lib/postgresql/data
-      - ./sql:/docker-entrypoint-initdb.d
+      - ./sql/migration:/docker-entrypoint-initdb.d
     restart: unless-stopped
 
   nginx:
