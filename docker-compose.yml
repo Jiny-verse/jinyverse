@@ -13,23 +13,39 @@ services:
     volumes:
       - ${POSTGRES_DATA_PATH:-postgres_data}:/var/lib/postgresql/data
       - ./sql:/docker-entrypoint-initdb.d
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - '80:80'
+    volumes:
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - external
+      - internal
+      - backend
+    restart: unless-stopped
 
   backend:
     build:
       context: .
       dockerfile: docker/Dockerfile
       target: backend-runner
-    ports:
-      - '8080:8080'
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-jinyverse}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-postgres}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-postgres}
       FILE_STORAGE_BASE_PATH: /app/data/uploads
+      JWT_SECRET: ${JWT_SECRET}
+      MAIL_USE_SMTP: ${MAIL_USE_SMTP}
+      MAIL_USERNAME: ${MAIL_USERNAME}
+      MAIL_PASSWORD: ${MAIL_PASSWORD}
     volumes:
       - ${UPLOAD_DATA_PATH:-/srv/data/uploads}:/app/data/uploads
     depends_on:
       - postgres
+    restart: unless-stopped
 
   external:
     build:
@@ -38,10 +54,9 @@ services:
       target: external-runner
       args:
         - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
-    ports:
-      - '3000:3000'
     depends_on:
       - backend
+    restart: unless-stopped
 
   internal:
     build:
@@ -50,10 +65,9 @@ services:
       target: internal-runner
       args:
         - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
-    ports:
-      - '3001:3001'
     depends_on:
       - backend
+    restart: unless-stopped
 
 volumes:
   postgres_data:
