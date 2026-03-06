@@ -29,12 +29,13 @@ ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 RUN pnpm install --no-frozen-lockfile
 RUN pnpm --filter @jinyverse/external build
-FROM base-node AS external-runner
+RUN pnpm --filter @jinyverse/external deploy --prod /app/deploy/external
+
+FROM node:20-alpine AS external-runner
 WORKDIR /app
-COPY --from=external /app/frontend/external/next.config.ts ./
-COPY --from=external /app/frontend/external/.next ./.next
-COPY --from=external /app/node_modules ./node_modules
-COPY --from=external /app/frontend/external/package.json ./package.json
+COPY --from=external /app/deploy/external/node_modules ./node_modules
+COPY --from=external /app/frontend/external/.next .next
+COPY --from=external /app/frontend/external/package.json .
 EXPOSE 3001
 CMD ["node_modules/.bin/next", "start", "-p", "3001"]
 
@@ -45,11 +46,12 @@ ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
 RUN pnpm install --no-frozen-lockfile
 RUN pnpm --filter @jinyverse/internal build
-FROM base-node AS internal-runner
+RUN pnpm --filter @jinyverse/internal deploy --prod /app/deploy/internal
+
+FROM node:20-alpine AS internal-runner
 WORKDIR /app
-COPY --from=internal /app/frontend/internal/next.config.ts ./
-COPY --from=internal /app/frontend/internal/.next ./.next
-COPY --from=internal /app/node_modules ./node_modules
-COPY --from=internal /app/frontend/internal/package.json ./package.json
+COPY --from=internal /app/deploy/internal/node_modules ./node_modules
+COPY --from=internal /app/frontend/internal/.next .next
+COPY --from=internal /app/frontend/internal/package.json .
 EXPOSE 3000
 CMD ["node_modules/.bin/next", "start", "-p", "3000"]
