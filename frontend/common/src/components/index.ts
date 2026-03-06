@@ -16,4 +16,4 @@ export * from './PostForm';
 export * from './PostDetail';
 export * from './ImageSplitView';
 export * from './board';
-export * from './topic';
+export * from './Topic';
