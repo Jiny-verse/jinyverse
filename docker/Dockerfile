@@ -36,7 +36,7 @@ COPY --from=external /app/frontend/external/.next ./.next
 COPY --from=external /app/node_modules ./node_modules
 COPY --from=external /app/frontend/external/package.json ./package.json
 EXPOSE 3001
-CMD ["pnpm", "start"]
+CMD ["node_modules/.bin/next", "start", "-p", "3001"]
 
 # --- Frontend Internal Stage ---
 FROM base-node AS internal
@@ -52,4 +52,4 @@ COPY --from=internal /app/frontend/internal/.next ./.next
 COPY --from=internal /app/node_modules ./node_modules
 COPY --from=internal /app/frontend/internal/package.json ./package.json
 EXPOSE 3000
-CMD ["pnpm", "start"]
+CMD ["node_modules/.bin/next", "start", "-p", "3000"]
