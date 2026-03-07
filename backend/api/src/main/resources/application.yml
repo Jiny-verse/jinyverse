@@ -57,6 +57,9 @@ app:
       - http://localhost:3001
       - http://127.0.0.1:3000
       - http://127.0.0.1:3001
+      - https://jinyverse.com
+      - https://www.jinyverse.com
+      - https://admin.jinyverse.com
   file:
     storage:
       base-path: ${FILE_STORAGE_BASE_PATH:}
