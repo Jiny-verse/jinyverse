@@ -35,7 +35,7 @@ export function SectionFormPanel() {
     removeSectionFile,
   } = useLandingContext();
 
-  const [ctaHref, setCtaHref] = useState('');
+  const [ctaLabel, setCtaLabel] = useState('');
   const [isAddingCta, setIsAddingCta] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [boards, setBoards] = useState<BoardOption[]>([]);
@@ -50,12 +50,10 @@ export function SectionFormPanel() {
   const slideSettings = (extraConfig.slideSettings ?? {}) as Partial<SlideSettings>;
 
   const handleAddCta = async () => {
-    const href = ctaHref.trim();
-    if (!href) return;
     setIsAddingCta(true);
     try {
-      const created = await addCta(selectedSection.id, href);
-      setCtaHref('');
+      const created = await addCta(selectedSection.id, ctaLabel.trim());
+      setCtaLabel('');
       setSelectedCtaId(created.id);
     } finally {
       setIsAddingCta(false);
@@ -145,26 +143,6 @@ export function SectionFormPanel() {
                     extraConfig: {
                       ...extraConfig,
                       customHeight: Number(e.target.value) || undefined,
-                    },
-                  })
-                }
-                placeholder="auto"
-              />
-            </div>
-
-            {/* Custom width */}
-            <div>
-              <label className="block text-xs font-medium text-muted-foreground mb-1">
-                {t('admin.landing.section.customWidth')}
-              </label>
-              <Input
-                type="number"
-                value={(extraConfig.customWidth as number) ?? ''}
-                onChange={(e) =>
-                  updateSection(selectedSection.id, {
-                    extraConfig: {
-                      ...extraConfig,
-                      customWidth: Number(e.target.value) || undefined,
                     },
                   })
                 }
@@ -356,7 +334,7 @@ export function SectionFormPanel() {
             <p className="text-xs text-muted-foreground mb-3">{t('common.noData')}</p>
           ) : (
             <ul className="space-y-1 mb-3">
-              {selectedSection.ctas.map((cta: LandingCta) => {
+              {selectedSection.ctas.map((cta: LandingCta, idx: number) => {
                 const ctaName = (cta.styleConfig as Record<string, unknown> | null)?.name as string | undefined;
                 return (
                   <li
@@ -365,7 +343,7 @@ export function SectionFormPanel() {
                     onClick={() => setSelectedCtaId(cta.id)}
                   >
                     <span className="shrink-0 text-xs text-muted-foreground">[{cta.type}]</span>
-                    <span className="truncate">{ctaName || cta.label || cta.href}</span>
+                    <span className="truncate">{ctaName || cta.label || `CTA ${idx + 1}`}</span>
                   </li>
                 );
               })}
@@ -375,9 +353,9 @@ export function SectionFormPanel() {
           {/* Add CTA inline */}
           <div className="flex gap-2">
             <Input
-              value={ctaHref}
-              onChange={(e) => setCtaHref(e.target.value)}
-              placeholder={t('admin.landing.ctaHrefPlaceholder')}
+              value={ctaLabel}
+              onChange={(e) => setCtaLabel(e.target.value)}
+              placeholder="CTA 이름 (선택)"
               className="flex-1 text-sm"
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleAddCta();
@@ -385,7 +363,7 @@ export function SectionFormPanel() {
             />
             <button
               type="button"
-              disabled={isAddingCta || !ctaHref.trim()}
+              disabled={isAddingCta}
               onClick={handleAddCta}
               className="shrink-0 px-3 py-1.5 bg-primary text-primary-foreground text-xs rounded hover:bg-primary/90 disabled:opacity-50 transition-colors"
             >

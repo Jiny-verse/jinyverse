@@ -1,6 +1,5 @@
 package com.jinyverse.backend.domain.landing.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,7 +21,6 @@ public class LandingCtaRequestDto {
 
     private String label;
 
-    @NotBlank(message = "링크 주소는 필수입니다")
     private String href;
 
     private String className;

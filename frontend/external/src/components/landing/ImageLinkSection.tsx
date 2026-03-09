@@ -59,13 +59,17 @@ export function ImageLinkSection({ section, apiBaseUrl }: ImageLinkSectionProps)
     );
   };
 
+  const customHeight = section.extraConfig?.customHeight as number | undefined;
+  const heightStyle: React.CSSProperties = customHeight
+    ? { height: `${customHeight}px` }
+    : { minHeight: '100vh' };
+
   return (
-    <section className="relative w-full h-[400px] bg-slate-700">
+    <section className="relative w-full bg-slate-700" style={heightStyle}>
       {/* Background image — isolated so overflow-hidden doesn't clip CTAs */}
       <div className="absolute inset-0 overflow-hidden">
         {renderImageWrapper()}
       </div>
-      <div className="absolute inset-0 bg-black/20" />
       {section.ctas.map((cta) => (
         <LandingCta
           key={cta.id}

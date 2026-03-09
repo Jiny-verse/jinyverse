@@ -61,13 +61,17 @@ export function DescriptionImageSection({ section, apiBaseUrl }: DescriptionImag
     );
   };
 
+  const customHeight = section.extraConfig?.customHeight as number | undefined;
+  const heightStyle: React.CSSProperties = customHeight
+    ? { height: `${customHeight}px` }
+    : { minHeight: '100vh' };
+
   return (
-    <section className="relative w-full min-h-[400px] bg-muted" style={{ minHeight: '400px' }}>
+    <section className="relative w-full bg-muted" style={heightStyle}>
       {/* Background image — isolated so overflow-hidden doesn't clip CTAs */}
       <div className="absolute inset-0 overflow-hidden">
         {renderImageWrapper()}
       </div>
-      <div className="absolute inset-0 bg-black/20" />
       {section.ctas.map((cta) => (
         <LandingCta
           key={cta.id}

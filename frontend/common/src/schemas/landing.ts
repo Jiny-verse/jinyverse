@@ -70,7 +70,7 @@ export type LandingSectionUpdateInput = z.infer<typeof landingSectionUpdateSchem
 export const landingCtaCreateSchema = z.object({
   type: ctaTypeSchema.optional(),
   label: z.string().max(255).optional(),
-  href: z.string().min(1),
+  href: z.string().optional().default(''),
   className: z.string().optional(),
   positionTop: z.number().optional(),
   positionLeft: z.number().optional(),

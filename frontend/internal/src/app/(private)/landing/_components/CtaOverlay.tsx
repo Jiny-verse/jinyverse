@@ -53,9 +53,11 @@ export function CtaOverlay({ cta, sectionId, isSelected, sectionRef, onSnap }: C
 
   const { startResize } = useResizeCta({
     sectionRef,
-    onResize: (ctaId, w, h) => {
+    onResize: (ctaId, w, h, newTopPct, newLeftPct) => {
       updateCta(sectionId, ctaId, {
         styleConfig: { ...sc, width: w, height: h },
+        ...(newTopPct !== null ? { positionTop: newTopPct } : {}),
+        ...(newLeftPct !== null ? { positionLeft: newLeftPct } : {}),
       });
     },
   });
@@ -159,7 +161,7 @@ export function CtaOverlay({ cta, sectionId, isSelected, sectionRef, onSnap }: C
           HANDLES.map(({ dir, cls }) => (
             <div
               key={dir}
-              className={`absolute w-2 h-2 bg-white border border-primary rounded-sm z-20 ${cls}`}
+              className={`absolute w-3 h-3 bg-white border-2 border-primary rounded-sm z-20 ${cls}`}
               onPointerDown={(e) => {
                 e.stopPropagation();
                 isResizingRef.current = true;
@@ -167,7 +169,7 @@ export function CtaOverlay({ cta, sectionId, isSelected, sectionRef, onSnap }: C
                   (sc.width as number | undefined) ?? ctaElementRef.current?.offsetWidth ?? 80;
                 const initH =
                   (sc.height as number | undefined) ?? ctaElementRef.current?.offsetHeight ?? 32;
-                startResize(cta.id, dir, e, initW, initH);
+                startResize(cta.id, dir, e, initW, initH, top, left);
                 const cleanup = () => {
                   isResizingRef.current = false;
                   window.removeEventListener('pointerup', cleanup);

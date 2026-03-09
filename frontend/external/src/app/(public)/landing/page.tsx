@@ -6,7 +6,7 @@ const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
 async function fetchSections(): Promise<LandingSection[]> {
   try {
     const res = await fetch(`${apiBaseUrl}/api/landing/sections`, {
-      next: { revalidate: 60 },
+      cache: 'no-store',
     });
     if (!res.ok) return [];
     return res.json();
@@ -32,7 +32,7 @@ export default async function LandingPage() {
   }
 
   return (
-    <div className="-mx-[4%] flex flex-col">
+    <div className="-mx-[4%] -mt-20 flex flex-col">
       <DynamicLandingRenderer sections={sections} apiBaseUrl={apiBaseUrl} />
     </div>
   );

@@ -172,13 +172,8 @@ export function SectionPreview({ section, apiBaseUrl }: SectionPreviewProps) {
 
   const showFilmstrip = FILMSTRIP_TYPES.includes(section.type);
   const customHeight = section.extraConfig?.customHeight as number | undefined;
-  const customWidth = section.extraConfig?.customWidth as number | undefined;
   const href = section.extraConfig?.href as string | undefined;
   const slideSettings = section.extraConfig?.slideSettings as SlideSettings | undefined;
-
-  const widthStyle: React.CSSProperties = customWidth
-    ? { width: `${customWidth}px`, maxWidth: '100%' }
-    : {};
 
   const resolveHref = (h: string) => {
     if (!h) return h;
@@ -209,7 +204,7 @@ export function SectionPreview({ section, apiBaseUrl }: SectionPreviewProps) {
     return (
       <div
         className="w-full relative overflow-hidden"
-        style={{ ...heightStyle, ...widthStyle }}
+        style={heightStyle}
       >
         {isCarousel ? (
           <HeroCarousel section={section} apiBaseUrl={base} slideSettings={slideSettings!} />
@@ -244,7 +239,7 @@ export function SectionPreview({ section, apiBaseUrl }: SectionPreviewProps) {
     return wrapWithLink(
       <div
         className="w-full flex overflow-hidden relative"
-        style={{ ...(customHeight ? { height: `${customHeight}px` } : { height: '300px' }), ...widthStyle }}
+        style={{ ...(customHeight ? { height: `${customHeight}px` } : { height: '300px' }) }}
       >
         <div className="w-1/2 bg-gray-200 flex items-center justify-center relative overflow-hidden">
           {bgImage ? (
@@ -269,7 +264,7 @@ export function SectionPreview({ section, apiBaseUrl }: SectionPreviewProps) {
     return (
       <div
         className="w-full p-4 bg-background"
-        style={{ ...(customHeight ? { height: `${customHeight}px` } : { height: '240px' }), ...widthStyle }}
+        style={{ ...(customHeight ? { height: `${customHeight}px` } : { height: '240px' }) }}
       >
         <div className="h-5 bg-gray-200 rounded mb-4 w-1/3" />
         {[0, 1, 2].map((i) => (
@@ -289,7 +284,7 @@ export function SectionPreview({ section, apiBaseUrl }: SectionPreviewProps) {
     return (
       <div
         className="w-full flex gap-2 p-4 bg-background relative"
-        style={{ ...(customHeight ? { height: `${customHeight}px` } : { height: '300px' }), ...widthStyle }}
+        style={{ ...(customHeight ? { height: `${customHeight}px` } : { height: '300px' }) }}
       >
         {[0, 1, 2].map((i) => (
           <div

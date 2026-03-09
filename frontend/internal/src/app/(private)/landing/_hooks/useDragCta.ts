@@ -22,37 +22,36 @@ export function useDragCta({ sectionRef, onMove, onSnap }: UseDragCtaOptions) {
       const target = e.currentTarget as HTMLElement;
       target.setPointerCapture(e.pointerId);
 
-      // Capture cursor offset within the CTA element at drag start
+      // CTA position is center-based (transform: translate(-50%, -50%))
+      // Capture offset from the CTA's CENTER, not its top-left corner
       const ctaRect = target.getBoundingClientRect();
-      const offsetX = e.clientX - ctaRect.left;
-      const offsetY = e.clientY - ctaRect.top;
+      const ctaCenterX = ctaRect.left + ctaRect.width / 2;
+      const ctaCenterY = ctaRect.top + ctaRect.height / 2;
+      const offsetX = e.clientX - ctaCenterX;
+      const offsetY = e.clientY - ctaCenterY;
 
       const handleMove = (moveEvent: PointerEvent) => {
         const section = sectionRef.current;
         if (!section) return;
 
         const rect = section.getBoundingClientRect();
-        const rawLeft = ((moveEvent.clientX - offsetX - rect.left) / rect.width) * 100;
-        const rawTop = ((moveEvent.clientY - offsetY - rect.top) / rect.height) * 100;
+        // New center position as % of section
+        let left = ((moveEvent.clientX - offsetX - rect.left) / rect.width) * 100;
+        let top = ((moveEvent.clientY - offsetY - rect.top) / rect.height) * 100;
 
-        // Clamp so CTA stays within section bounds
-        const ctaW = (ctaRect.width / rect.width) * 100;
-        const ctaH = (ctaRect.height / rect.height) * 100;
-        let left = Math.max(0, Math.min(100 - ctaW, rawLeft));
-        let top = Math.max(0, Math.min(100 - ctaH, rawTop));
+        // Clamp so CTA center stays within section bounds
+        left = Math.max(0, Math.min(100, left));
+        top = Math.max(0, Math.min(100, top));
 
         // Smart snap to center
-        const centerX = left + ctaW / 2;
-        const centerY = top + ctaH / 2;
         let snappedV = false;
         let snappedH = false;
-
-        if (Math.abs(centerX - 50) < SNAP_THRESHOLD) {
-          left = 50 - ctaW / 2;
+        if (Math.abs(left - 50) < SNAP_THRESHOLD) {
+          left = 50;
           snappedV = true;
         }
-        if (Math.abs(centerY - 50) < SNAP_THRESHOLD) {
-          top = 50 - ctaH / 2;
+        if (Math.abs(top - 50) < SNAP_THRESHOLD) {
+          top = 50;
           snappedH = true;
         }
 

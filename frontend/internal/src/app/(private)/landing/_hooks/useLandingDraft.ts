@@ -143,9 +143,10 @@ export function useLandingDraft(apiOptions: ApiOptions) {
     []
   );
 
-  const addCta = useCallback(async (sectionId: string, href: string): Promise<LandingCta> => {
+  const addCta = useCallback(async (sectionId: string, label: string): Promise<LandingCta> => {
     const created = await createLandingCta(apiOptionsRef.current, sectionId, {
-      href,
+      label: label || undefined,
+      href: '',
       positionTop: 50,
       positionLeft: 50,
       isActive: true,

@@ -106,7 +106,7 @@ public class LandingCta {
                 .typeCategoryCode("landing_cta_type")
                 .type(dto.getType() != null ? dto.getType() : "button")
                 .label(dto.getLabel())
-                .href(dto.getHref())
+                .href(dto.getHref() != null ? dto.getHref() : "")
                 .className(dto.getClassName())
                 .positionTop(dto.getPositionTop())
                 .positionLeft(dto.getPositionLeft())
