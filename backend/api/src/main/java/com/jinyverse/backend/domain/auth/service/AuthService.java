@@ -281,6 +281,13 @@ public class AuthService {
                 null, Map.of("username", user.getUsername(), "email", user.getEmail()));
     }
 
+    @Transactional(readOnly = true)
+    public void checkUsername(String username) {
+        if (userRepository.findByUsernameAndDeletedAtIsNull(username).isPresent()) {
+            throw new ConflictException("Username already exists");
+        }
+    }
+
     @Transactional
     public void verifyEmail(VerifyEmailRequestDto request) {
         Verification v = verificationService.verify(request.getEmail(), request.getCode(), VERIFICATION_TYPE_EMAIL);

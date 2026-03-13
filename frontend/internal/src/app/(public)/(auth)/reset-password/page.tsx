@@ -16,6 +16,7 @@ function ResetPasswordContent() {
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
@@ -41,6 +42,10 @@ function ResetPasswordContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (newPassword !== passwordConfirm) {
+      setError(t('validation.passwordMismatch', { defaultValue: '비밀번호가 일치하지 않습니다.' }));
+      return;
+    }
     setError('');
     setSubmitting(true);
     try {
@@ -96,6 +101,17 @@ function ResetPasswordContent() {
           maxLength={100}
           autoComplete="new-password"
           placeholder={t('auth.reset.passwordPlaceholder', { defaultValue: '영문, 숫자, 특수문자 포함 8자 이상' })}
+        />
+        <Input
+          label={t('form.label.passwordConfirm', { defaultValue: '비밀번호 확인' })}
+          type="password"
+          value={passwordConfirm}
+          onChange={(e) => setPasswordConfirm(e.target.value)}
+          required
+          minLength={8}
+          maxLength={100}
+          autoComplete="new-password"
+          placeholder={t('auth.reset.passwordConfirmPlaceholder', { defaultValue: '비밀번호를 다시 입력해주세요' })}
         />
         <Button type="submit" disabled={submitting} className="w-full">
           {submitting ? t('common.saving', { defaultValue: '재설정 중...' }) : t('user.profile.changePassword', { defaultValue: '비밀번호 변경' })}

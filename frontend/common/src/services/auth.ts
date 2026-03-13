@@ -93,6 +93,18 @@ export async function register(baseUrl: string, body: RegisterRequest): Promise<
   }
 }
 
+export async function checkUsername(baseUrl: string, username: string): Promise<void> {
+  const res = await fetch(`${baseUrl}/api/auth/check-username?username=${encodeURIComponent(username)}`, {
+    method: 'GET',
+    headers: JSON_HEADERS,
+    credentials: FETCH_CREDENTIALS,
+  });
+  if (!res.ok) {
+    const text = await res.text().catch(() => res.statusText);
+    throw new Error(`API ${res.status} ${res.statusText}: ${text}`);
+  }
+}
+
 export async function verifyEmail(baseUrl: string, body: VerifyEmailRequest): Promise<void> {
   const parsed = verifyEmailRequestSchema.parse(body);
   const res = await fetch(`${baseUrl}/api/auth/verify-email`, {

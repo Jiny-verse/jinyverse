@@ -16,6 +16,7 @@ function ResetPasswordContent() {
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
   const [newPassword, setNewPassword] = useState('');
+  const [passwordConfirm, setPasswordConfirm] = useState('');
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
@@ -41,6 +42,10 @@ function ResetPasswordContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (newPassword !== passwordConfirm) {
+      setError(t('validation.passwordMismatch'));
+      return;
+    }
     setError('');
     setSubmitting(true);
     try {
@@ -96,6 +101,17 @@ function ResetPasswordContent() {
           maxLength={100}
           autoComplete="new-password"
           placeholder={t('auth.reset.passwordPlaceholder')}
+        />
+        <Input
+          label={t('form.label.passwordConfirm')}
+          type="password"
+          value={passwordConfirm}
+          onChange={(e) => setPasswordConfirm(e.target.value)}
+          required
+          minLength={8}
+          maxLength={100}
+          autoComplete="new-password"
+          placeholder={t('auth.reset.passwordConfirmPlaceholder')}
         />
         <Button type="submit" disabled={submitting} className="w-full">
           {submitting ? t('auth.reset.submitting') : t('auth.reset.submit')}

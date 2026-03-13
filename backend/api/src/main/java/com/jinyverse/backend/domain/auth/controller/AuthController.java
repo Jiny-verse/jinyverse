@@ -97,6 +97,12 @@ public class AuthController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @GetMapping("/check-username")
+    public ResponseEntity<Void> checkUsername(@RequestParam("username") String username) {
+        authService.checkUsername(username);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/verify-email")
     public ResponseEntity<Void> verifyEmail(@Valid @RequestBody VerifyEmailRequestDto request) {
         authService.verifyEmail(request);
