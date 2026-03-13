@@ -5,11 +5,11 @@ services:
       dockerfile: docker/Dockerfile
       target: database
     ports:
-      - '5433:5432'
+      - '127.0.0.1:5433:5432'
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-jinyverse}
       POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ${POSTGRES_DATA_PATH:-postgres_data}:/var/lib/postgresql/data
       - ./sql/migration:/docker-entrypoint-initdb.d
@@ -38,7 +38,7 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-jinyverse}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-postgres}
-      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-postgres}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       FILE_STORAGE_BASE_PATH: /app/data/uploads
       JWT_SECRET: ${JWT_SECRET}
       MAIL_USE_SMTP: ${MAIL_USE_SMTP}

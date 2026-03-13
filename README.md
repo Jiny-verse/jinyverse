@@ -1,6 +1,6 @@
 # Jinyverse Monorepo
 
-pnpm · Next.js 15 · Spring Boot 3.3 · PostgreSQL 15 · Docker를 사용하는 풀스택 모노레포입니다.
+pnpm · Next.js 15 · Spring Boot 3.3 · PostgreSQL 15 · Docker 기반 풀스택 모노레포
 
 | 기술        | 버전            |
 | ----------- | --------------- |
@@ -13,15 +13,18 @@ pnpm · Next.js 15 · Spring Boot 3.3 · PostgreSQL 15 · Docker를 사용하는
 
 ---
 
-## 서비스 포트
+## 서비스 포트 및 접근 권한
 
-| 서비스                  | 로컬 포트 | 컨테이너 포트 | 설명                     |
-| ----------------------- | --------- | ------------- | ------------------------ |
-| **PostgreSQL**          | `5433`    | `5432`        | DB 접속 시 **5433** 사용 |
-| **Backend**             | `8080`    | `8080`        | Spring Boot REST API     |
-| **Frontend (External)** | `3001`    | `3001`        | 사용자용 앱              |
-| **Frontend (Internal)** | `3000`    | `3000`        | 관리자용 앱              |
-| **Jenkins**             | `8081`    | `8080`        | CI/CD 자동화             |
+보안 강화를 위한 외부 직접 노출 포트 최소화 및 관리용 서비스 로컬 바인딩(SSH 터널링 필수) 설정 상태
+
+| 서비스 | 접근 주소 (Port) | 내부 포트 | 설명 |
+| :--- | :--- | :--- | :--- |
+| **Nginx (Proxy)** | `80`, `443` | - | 전체 서비스의 진입점 (SSL 적용) |
+| **Frontend (User)** | `jinyverse.com` | `3001` | Nginx를 통한 서비스 제공 |
+| **Frontend (Admin)** | `admin.jinyverse.com` | `3000` | Nginx를 통한 서비스 제공 |
+| **Backend API** | `api.jinyverse.com` | `8080` | Nginx를 통한 서비스 제공 |
+| **PostgreSQL** | `127.0.0.1:5433` | `5432` | 외부 접속 차단 (SSH 터널링 필요) |
+| **Jenkins** | `127.0.0.1:8081` | `8080` | 외부 접속 차단 (SSH 터널링 필요) |
 
 ---
 
@@ -62,7 +65,7 @@ cp .env.example .env
 | `POSTGRES_PASSWORD`          | DB 비밀번호               | `postgres`                                   | **변경 필수**             |
 | `POSTGRES_DATA_PATH`         | DB 데이터 저장 경로       | 비워둠 (named volume)                        | `/srv/data/postgres`      |
 | `UPLOAD_DATA_PATH`           | 업로드 파일 저장 경로     | 비워둠 (named volume)                        | `/srv/data/uploads`       |
-| `NEXT_PUBLIC_API_URL`        | 프론트 → 백엔드 API URL   | `http://localhost:8080`                      | `http://서버IP:8080`      |
+| `NEXT_PUBLIC_API_URL`        | 프론트 → 백엔드 API URL   | `http://localhost:8080`                      | `https://api.jinyverse.com` |
 | `SPRING_DATASOURCE_URL`      | JDBC 접속 URL (bootRun용) | `jdbc:postgresql://localhost:5433/jinyverse` | 불필요 (Docker 내부 연결) |
 | `SPRING_DATASOURCE_USERNAME` | DB 사용자                 | `postgres`                                   | `postgres`                |
 | `SPRING_DATASOURCE_PASSWORD` | DB 비밀번호               | `postgres`                                   | **변경 필수**             |
@@ -98,9 +101,11 @@ docker compose -f docker-compose.jenkins.yml up -d --build
 # 2. 초기 관리자 비밀번호 확인
 docker exec jinyverse-jenkins cat /var/jenkins_home/secrets/initialAdminPassword
 
-# 3. http://localhost:8081 접속 → 초기 설정 마법사 진행
-#    - "Install suggested plugins" 선택
-#    - 관리자 계정 생성
+# 3. http://localhost:8081 접속 (SSH 터널링 사용 권장)
+#    - 보안을 위해 Jenkins는 서버 로컬(127.0.0.1)에만 바인딩됨
+#    - 로컬 PC에서 접속 시: ssh -L 8081:localhost:8081 user@server_ip
+#    - 이후 웹 브라우저에서 http://localhost:8081 접속
+#    - 초기 설정 마법사 진행
 
 # 4. 파이프라인 잡 생성
 #    새 아이템 → Pipeline 이름 입력 → Pipeline 선택 → 확인
@@ -236,12 +241,18 @@ jinyverse/
 
 ---
 
-## Troubleshooting
+## Security & Audit
 
-| 증상                              | 원인                     | 해결                                                                               |
-| --------------------------------- | ------------------------ | ---------------------------------------------------------------------------------- |
-| 포트 이미 사용 중 (5433, 8080 등) | 로컬 프로세스 충돌       | `lsof -i :5433` 으로 확인 후 종료                                                  |
-| `NEXT_PUBLIC_API_URL` 빈 값 경고  | `.env` 미복사            | `cp .env.local.example .env`                                                       |
-| DB 연결 실패 (bootRun)            | postgres 컨테이너 미기동 | `docker compose -f docker-compose.yml -f docker-compose.local.yml up -d postgres`  |
-| 프론트 빌드 실패                  | pnpm install 안 됨       | 루트에서 `pnpm install` 실행                                                       |
-| Jenkins 첫 접속 비밀번호 모름     | 초기 비밀번호 필요       | `docker exec jinyverse-jenkins cat /var/jenkins_home/secrets/initialAdminPassword` |
+공개 저장소 전환 전 자체 보안 감사를 통한 인프라 및 코드 전반의 보안 강화 조치 완료
+
+- **Infrastructure Hardening**:
+  - Jenkins `127.0.0.1` 바인딩을 통한 외부 직접 노출 차단 (SSH 터널링 필수)
+  - Docker 컨테이너(Next.js, Spring Boot) Non-root 사용자 실행 적용
+  - 데이터베이스 및 주요 서비스 기본 패스워드 제거 및 환경 변수 주입 강제
+- **Nginx Security**:
+  - HSTS, X-Frame-Options, CSP 등 표준 보안 헤더 기반 웹 취약점(XSS, Clickjacking 등) 방어
+- **Code Integrity**:
+  - `DOMPurify` 기반 데이터 렌더링 보안 및 `normalize()`를 활용한 Path Traversal 방어 로직 적용
+  - 모든 시크릿 및 환경 변수는 `.env` 주입 방식 사용, 코드 내 하드코딩된 자격 증명 부재 보장
+
+---

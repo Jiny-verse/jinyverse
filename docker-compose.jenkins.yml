@@ -4,10 +4,10 @@ services:
       context: .
       dockerfile: docker/Dockerfile.jenkins
     container_name: jinyverse-jenkins
-    user: root
+    # user: root (보안상 제거, 하위 경로 권한 조정 필요)
     restart: unless-stopped
     ports:
-      - '8081:8080'
+      - '127.0.0.1:8081:8080'
       - '50000:50000'
     volumes:
       - jenkins_home:/var/jenkins_home

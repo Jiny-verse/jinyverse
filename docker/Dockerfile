@@ -20,6 +20,10 @@ RUN ./gradlew :api:build -x test
 FROM eclipse-temurin:17-jre-jammy AS backend-runner
 WORKDIR /app
 COPY --from=backend /app/api/build/libs/*.jar app.jar
+# Non-root user for security
+RUN groupadd -r jiny && useradd -r -g jiny jiny
+RUN chown jiny:jiny app.jar
+USER jiny
 ENTRYPOINT ["java", "-jar", "app.jar"]
 
 # --- Frontend External Stage ---
@@ -37,6 +41,7 @@ COPY --from=external /app/deploy/external/node_modules ./node_modules
 COPY --from=external /app/frontend/external/.next .next
 COPY --from=external /app/frontend/external/package.json .
 EXPOSE 3001
+USER node
 CMD ["node_modules/.bin/next", "start", "-p", "3001"]
 
 # --- Frontend Internal Stage ---
@@ -54,4 +59,5 @@ COPY --from=internal /app/deploy/internal/node_modules ./node_modules
 COPY --from=internal /app/frontend/internal/.next .next
 COPY --from=internal /app/frontend/internal/package.json .
 EXPOSE 3000
+USER node
 CMD ["node_modules/.bin/next", "start", "-p", "3000"]
