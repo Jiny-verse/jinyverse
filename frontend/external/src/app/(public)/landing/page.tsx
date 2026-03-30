@@ -3,11 +3,15 @@ import type { LandingSection } from 'common/schemas';
 
 export const dynamic = 'force-dynamic';
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
+// Server-side: use internal Docker URL for fetching data
+const serverBaseUrl =
+  process.env.API_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+// Client-side: empty string → browser uses relative URLs through Next.js proxy
+const clientBaseUrl = process.env.NEXT_PUBLIC_API_URL || '';
 
 async function fetchSections(): Promise<LandingSection[]> {
   try {
-    const res = await fetch(`${apiBaseUrl}/api/landing/sections`, {
+    const res = await fetch(`${serverBaseUrl}/api/landing/sections`, {
       cache: 'no-store',
     });
     if (!res.ok) return [];
@@ -35,7 +39,7 @@ export default async function LandingPage() {
 
   return (
     <div className="-mx-[4%] -mt-20 flex flex-col">
-      <DynamicLandingRenderer sections={sections} apiBaseUrl={apiBaseUrl} />
+      <DynamicLandingRenderer sections={sections} apiBaseUrl={clientBaseUrl} />
     </div>
   );
 }

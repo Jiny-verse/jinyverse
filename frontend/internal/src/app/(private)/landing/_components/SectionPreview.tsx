@@ -184,7 +184,7 @@ export function SectionPreview({ section, apiBaseUrl }: SectionPreviewProps) {
 
   const defaultHeightStyle: React.CSSProperties = customHeight
     ? { height: `${customHeight}px` }
-    : { minHeight: '100vh' };
+    : { height: '500px' };
 
   // ── Hero ──
   if (section.type === 'hero') {
