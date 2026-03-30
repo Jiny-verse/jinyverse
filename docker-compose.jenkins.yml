@@ -13,12 +13,12 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     security_opt:
       - no-new-privileges:true
-    pids_limit: 300
     deploy:
       resources:
         limits:
           memory: 1G
           cpus: '1.0'
+          pids: 300
 
 volumes:
   jenkins_home:
