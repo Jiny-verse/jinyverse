@@ -38,7 +38,7 @@ export default async function LandingPage() {
   }
 
   return (
-    <div className="-mx-[4%] -mt-20 flex flex-col">
+    <div className="-mx-[4vw] -mt-20 -mb-6 flex flex-col">
       <DynamicLandingRenderer sections={sections} apiBaseUrl={clientBaseUrl} />
     </div>
   );

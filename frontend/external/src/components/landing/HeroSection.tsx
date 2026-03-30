@@ -84,7 +84,7 @@ export function HeroSection({ section, apiBaseUrl }: HeroSectionProps) {
   const customHeight = extraConfig.customHeight as number | undefined;
   const heightStyle: React.CSSProperties = customHeight
     ? { height: `${customHeight}px` }
-    : { minHeight: '100vh' };
+    : { minHeight: '100dvh' };
 
   return (
     <section className="relative w-full bg-slate-800" style={heightStyle}>
@@ -103,6 +103,10 @@ export function HeroSection({ section, apiBaseUrl }: HeroSectionProps) {
           renderSlideContent(fileIds[0], true)
         ) : null}
       </div>
+
+      {/* Top gradient overlay for nav readability */}
+      <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-white/50 to-transparent dark:hidden z-[1] pointer-events-none" />
+      <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/50 to-transparent hidden dark:block z-[1] pointer-events-none" />
 
       {/* Carousel prev/next controls */}
       {isCarousel && (slideSettings.showControls ?? true) && (

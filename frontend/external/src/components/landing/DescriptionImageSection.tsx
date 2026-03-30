@@ -64,7 +64,7 @@ export function DescriptionImageSection({ section, apiBaseUrl }: DescriptionImag
   const customHeight = section.extraConfig?.customHeight as number | undefined;
   const heightStyle: React.CSSProperties = customHeight
     ? { height: `${customHeight}px` }
-    : { minHeight: '100vh' };
+    : { minHeight: '100dvh' };
 
   return (
     <section className="relative w-full bg-muted" style={heightStyle}>
@@ -72,6 +72,10 @@ export function DescriptionImageSection({ section, apiBaseUrl }: DescriptionImag
       <div className="absolute inset-0 overflow-hidden">
         {renderImageWrapper()}
       </div>
+      {/* Top gradient overlay for nav readability */}
+      <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-white/50 to-transparent dark:hidden z-[1] pointer-events-none" />
+      <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/50 to-transparent hidden dark:block z-[1] pointer-events-none" />
+
       {section.ctas.map((cta) => (
         <LandingCta
           key={cta.id}

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: 'Monorepo Project',
 };
 
-const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
+const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
 
 export default function RootLayout({
   children,

@@ -182,15 +182,15 @@ export function SectionPreview({ section, apiBaseUrl }: SectionPreviewProps) {
   const customHeight = section.extraConfig?.customHeight as number | undefined;
   const slideSettings = section.extraConfig?.slideSettings as SlideSettings | undefined;
 
-  const defaultHeightStyle: React.CSSProperties = customHeight
+  const heightStyle: React.CSSProperties | undefined = customHeight
     ? { height: `${customHeight}px` }
-    : { height: '500px' };
+    : undefined;
 
   // ── Hero ──
   if (section.type === 'hero') {
     const isCarousel = slideSettings?.enabled && fileIds.length > 1;
     return (
-      <div className="w-full relative overflow-hidden bg-slate-800" style={defaultHeightStyle}>
+      <div className="w-full relative overflow-hidden bg-slate-800" style={heightStyle}>
         <div className="absolute inset-0 overflow-hidden">
           {isCarousel ? (
             <HeroCarousel section={section} apiBaseUrl={base} slideSettings={slideSettings!} />
@@ -207,7 +207,7 @@ export function SectionPreview({ section, apiBaseUrl }: SectionPreviewProps) {
   // ── Image (DescriptionImage) ──
   if (section.type === 'image') {
     return (
-      <div className="w-full relative overflow-hidden bg-muted" style={defaultHeightStyle}>
+      <div className="w-full relative overflow-hidden bg-muted" style={heightStyle}>
         <div className="absolute inset-0 overflow-hidden">
           {bgImage ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -224,7 +224,7 @@ export function SectionPreview({ section, apiBaseUrl }: SectionPreviewProps) {
   // ── Image Link ──
   if (section.type === 'image_link') {
     return (
-      <div className="w-full relative overflow-hidden bg-slate-700" style={defaultHeightStyle}>
+      <div className="w-full relative overflow-hidden bg-slate-700" style={heightStyle}>
         <div className="absolute inset-0 overflow-hidden">
           {bgImage ? (
             // eslint-disable-next-line @next/next/no-img-element

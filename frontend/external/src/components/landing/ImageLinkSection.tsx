@@ -62,7 +62,7 @@ export function ImageLinkSection({ section, apiBaseUrl }: ImageLinkSectionProps)
   const customHeight = section.extraConfig?.customHeight as number | undefined;
   const heightStyle: React.CSSProperties = customHeight
     ? { height: `${customHeight}px` }
-    : { minHeight: '100vh' };
+    : { minHeight: '100dvh' };
 
   return (
     <section className="relative w-full bg-slate-700" style={heightStyle}>
@@ -70,6 +70,10 @@ export function ImageLinkSection({ section, apiBaseUrl }: ImageLinkSectionProps)
       <div className="absolute inset-0 overflow-hidden">
         {renderImageWrapper()}
       </div>
+      {/* Top gradient overlay for nav readability */}
+      <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-white/50 to-transparent dark:hidden z-[1] pointer-events-none" />
+      <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/50 to-transparent hidden dark:block z-[1] pointer-events-none" />
+
       {section.ctas.map((cta) => (
         <LandingCta
           key={cta.id}
