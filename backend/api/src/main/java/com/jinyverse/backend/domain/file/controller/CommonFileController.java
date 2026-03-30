@@ -9,6 +9,7 @@ import com.jinyverse.backend.exception.ApiErrorResponse;
 import com.jinyverse.backend.domain.file.service.UploadSessionService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.UUID;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/files")
 @RequiredArgsConstructor
@@ -62,7 +64,10 @@ public class CommonFileController {
                             e.getMessage() != null && !e.getMessage().isBlank() ? e.getMessage()
                                     : "파일 저장 경로가 설정되지 않았습니다. 관리자 설정에서 파일 저장소 경로를 입력하세요."));
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            log.error("File upload failed for '{}': {}", file.getOriginalFilename(), e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ApiErrorResponse("FILE_UPLOAD_FAILED",
+                            "파일 업로드 중 오류가 발생했습니다: " + e.getClass().getSimpleName()));
         }
     }
 

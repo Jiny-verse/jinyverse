@@ -1,6 +1,8 @@
 import { DynamicLandingRenderer } from '@/components/landing/DynamicLandingRenderer';
 import type { LandingSection } from 'common/schemas';
 
+export const dynamic = 'force-dynamic';
+
 const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8080';
 
 async function fetchSections(): Promise<LandingSection[]> {

@@ -122,26 +122,34 @@ function HeroCarousel({
 
   return (
     <>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        key={fileIds[activeIdx]}
-        src={`${apiBaseUrl}/api/files/${fileIds[activeIdx]}/download`}
-        alt=""
-        className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500"
-      />
+      {fileIds.map((fileId, idx) => (
+        <div
+          key={fileId}
+          className={`absolute inset-0 transition-opacity duration-700 ${
+            idx === activeIdx ? 'opacity-100' : 'opacity-0'
+          }`}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={`${apiBaseUrl}/api/files/${fileId}/download`}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        </div>
+      ))}
       {slideSettings.showControls && fileIds.length > 1 && (
         <>
           <button
             type="button"
             onClick={prev}
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-30 w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70"
+            className="absolute left-3 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 text-xl leading-none"
           >
             ‹
           </button>
           <button
             type="button"
             onClick={next}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-30 w-8 h-8 rounded-full bg-black/50 text-white flex items-center justify-center hover:bg-black/70"
+            className="absolute right-3 top-1/2 -translate-y-1/2 z-30 w-9 h-9 rounded-full bg-black/40 text-white flex items-center justify-center hover:bg-black/60 text-xl leading-none"
           >
             ›
           </button>
@@ -155,7 +163,7 @@ function HeroCarousel({
               type="button"
               onClick={() => setActiveIdx(i)}
               className={`w-2 h-2 rounded-full transition-colors ${
-                i === activeIdx ? 'bg-white' : 'bg-white/40'
+                i === activeIdx ? 'bg-white' : 'bg-white/50'
               }`}
             />
           ))}
@@ -172,136 +180,90 @@ export function SectionPreview({ section, apiBaseUrl }: SectionPreviewProps) {
 
   const showFilmstrip = FILMSTRIP_TYPES.includes(section.type);
   const customHeight = section.extraConfig?.customHeight as number | undefined;
-  const href = section.extraConfig?.href as string | undefined;
   const slideSettings = section.extraConfig?.slideSettings as SlideSettings | undefined;
 
-  const resolveHref = (h: string) => {
-    if (!h) return h;
-    if (h.startsWith('http://') || h.startsWith('https://') || h.startsWith('/')) return h;
-    return `https://${h}`;
-  };
+  const defaultHeightStyle: React.CSSProperties = customHeight
+    ? { height: `${customHeight}px` }
+    : { minHeight: '100vh' };
 
-  const wrapWithLink = (content: React.ReactElement, extraClass = '') => {
-    if (!href) {
-      if (extraClass) return <div className={extraClass}>{content}</div>;
-      return content;
-    }
-    return (
-      <a
-        href={resolveHref(href)}
-        target={href.startsWith('/') ? undefined : '_blank'}
-        rel="noopener noreferrer"
-        className={`block ${extraClass}`}
-      >
-        {content}
-      </a>
-    );
-  };
-
+  // ── Hero ──
   if (section.type === 'hero') {
     const isCarousel = slideSettings?.enabled && fileIds.length > 1;
-    const heightStyle = customHeight ? { height: `${customHeight}px` } : { height: '400px' };
     return (
-      <div
-        className="w-full relative overflow-hidden"
-        style={heightStyle}
-      >
-        {isCarousel ? (
-          <HeroCarousel section={section} apiBaseUrl={base} slideSettings={slideSettings!} />
-        ) : bgImage ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            key={fileIds[0]}
-            src={bgImage}
-            alt=""
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        ) : (
-          <div
-            className="absolute inset-0"
-            style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
-          />
-        )}
-        {href && (
-          <a
-            href={resolveHref(href)}
-            target={href.startsWith('/') ? undefined : '_blank'}
-            rel="noopener noreferrer"
-            className="absolute inset-0 z-10"
-          />
-        )}
+      <div className="w-full relative overflow-hidden bg-slate-800" style={defaultHeightStyle}>
+        <div className="absolute inset-0 overflow-hidden">
+          {isCarousel ? (
+            <HeroCarousel section={section} apiBaseUrl={base} slideSettings={slideSettings!} />
+          ) : bgImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img key={fileIds[0]} src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover" />
+          ) : null}
+        </div>
         {showFilmstrip && <ImageFilmstrip section={section} apiBaseUrl={base} />}
       </div>
     );
   }
 
+  // ── Image (DescriptionImage) ──
   if (section.type === 'image') {
-    return wrapWithLink(
-      <div
-        className="w-full flex overflow-hidden relative"
-        style={{ ...(customHeight ? { height: `${customHeight}px` } : { height: '300px' }) }}
-      >
-        <div className="w-1/2 bg-gray-200 flex items-center justify-center relative overflow-hidden">
+    return (
+      <div className="w-full relative overflow-hidden bg-muted" style={defaultHeightStyle}>
+        <div className="absolute inset-0 overflow-hidden">
           {bgImage ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img key={fileIds[0]} src={bgImage} alt="" className="w-full h-full object-cover" />
+            <img key={fileIds[0]} src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover" />
           ) : (
-            <span className="text-gray-400 text-sm">Image</span>
+            <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900" />
           )}
         </div>
-        <div className="w-1/2 flex flex-col justify-center px-8 bg-background">
-          <div className="h-5 bg-gray-200 rounded mb-3 w-3/4" />
-          <div className="h-3 bg-gray-100 rounded mb-2 w-full" />
-          <div className="h-3 bg-gray-100 rounded mb-2 w-5/6" />
-          <div className="h-3 bg-gray-100 rounded w-4/6" />
+        {showFilmstrip && <ImageFilmstrip section={section} apiBaseUrl={base} />}
+      </div>
+    );
+  }
+
+  // ── Image Link ──
+  if (section.type === 'image_link') {
+    return (
+      <div className="w-full relative overflow-hidden bg-slate-700" style={defaultHeightStyle}>
+        <div className="absolute inset-0 overflow-hidden">
+          {bgImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img key={fileIds[0]} src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover" />
+          ) : null}
         </div>
         {showFilmstrip && <ImageFilmstrip section={section} apiBaseUrl={base} />}
       </div>
     );
   }
 
+  // ── Board Top ──
   if (section.type === 'board_top') {
     return (
-      <div
-        className="w-full p-4 bg-background"
-        style={{ ...(customHeight ? { height: `${customHeight}px` } : { height: '240px' }) }}
-      >
-        <div className="h-5 bg-gray-200 rounded mb-4 w-1/3" />
-        {[0, 1, 2].map((i) => (
-          <div key={i} className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 bg-gray-200 rounded shrink-0" />
-            <div className="flex-1">
-              <div className="h-3 bg-gray-200 rounded mb-1.5 w-3/4" />
-              <div className="h-2 bg-gray-100 rounded w-1/2" />
-            </div>
+      <div className="w-full py-12 bg-background">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="h-6 bg-muted rounded mb-6 w-1/3" />
+          <div className="grid grid-cols-3 gap-4">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="rounded-lg border border-border overflow-hidden bg-card">
+                <div className="w-full h-40 bg-gradient-to-br from-slate-600 to-slate-800" />
+                <div className="p-3">
+                  <div className="h-4 bg-muted rounded mb-2 w-3/4" />
+                  <div className="flex items-center justify-between mt-2">
+                    <div className="h-3 bg-muted/50 rounded w-1/3" />
+                    <div className="h-3 bg-muted/50 rounded w-1/4" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
       </div>
     );
   }
 
-  if (section.type === 'image_link') {
-    return (
-      <div
-        className="w-full flex gap-2 p-4 bg-background relative"
-        style={{ ...(customHeight ? { height: `${customHeight}px` } : { height: '300px' }) }}
-      >
-        {[0, 1, 2].map((i) => (
-          <div
-            key={i}
-            className="flex-1 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 text-sm"
-          >
-            Image {i + 1}
-          </div>
-        ))}
-        {showFilmstrip && <ImageFilmstrip section={section} apiBaseUrl={base} />}
-      </div>
-    );
-  }
-
-  // Fallback
+  // ── Fallback ──
   return (
-    <div className="h-[200px] w-full flex items-center justify-center bg-gray-100 text-gray-400">
+    <div className="h-[200px] w-full flex items-center justify-center bg-muted text-muted-foreground">
       [{section.type}]
     </div>
   );

@@ -42,7 +42,7 @@ export function Modal({ isOpen, onClose, title, children, footer, size = 'md' }:
   const content = (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className={`relative bg-white rounded-lg shadow-xl ${sizeStyles[size]} w-full mx-4`}>
+      <div className={`relative bg-background rounded-lg shadow-xl ${sizeStyles[size]} w-full mx-4`}>
         {title && (
           <div className="px-6 py-4 border-b">
             <h2 className="text-xl font-semibold">{title}</h2>

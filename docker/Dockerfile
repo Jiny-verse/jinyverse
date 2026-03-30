@@ -22,6 +22,7 @@ WORKDIR /app
 COPY --from=backend /app/api/build/libs/*.jar app.jar
 # Non-root user for security
 RUN groupadd -r jiny && useradd -r -g jiny jiny
+RUN mkdir -p /app/data/uploads && chown -R jiny:jiny /app/data/uploads
 RUN chown jiny:jiny app.jar
 USER jiny
 ENTRYPOINT ["java", "-jar", "app.jar"]
