@@ -56,7 +56,9 @@ services:
       dockerfile: docker/Dockerfile
       target: external-runner
       args:
-        - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+        - NEXT_PUBLIC_API_URL=
+    environment:
+      - API_BACKEND_URL=http://backend:8080
     depends_on:
       - backend
     restart: unless-stopped
