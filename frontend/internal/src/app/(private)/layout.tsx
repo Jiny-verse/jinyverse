@@ -42,7 +42,7 @@ function PrivateLayoutContent({
             </button>
           </div>
         </header>
-        <main className="flex-1 bg-background px-[4%] py-6">{children}</main>
+        <main className="flex-1 bg-background px-[4%] py-6 min-h-0">{children}</main>
       </div>
     </div>
   );

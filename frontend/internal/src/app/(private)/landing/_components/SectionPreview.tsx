@@ -189,16 +189,31 @@ export function SectionPreview({ section, apiBaseUrl }: SectionPreviewProps) {
   // ── Hero ──
   if (section.type === 'hero') {
     const isCarousel = slideSettings?.enabled && fileIds.length > 1;
-    return (
-      <div className="w-full relative overflow-hidden bg-slate-800" style={heightStyle}>
-        <div className="absolute inset-0 overflow-hidden">
-          {isCarousel ? (
-            <HeroCarousel section={section} apiBaseUrl={base} slideSettings={slideSettings!} />
-          ) : bgImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img key={fileIds[0]} src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover" />
-          ) : null}
+    if (customHeight) {
+      return (
+        <div className="w-full relative overflow-hidden bg-slate-800" style={heightStyle}>
+          <div className="absolute inset-0 overflow-hidden">
+            {isCarousel ? (
+              <HeroCarousel section={section} apiBaseUrl={base} slideSettings={slideSettings!} />
+            ) : bgImage ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img key={fileIds[0]} src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover" />
+            ) : null}
+          </div>
+          {showFilmstrip && <ImageFilmstrip section={section} apiBaseUrl={base} />}
         </div>
+      );
+    }
+    return (
+      <div className="w-full relative overflow-hidden bg-slate-800">
+        {isCarousel ? (
+          <HeroCarousel section={section} apiBaseUrl={base} slideSettings={slideSettings!} />
+        ) : bgImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img key={fileIds[0]} src={bgImage} alt="" className="w-full h-auto block" />
+        ) : (
+          <div className="w-full h-[200px]" />
+        )}
         {showFilmstrip && <ImageFilmstrip section={section} apiBaseUrl={base} />}
       </div>
     );
@@ -206,16 +221,29 @@ export function SectionPreview({ section, apiBaseUrl }: SectionPreviewProps) {
 
   // ── Image (DescriptionImage) ──
   if (section.type === 'image') {
-    return (
-      <div className="w-full relative overflow-hidden bg-muted" style={heightStyle}>
-        <div className="absolute inset-0 overflow-hidden">
-          {bgImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img key={fileIds[0]} src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover" />
-          ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900" />
-          )}
+    if (customHeight) {
+      return (
+        <div className="w-full relative overflow-hidden bg-muted" style={heightStyle}>
+          <div className="absolute inset-0 overflow-hidden">
+            {bgImage ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img key={fileIds[0]} src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover" />
+            ) : (
+              <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900" />
+            )}
+          </div>
+          {showFilmstrip && <ImageFilmstrip section={section} apiBaseUrl={base} />}
         </div>
+      );
+    }
+    return (
+      <div className="w-full relative overflow-hidden bg-muted">
+        {bgImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img key={fileIds[0]} src={bgImage} alt="" className="w-full h-auto block" />
+        ) : (
+          <div className="w-full h-[200px] bg-gradient-to-br from-slate-700 to-slate-900" />
+        )}
         {showFilmstrip && <ImageFilmstrip section={section} apiBaseUrl={base} />}
       </div>
     );
@@ -223,14 +251,27 @@ export function SectionPreview({ section, apiBaseUrl }: SectionPreviewProps) {
 
   // ── Image Link ──
   if (section.type === 'image_link') {
-    return (
-      <div className="w-full relative overflow-hidden bg-slate-700" style={heightStyle}>
-        <div className="absolute inset-0 overflow-hidden">
-          {bgImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img key={fileIds[0]} src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover" />
-          ) : null}
+    if (customHeight) {
+      return (
+        <div className="w-full relative overflow-hidden bg-slate-700" style={heightStyle}>
+          <div className="absolute inset-0 overflow-hidden">
+            {bgImage ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img key={fileIds[0]} src={bgImage} alt="" className="absolute inset-0 w-full h-full object-cover" />
+            ) : null}
+          </div>
+          {showFilmstrip && <ImageFilmstrip section={section} apiBaseUrl={base} />}
         </div>
+      );
+    }
+    return (
+      <div className="w-full relative overflow-hidden bg-slate-700">
+        {bgImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img key={fileIds[0]} src={bgImage} alt="" className="w-full h-auto block" />
+        ) : (
+          <div className="w-full h-[200px]" />
+        )}
         {showFilmstrip && <ImageFilmstrip section={section} apiBaseUrl={base} />}
       </div>
     );
