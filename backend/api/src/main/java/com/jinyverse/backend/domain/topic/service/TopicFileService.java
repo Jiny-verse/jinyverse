@@ -27,7 +27,8 @@ public class TopicFileService {
 
     @Transactional
     public void saveTopicFiles(UUID topicId, List<TopicFileItemDto> files) {
-        relTopicFileRepository.findByTopicId(topicId).forEach(relTopicFileRepository::delete);
+        relTopicFileRepository.deleteByTopicId(topicId);
+        relTopicFileRepository.flush();
         if (files == null || files.isEmpty()) return;
         for (int i = 0; i < files.size(); i++) {
             TopicFileItemDto item = files.get(i);
