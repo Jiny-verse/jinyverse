@@ -33,7 +33,7 @@ export function NormalBoardRow({ topic, onClick }: NormalBoardRowProps) {
           {topic.title}
         </h3>
       </div>
-      {excerpt && <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{excerpt}</p>}
+      {excerpt && <p className="mt-1 text-sm text-muted-foreground whitespace-pre-line line-clamp-2">{excerpt}</p>}
       <p className="mt-2 text-xs text-muted-foreground">
         {topic.author?.nickname ?? '-'} · {formatRelativeOrAbsolute(topic.createdAt)} · 조회{' '}
         {topic.viewCount ?? 0}

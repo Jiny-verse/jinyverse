@@ -33,7 +33,7 @@ export function BlogBoardCard({ topic, apiOptions, onClick }: BlogBoardCardProps
       <div className="flex flex-col justify-between min-w-0 flex-1 py-1">
         <div>
           <h3 className="text-base font-semibold text-gray-900 truncate">{topic.title}</h3>
-          <p className="mt-1 text-sm text-gray-600 line-clamp-2">{excerpt}</p>
+          <p className="mt-1 text-sm text-gray-600 whitespace-pre-line line-clamp-2">{excerpt}</p>
         </div>
         <div className="flex items-center gap-3 flex-wrap">
           {topic.tags?.slice(0, 3).map((t) => (

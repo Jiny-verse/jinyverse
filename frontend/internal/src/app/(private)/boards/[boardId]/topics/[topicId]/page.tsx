@@ -56,7 +56,7 @@ export default function TopicDetailPage() {
 
   if (error) {
     return (
-      <div className="">
+      <div>
         <p className="text-destructive">{error}</p>
         <Link
           href={`/boards/${boardId}/topics`}
@@ -70,14 +70,14 @@ export default function TopicDetailPage() {
 
   if (!topic || !board) {
     return (
-      <div className="">
+      <div>
         <p className="text-muted-foreground">{t('common.loading')}</p>
       </div>
     );
   }
 
   return (
-    <div className="">
+    <div>
       <div className="flex items-center justify-between mb-4">
         <Link
           href={`/boards/${boardId}/topics`}
@@ -104,7 +104,7 @@ export default function TopicDetailPage() {
         </div>
       </div>
 
-      <div className="mb-8">
+      <div className="mb-6">
         <PostDetailRenderer board={board} topic={topic} apiOptions={options} />
       </div>
 

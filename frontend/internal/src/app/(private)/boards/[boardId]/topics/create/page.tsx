@@ -41,7 +41,7 @@ export default function CreateTopicPage() {
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
+    <div>
       <h1 className="text-2xl font-bold mb-6 text-foreground">
         새 게시글 작성
       </h1>

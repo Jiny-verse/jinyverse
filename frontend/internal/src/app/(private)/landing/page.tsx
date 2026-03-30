@@ -13,7 +13,7 @@ export default function LandingPage() {
   const options = useApiOptions();
   return (
     <LandingProvider apiOptions={options}>
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-[calc(100vh-3.25rem)] -mx-[4%] -my-6">
         <LandingHeader />
         <div className="flex flex-1 overflow-hidden">
           <LandingCanvas className="flex-1 overflow-y-auto" />

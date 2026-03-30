@@ -43,7 +43,7 @@ function BoardsContent() {
   }, [options.baseUrl, options.channel]);
 
   return (
-    <div className="">
+    <div>
       <h1 className="text-2xl font-bold mb-6">{t('admin.board.title')}</h1>
       {loadError && <Alert variant="error">{loadError}</Alert>}
       <Table apiOptions={options} />

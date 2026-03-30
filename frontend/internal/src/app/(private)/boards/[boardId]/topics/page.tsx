@@ -53,7 +53,7 @@ export default function TopicsPage() {
 
   if (error) {
     return (
-      <div className="">
+      <div>
         <p className="text-destructive">{error}</p>
         <Link href="/boards" className="mt-4 inline-block text-muted-foreground hover:text-foreground">
           {t('board.list.title', { defaultValue: '게시판 목록' })}
@@ -74,15 +74,15 @@ export default function TopicsPage() {
   return (
     <>
     {confirmDialog}
-    <div className="">
+    <div>
       <Link href="/boards" className="text-muted-foreground hover:text-foreground mb-4 inline-block">
         ← {t('board.list.title', { defaultValue: '게시판 목록' })}
       </Link>
       <h1 className="text-2xl font-bold mb-6">{t('board.topic.manage', { defaultValue: '게시글 관리' })}</h1>
 
       {isNormal ? (
-        <div className={hasPreview ? 'flex gap-0 h-[calc(100vh-10rem)] min-h-[400px]' : ''}>
-          <div className={hasPreview ? 'w-1/2 min-w-0 pr-4 flex flex-col' : ''}>
+        <div className={hasPreview ? 'flex gap-6 h-[calc(100vh-10rem)] min-h-[400px]' : ''}>
+          <div className={hasPreview ? 'w-1/2 min-w-0 flex flex-col' : ''}>
             <Table
               boardId={boardId}
               data={data?.content ?? []}

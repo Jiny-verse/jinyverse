@@ -41,7 +41,7 @@ export default function NotificationTemplateDetailPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6">템플릿 편집</h1>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <TemplateForm
           initial={{
             name: template.name,

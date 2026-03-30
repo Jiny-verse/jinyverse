@@ -88,7 +88,7 @@ function MenusContent() {
   }, [domain.crud, pendingDeleteCode, selectedMenu?.code]);
 
   return (
-    <div className="">
+    <div>
       {loadError && <Alert variant="error">{loadError}</Alert>}
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">{t('admin.menu.title')}</h1>

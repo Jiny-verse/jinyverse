@@ -40,7 +40,7 @@ export default function InquiryDetailPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold mb-1">{inquiry.title}</h1>
+      <h1 className="text-2xl font-bold mb-1">{inquiry.title}</h1>
       <p className="text-sm text-muted-foreground mb-6">티켓 {inquiry.ticketNo}</p>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

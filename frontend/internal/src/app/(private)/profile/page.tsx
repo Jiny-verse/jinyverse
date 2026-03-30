@@ -135,7 +135,7 @@ export default function ProfilePage() {
           {/* 이름 / 닉네임 수정 */}
           <section className="max-w-xl rounded-lg border border-border bg-card p-6 mb-6">
             <h2 className="mb-4 text-lg font-semibold text-foreground">{t('user.profile.basicInfo')}</h2>
-            <form onSubmit={handleSaveInfo} className="flex flex-col gap-3">
+            <form onSubmit={handleSaveInfo} className="flex flex-col gap-4">
               <label className="flex flex-col gap-1">
                 <span className="text-sm font-medium text-gray-300">{t('form.label.name')}</span>
                 <input
@@ -170,7 +170,7 @@ export default function ProfilePage() {
 
           {/* 프로필 이미지 */}
           <section className="max-w-xl rounded-lg border border-border bg-card p-6 mb-6">
-            <h2 className="mb-3 text-lg font-semibold text-foreground">{t('user.profile.image')}</h2>
+            <h2 className="mb-4 text-lg font-semibold text-foreground">{t('user.profile.image')}</h2>
             <SingleImageField
               apiOptions={options}
               value={me.profileImageFileId ?? null}
@@ -196,7 +196,7 @@ export default function ProfilePage() {
           {/* 비밀번호 변경 */}
           <section className="max-w-xl rounded-lg border border-border bg-card p-6">
             <h2 className="mb-4 text-lg font-semibold text-foreground">{t('user.profile.changePassword')}</h2>
-            <form onSubmit={handleChangePassword} className="flex flex-col gap-3">
+            <form onSubmit={handleChangePassword} className="flex flex-col gap-4">
               <label className="flex flex-col gap-1">
                 <span className="text-sm font-medium text-gray-300">{t('user.profile.currentPassword')}</span>
                 <input

@@ -41,7 +41,7 @@ export function ProjectBoardCard({ topic, apiOptions, onClick }: ProjectBoardCar
       ) : null}
       <div className="px-4 pb-4 pt-2">
         <h3 className="text-base font-semibold text-gray-900 truncate">{topic.title}</h3>
-        {excerpt && <p className="mt-1 text-sm text-gray-600 truncate">{excerpt}</p>}
+        {excerpt && <p className="mt-1 text-sm text-gray-600 whitespace-pre-line line-clamp-2">{excerpt}</p>}
         <p className="mt-1 text-xs text-gray-500">
           {topic.author?.nickname ?? '-'} · {formatRelativeOrAbsolute(topic.createdAt)}
         </p>

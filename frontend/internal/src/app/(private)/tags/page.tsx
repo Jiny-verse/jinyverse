@@ -21,7 +21,7 @@ function TagsContent() {
   }, [options.baseUrl, options.channel]);
 
   return (
-    <div className="">
+    <div>
       <h1 className="mb-6 text-2xl font-bold">{t('admin.tag.title')}</h1>
       <Table apiOptions={options} />
       <CreateDialog usageOptions={usageOptions} />
