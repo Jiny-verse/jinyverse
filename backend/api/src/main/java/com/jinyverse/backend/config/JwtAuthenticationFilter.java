@@ -100,6 +100,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (path == null) return false;
         if (path.equals("/api/menus") || path.startsWith("/api/menus/")) return true;
         if (path.equals("/api/boards")) return true;
+        if (path.startsWith("/api/boards/") && path.indexOf('/', 12) < 0) return true; // /api/boards/{id} 단건만
         if (path.equals("/api/topics")) return true;
         if (path.startsWith("/api/topics/") && path.indexOf('/', 12) < 0) return true; // /api/topics/{id} 단건만
         if (path.equals("/api/comments")) return true;
