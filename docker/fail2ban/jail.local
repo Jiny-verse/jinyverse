@@ -1,0 +1,46 @@
+[DEFAULT]
+bantime  = 1h
+findtime = 10m
+maxretry = 5
+banaction = iptables-multiport
+ignoreip = 127.0.0.1/8 ::1
+
+# ── Nginx 반복 4xx (스캐너/봇 탐지) ──
+[nginx-4xx]
+enabled  = true
+port     = http,https
+filter   = nginx-4xx
+logpath  = /var/lib/docker/volumes/*_nginx_logs/_data/access.log
+maxretry = 20
+findtime = 1m
+bantime  = 1h
+
+# ── Nginx 인증 실패 (401) ──
+[nginx-auth]
+enabled  = true
+port     = http,https
+filter   = nginx-auth
+logpath  = /var/lib/docker/volumes/*_nginx_logs/_data/access.log
+maxretry = 10
+findtime = 5m
+bantime  = 30m
+
+# ── 웹 스캐너 탐지 (444 응답) ──
+[nginx-scanner]
+enabled  = true
+port     = http,https
+filter   = nginx-scanner
+logpath  = /var/lib/docker/volumes/*_nginx_logs/_data/access.log
+maxretry = 3
+findtime = 1m
+bantime  = 24h
+
+# ── SSH 브루트포스 ──
+[sshd]
+enabled  = true
+port     = ssh
+filter   = sshd
+logpath  = /var/log/auth.log
+maxretry = 5
+findtime = 10m
+bantime  = 1h
