@@ -42,6 +42,7 @@ public class CommonFileService {
 
     private final CommonFileRepository commonFileRepository;
     private final FileStorage fileStorage;
+    private final ImageResizeService imageResizeService;
     private final RelTopicFileRepository relTopicFileRepository;
     private final TopicRepository topicRepository;
 
@@ -106,6 +107,13 @@ public class CommonFileService {
         } catch (IOException e) {
             log.warn("CommonFileService.delete: 스토리지 파일 삭제 실패 {} - {}", commonFile.getFilePath(), e.getMessage());
         }
+        if (commonFile.getThumbnailPath() != null) {
+            try {
+                fileStorage.delete(commonFile.getThumbnailPath());
+            } catch (IOException e) {
+                log.warn("CommonFileService.delete: 썸네일 삭제 실패 {} - {}", commonFile.getThumbnailPath(), e.getMessage());
+            }
+        }
         commonFileRepository.delete(commonFile);
     }
 
@@ -137,6 +145,21 @@ public class CommonFileService {
                 ? file.getContentType()
                 : "application/octet-stream");
         entity.setFileExt(ext);
+
+        // 이미지 파일인 경우 썸네일 생성
+        if (imageResizeService.isResizable(entity.getMimeType())) {
+            try {
+                Resource originalResource = fileStorage.getResource(relativePath);
+                if (originalResource != null && originalResource.exists()) {
+                    Path thumbAbsPath = imageResizeService.generateThumbnail(originalResource.getFile().toPath());
+                    String relativeThumbPath = imageResizeService.deriveRelativeThumbnailPath(relativePath);
+                    entity.setThumbnailPath(relativeThumbPath);
+                    log.debug("CommonFileService: 썸네일 생성 완료 {}", thumbAbsPath);
+                }
+            } catch (Exception e) {
+                log.warn("CommonFileService: 썸네일 생성 실패 (업로드는 유지) {} - {}", relativePath, e.getMessage());
+            }
+        }
 
         try {
             CommonFile saved = commonFileRepository.save(entity);
