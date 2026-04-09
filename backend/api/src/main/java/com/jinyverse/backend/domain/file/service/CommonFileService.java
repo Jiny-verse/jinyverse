@@ -214,7 +214,7 @@ public class CommonFileService {
                 if (thumb != null && thumb.exists()) {
                     return thumb;
                 }
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 log.warn("getResourceForThumbnail: 지연 썸네일 생성 실패 {} - {}", file.getFilePath(), e.getMessage());
             }
         }

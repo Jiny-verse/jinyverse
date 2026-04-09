@@ -84,7 +84,7 @@ services:
       MAIL_USE_SMTP: ${MAIL_USE_SMTP}
       MAIL_USERNAME: ${MAIL_USERNAME}
       MAIL_PASSWORD: ${MAIL_PASSWORD}
-      JAVA_OPTS: "-Xmx384m -Xms128m"
+      JAVA_OPTS: "-Xmx600m -Xms128m"
     volumes:
       - ${UPLOAD_DATA_PATH:-/srv/data/uploads}:/app/data/uploads
     depends_on:
