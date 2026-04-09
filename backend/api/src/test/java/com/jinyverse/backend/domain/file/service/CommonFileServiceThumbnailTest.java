@@ -19,7 +19,6 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
@@ -37,6 +36,7 @@ class CommonFileServiceThumbnailTest {
     @Mock private CommonFileRepository commonFileRepository;
     @Mock private FileStorage fileStorage;
     @Mock private ImageResizeService imageResizeService;
+    @Mock private ThumbnailAsyncService thumbnailAsyncService;
     @Mock private RelTopicFileRepository relTopicFileRepository;
     @Mock private TopicRepository topicRepository;
 
@@ -49,21 +49,12 @@ class CommonFileServiceThumbnailTest {
     // ===== 업로드 시 썸네일 생성 =====
 
     @Test
-    @DisplayName("uploadFromMultipart: 이미지 파일이면 썸네일 생성 후 thumbnailPath 저장")
+    @DisplayName("uploadFromMultipart: 이미지 파일이면 비동기 썸네일 생성 트리거")
     void uploadFromMultipart_이미지_썸네일생성() throws IOException {
         MultipartFile file = new MockMultipartFile(
                 "file", "photo.jpg", "image/jpeg", new byte[]{1, 2, 3});
 
-        Path thumbFile = tempDir.resolve("photo_thumb.jpg");
-        Files.createFile(thumbFile);
-
-        FileSystemResource fakeResource = new FileSystemResource(tempDir.resolve("photo.jpg").toFile());
-        Files.createFile(tempDir.resolve("photo.jpg"));
-
         when(imageResizeService.isResizable("image/jpeg")).thenReturn(true);
-        when(fileStorage.getResource(any())).thenReturn(fakeResource);
-        when(imageResizeService.generateThumbnail(any(Path.class))).thenReturn(thumbFile);
-        when(imageResizeService.deriveRelativeThumbnailPath(any())).thenReturn("2025/01/01/_thumb/photo_thumb.jpg");
 
         ArgumentCaptor<CommonFile> captor = ArgumentCaptor.forClass(CommonFile.class);
         when(commonFileRepository.save(captor.capture())).thenAnswer(inv -> inv.getArgument(0));
@@ -71,8 +62,10 @@ class CommonFileServiceThumbnailTest {
         CommonFileResponseDto result = commonFileService.uploadFromMultipart(file, null);
 
         assertThat(result).isNotNull();
-        assertThat(captor.getValue().getThumbnailPath()).isEqualTo("2025/01/01/_thumb/photo_thumb.jpg");
-        verify(imageResizeService).generateThumbnail(any(Path.class));
+        // 비동기 생성이므로 thumbnailPath는 즉시 설정되지 않음
+        assertThat(captor.getValue().getThumbnailPath()).isNull();
+        // 대신 비동기 서비스가 트리거돼야 함
+        verify(thumbnailAsyncService).generateAndSave(any(), any(), eq("image/jpeg"));
     }
 
     @Test
@@ -93,27 +86,21 @@ class CommonFileServiceThumbnailTest {
     }
 
     @Test
-    @DisplayName("uploadFromMultipart: 썸네일 생성 실패해도 업로드는 성공")
-    void uploadFromMultipart_썸네일실패_업로드유지() throws IOException {
+    @DisplayName("uploadFromMultipart: 비이미지 파일은 비동기 썸네일 트리거 안 함")
+    void uploadFromMultipart_비이미지_비동기트리거없음() throws IOException {
         MultipartFile file = new MockMultipartFile(
-                "file", "photo.png", "image/png", new byte[]{1, 2, 3});
+                "file", "document.pdf", "application/pdf", new byte[]{1, 2, 3});
 
-        FileSystemResource fakeResource = new FileSystemResource(tempDir.resolve("photo.png").toFile());
-        Files.createFile(tempDir.resolve("photo.png"));
-
-        when(imageResizeService.isResizable("image/png")).thenReturn(true);
-        when(fileStorage.getResource(any())).thenReturn(fakeResource);
-        when(imageResizeService.generateThumbnail(any(Path.class)))
-                .thenThrow(new IOException("리사이즈 실패"));
+        when(imageResizeService.isResizable("application/pdf")).thenReturn(false);
 
         ArgumentCaptor<CommonFile> captor = ArgumentCaptor.forClass(CommonFile.class);
         when(commonFileRepository.save(captor.capture())).thenAnswer(inv -> inv.getArgument(0));
 
-        // 예외 없이 정상 완료
         CommonFileResponseDto result = commonFileService.uploadFromMultipart(file, null);
 
         assertThat(result).isNotNull();
         assertThat(captor.getValue().getThumbnailPath()).isNull();
+        verify(thumbnailAsyncService, never()).generateAndSave(any(), any(), any());
     }
 
     // ===== 삭제 시 썸네일 삭제 =====
@@ -216,8 +203,8 @@ class CommonFileServiceThumbnailTest {
     }
 
     @Test
-    @DisplayName("getResourceForThumbnail: thumbnailPath null인 이미지 → 지연 생성 후 썸네일 반환")
-    void getResourceForThumbnail_지연생성_썸네일반환() throws IOException {
+    @DisplayName("getResourceForThumbnail: thumbnailPath null인 이미지 → 비동기 트리거 후 원본 즉시 반환")
+    void getResourceForThumbnail_지연생성_원본즉시반환() throws IOException {
         UUID fileId = UUID.randomUUID();
         CommonFile entity = new CommonFile();
         entity.setFilePath("2025/01/01/uuid.jpg");
@@ -226,31 +213,20 @@ class CommonFileServiceThumbnailTest {
 
         Path fakeOriginal = tempDir.resolve("uuid.jpg");
         Files.createFile(fakeOriginal);
-        Path fakeThumb = tempDir.resolve("_thumb/uuid_thumb.jpg");
-        Files.createDirectories(fakeThumb.getParent());
-        Files.createFile(fakeThumb);
-
         FileSystemResource originalResource = new FileSystemResource(fakeOriginal.toFile());
-        FileSystemResource thumbResource = new FileSystemResource(fakeThumb.toFile());
 
         when(commonFileRepository.findById(fileId)).thenReturn(Optional.of(entity));
         when(fileStorage.getResource("2025/01/01/uuid.jpg")).thenReturn(originalResource);
         when(imageResizeService.isResizable("image/jpeg")).thenReturn(true);
-        when(imageResizeService.generateThumbnail(any(Path.class))).thenReturn(fakeThumb);
-        when(imageResizeService.deriveRelativeThumbnailPath("2025/01/01/uuid.jpg"))
-                .thenReturn("2025/01/01/_thumb/uuid_thumb.jpg");
-        when(fileStorage.getResource("2025/01/01/_thumb/uuid_thumb.jpg")).thenReturn(thumbResource);
-        when(commonFileRepository.save(any(CommonFile.class))).thenReturn(entity);
 
-        var result = getResourceForThumbnail_썸네일반환_실행(fileId);
+        var result = commonFileService.getResourceForThumbnail(fileId);
 
-        assertThat(result).isSameAs(thumbResource);
-        assertThat(entity.getThumbnailPath()).isEqualTo("2025/01/01/_thumb/uuid_thumb.jpg");
-        verify(commonFileRepository).save(entity);
-    }
-
-    private org.springframework.core.io.Resource getResourceForThumbnail_썸네일반환_실행(UUID fileId) throws IOException {
-        return commonFileService.getResourceForThumbnail(fileId);
+        // 비동기이므로 원본 즉시 반환
+        assertThat(result).isSameAs(originalResource);
+        // 비동기 서비스 트리거 확인
+        verify(thumbnailAsyncService).generateAndSave(eq(fileId), eq("2025/01/01/uuid.jpg"), eq("image/jpeg"));
+        // DB save는 비동기 측에서 하므로 동기 측에서는 호출 안 함
+        verify(commonFileRepository, never()).save(any());
     }
 
     @Test

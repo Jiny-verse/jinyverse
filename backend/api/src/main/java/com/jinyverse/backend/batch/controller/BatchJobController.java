@@ -6,6 +6,7 @@ import com.jinyverse.backend.domain.common.util.Channel;
 import com.jinyverse.backend.domain.common.util.RequestContext;
 import com.jinyverse.backend.domain.file.repository.CommonFileRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.JobParametersBuilder;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/admin/jobs")
 @RequiredArgsConstructor
@@ -72,8 +74,10 @@ public class BatchJobController {
             jobLauncher.run(cleanupOrphanFilesJob, params);
             return ResponseEntity.ok(Map.of("status", "started", "job", CleanupOrphanFilesJobConfig.JOB_NAME));
         } catch (Exception e) {
+            log.error("cleanup-orphan-files 실행 실패", e);
             return ResponseEntity.internalServerError()
-                    .body(Map.of("status", "error", "message", e.getMessage()));
+                    .body(Map.of("status", "error", "message",
+                            e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName()));
         }
     }
 
@@ -93,8 +97,10 @@ public class BatchJobController {
             jobLauncher.run(thumbnailBackfillJob, params);
             return ResponseEntity.ok(Map.of("status", "started", "job", ThumbnailBackfillJobConfig.JOB_NAME));
         } catch (Exception e) {
+            log.error("thumbnail-backfill 실행 실패", e);
             return ResponseEntity.internalServerError()
-                    .body(Map.of("status", "error", "message", e.getMessage()));
+                    .body(Map.of("status", "error", "message",
+                            e.getMessage() != null ? e.getMessage() : e.getClass().getSimpleName()));
         }
     }
 }

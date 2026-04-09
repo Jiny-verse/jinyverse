@@ -24,6 +24,8 @@ spring:
   batch:
     jdbc:
       initialize-schema: always
+    job:
+      enabled: false
   servlet:
     multipart:
       max-file-size: 20MB
