@@ -195,7 +195,7 @@ export default function TopicsPage() {
                   </Button>
                 )}
                 <Button size="sm" onClick={navigateToCreate}>
-                  {t('ui.button.add', { defaultValue: '추가' })} {t('board.topic.title', { defaultValue: '게시글' })}
+                  {t('board.topic.title', { defaultValue: '게시글' })} {t('ui.button.add', { defaultValue: '추가' })}
                 </Button>
               </>
             }

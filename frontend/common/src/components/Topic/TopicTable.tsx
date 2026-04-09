@@ -77,7 +77,7 @@ export function TopicTable({
       selection={selection}
       onBatchDelete={onBatchDelete}
       onAdd={onAdd}
-      addButtonLabel={onAdd ? `${t('ui.button.add')} ${t('board.topic.title')}` : undefined}
+      addButtonLabel={onAdd ? `${t('board.topic.title')} ${t('ui.button.add')}` : undefined}
       onRowClick={onRowClick}
       selectedRowId={selectedRowId}
       getRowClassName={getRowClassName}
