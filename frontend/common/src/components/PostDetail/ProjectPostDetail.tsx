@@ -7,7 +7,8 @@ import { ContentViewer } from '../Editor/Viewer/ContentViewer';
 import { Badge } from '../../ui/Badge';
 import { formatRelativeOrAbsolute } from '../../utils/formatDateTime';
 import { getMainFileId } from '../../utils/post';
-import { useImageUrlFromFileId } from '../../hooks/useImageUrlFromFileId';
+import { getThumbnailUrl } from '../../utils/file';
+import { getDownloadUrl } from '../../services/file';
 import useLanguage from '../../utils/i18n/hooks/useLanguage';
 
 interface LightboxProps {
@@ -18,11 +19,9 @@ interface LightboxProps {
 }
 
 function LightboxImage({ fileId, apiOptions }: { fileId: string; apiOptions: ApiOptions }) {
-  const url = useImageUrlFromFileId(fileId, apiOptions);
-  return url ? (
+  const url = getDownloadUrl(apiOptions, fileId);
+  return (
     <img src={url} alt="" className="max-w-full max-h-[80vh] object-contain" onClick={(e) => e.stopPropagation()} />
-  ) : (
-    <div className="w-32 h-32 bg-muted animate-pulse rounded" />
   );
 }
 
@@ -85,17 +84,13 @@ function GridImage({
   apiOptions: ApiOptions;
   onClick: () => void;
 }) {
-  const url = useImageUrlFromFileId(fileId, apiOptions);
+  const url = getThumbnailUrl(apiOptions, fileId);
   return (
     <div
       className="aspect-square overflow-hidden cursor-zoom-in hover:scale-[1.02] transition-transform duration-200"
       onClick={onClick}
     >
-      {url ? (
-        <img src={url} alt="" className="w-full h-full object-cover" />
-      ) : (
-        <div className="w-full h-full bg-muted animate-pulse" />
-      )}
+      <img src={url} alt="" className="w-full h-full object-cover" />
     </div>
   );
 }
@@ -120,7 +115,7 @@ export function ProjectPostDetail({ topic, apiOptions }: ProjectPostDetailProps)
   const { t } = useLanguage();
 
   const mainFileId = getMainFileId(topic);
-  const coverUrl = useImageUrlFromFileId(mainFileId, apiOptions);
+  const coverUrl = mainFileId ? getThumbnailUrl(apiOptions, mainFileId) : null;
   const editorImageFileIds = extractEditorImageFileIds(topic.content ?? '');
 
   return (

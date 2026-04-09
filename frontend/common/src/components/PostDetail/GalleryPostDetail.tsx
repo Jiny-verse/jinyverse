@@ -5,7 +5,7 @@ import type { ApiOptions } from '../../types/api';
 import type { Topic } from '../../schemas/topic';
 import { Badge } from '../../ui/Badge';
 import { formatRelativeOrAbsolute } from '../../utils/formatDateTime';
-import { useImageUrlFromFileId } from '../../hooks/useImageUrlFromFileId';
+import { getThumbnailUrl } from '../../utils/file';
 import { ImageSplitViewer } from '../ImageSplitView';
 import useLanguage from '../../utils/i18n/hooks/useLanguage';
 
@@ -20,7 +20,7 @@ function GalleryImage({
   onClick: () => void;
   ariaLabel: string;
 }) {
-  const url = useImageUrlFromFileId(fileId, apiOptions);
+  const url = getThumbnailUrl(apiOptions, fileId);
   return (
     <button
       type="button"
@@ -28,11 +28,7 @@ function GalleryImage({
       className="block w-full cursor-zoom-in focus:outline-none"
       aria-label={ariaLabel}
     >
-      {url ? (
-        <img src={url} alt="" className="w-full h-auto" />
-      ) : (
-        <div className="w-full aspect-video bg-muted animate-pulse" />
-      )}
+      <img src={url} alt="" className="w-full h-auto" />
     </button>
   );
 }

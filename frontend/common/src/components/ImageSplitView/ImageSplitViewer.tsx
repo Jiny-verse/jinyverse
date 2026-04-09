@@ -3,7 +3,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import type { ApiOptions } from '../../types/api';
 import type { FileAttachmentItem } from '../../schemas/file';
-import { useImageUrlFromFileId } from '../../hooks/useImageUrlFromFileId';
+import { getThumbnailUrl } from '../../utils/file';
+import { getDownloadUrl } from '../../services/file';
 
 interface ThumbnailProps {
   fileId: string;
@@ -13,7 +14,7 @@ interface ThumbnailProps {
 }
 
 function Thumbnail({ fileId, apiOptions, selected, onClick }: ThumbnailProps) {
-  const url = useImageUrlFromFileId(fileId, apiOptions);
+  const url = getThumbnailUrl(apiOptions, fileId);
   return (
     <button
       type="button"
@@ -22,11 +23,7 @@ function Thumbnail({ fileId, apiOptions, selected, onClick }: ThumbnailProps) {
         selected ? 'border-blue-500' : 'border-transparent hover:border-gray-400'
       }`}
     >
-      {url ? (
-        <img src={url} alt="" className="w-full h-full object-cover" />
-      ) : (
-        <div className="w-full h-full bg-gray-200 animate-pulse" />
-      )}
+      <img src={url} alt="" className="w-full h-full object-cover" />
     </button>
   );
 }
@@ -37,14 +34,10 @@ interface MainImageProps {
 }
 
 function MainImage({ fileId, apiOptions }: MainImageProps) {
-  const url = useImageUrlFromFileId(fileId, apiOptions);
+  const url = getDownloadUrl(apiOptions, fileId);
   return (
     <div className="w-full h-full flex items-center justify-center bg-black">
-      {url ? (
-        <img src={url} alt="" className="max-w-full max-h-full object-contain" />
-      ) : (
-        <div className="w-64 h-64 bg-gray-800 animate-pulse" />
-      )}
+      <img src={url} alt="" className="max-w-full max-h-full object-contain" />
     </div>
   );
 }

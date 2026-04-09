@@ -6,7 +6,7 @@ import { ContentViewer } from '../Editor/Viewer/ContentViewer';
 import { Badge } from '../../ui/Badge';
 import { formatRelativeOrAbsolute } from '../../utils/formatDateTime';
 import { getMainFileId } from '../../utils/post';
-import { useImageUrlFromFileId } from '../../hooks/useImageUrlFromFileId';
+import { getThumbnailUrl } from '../../utils/file';
 import useLanguage from '../../utils/i18n/hooks/useLanguage';
 
 interface BlogPostDetailProps {
@@ -16,7 +16,7 @@ interface BlogPostDetailProps {
 
 export function BlogPostDetail({ topic, apiOptions }: BlogPostDetailProps) {
   const mainFileId = getMainFileId(topic);
-  const coverUrl = useImageUrlFromFileId(mainFileId, apiOptions);
+  const coverUrl = mainFileId ? getThumbnailUrl(apiOptions, mainFileId) : null;
   const { t } = useLanguage();
 
   return (
