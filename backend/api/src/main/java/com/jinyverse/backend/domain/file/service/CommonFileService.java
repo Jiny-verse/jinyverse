@@ -174,8 +174,8 @@ public class CommonFileService {
         return resource;
     }
 
-    /** 썸네일 리소스 반환. 썸네일이 없으면 지연 생성 후 DB 업데이트. 이미지가 아니면 원본 fallback. */
-    @Transactional
+    /** 썸네일 리소스 반환. 썸네일이 없으면 404. 원본 파일을 fallback으로 반환하지 않음. */
+    @Transactional(readOnly = true)
     public Resource getResourceForThumbnail(UUID id) throws IOException {
         CommonFile file = commonFileRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("CommonFile", id));
@@ -187,17 +187,11 @@ public class CommonFileService {
             }
         }
 
-        Resource original = fileStorage.getResource(file.getFilePath());
-        if (original == null || !original.exists()) {
-            throw new IOException("File not found in storage: " + file.getFilePath());
-        }
-
-        // 썸네일 없으면 백그라운드에서 생성 트리거 후 원본 즉시 반환 (HTTP 스레드 블로킹 없음)
-        if (imageResizeService.isResizable(file.getMimeType())) {
-            thumbnailAsyncService.generateAndSave(id, file.getFilePath(), file.getMimeType());
-        }
-
-        return original;
+        // 썸네일 미생성 상태에서 원본 대용 서빙 금지:
+        // 원본을 서빙하면 대용량 파일이 스트리밍되어 메모리/커넥션 슬롯을 점유하고,
+        // 동시에 @Async ImageMagick 프로세스를 중복 트리거해 PID 소진으로 이어진다.
+        // 업로드 시 이미 비동기 생성이 트리거되며, 기존 파일은 어드민 백필로 처리한다.
+        throw new ResourceNotFoundException("Thumbnail not found for file", id);
     }
 
     public void checkDownloadAccess(UUID fileId, RequestContext ctx) {
