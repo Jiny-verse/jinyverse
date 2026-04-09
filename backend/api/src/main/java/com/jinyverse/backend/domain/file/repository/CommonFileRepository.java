@@ -22,4 +22,7 @@ public interface CommonFileRepository extends JpaRepository<CommonFile, UUID>, J
                    AND NOT EXISTS (SELECT u FROM RelUserFile u WHERE u.fileId = f.id))
             """)
     List<CommonFile> findOrphanFilesCreatedBefore(@Param("before") LocalDateTime before);
+
+    @Query("SELECT f FROM CommonFile f WHERE f.thumbnailPath IS NULL AND f.mimeType IN :mimeTypes")
+    List<CommonFile> findByThumbnailPathIsNullAndMimeTypeIn(@Param("mimeTypes") List<String> mimeTypes);
 }

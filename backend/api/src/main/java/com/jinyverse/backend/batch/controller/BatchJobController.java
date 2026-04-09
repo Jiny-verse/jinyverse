@@ -1,6 +1,7 @@
 package com.jinyverse.backend.batch.controller;
 
 import com.jinyverse.backend.batch.job.CleanupOrphanFilesJobConfig;
+import com.jinyverse.backend.batch.job.ThumbnailBackfillJobConfig;
 import com.jinyverse.backend.domain.common.util.Channel;
 import com.jinyverse.backend.domain.common.util.RequestContext;
 import lombok.RequiredArgsConstructor;
@@ -23,8 +24,12 @@ import java.util.Map;
 public class BatchJobController {
 
     private final JobLauncher jobLauncher;
+
     @Qualifier(CleanupOrphanFilesJobConfig.JOB_NAME)
     private final Job cleanupOrphanFilesJob;
+
+    @Qualifier(ThumbnailBackfillJobConfig.JOB_NAME)
+    private final Job thumbnailBackfillJob;
 
     @PostMapping("/cleanup-orphan-files")
     public ResponseEntity<Map<String, String>> runCleanupOrphanFiles(
@@ -41,6 +46,27 @@ public class BatchJobController {
                     .toJobParameters();
             jobLauncher.run(cleanupOrphanFilesJob, params);
             return ResponseEntity.ok(Map.of("status", "started", "job", CleanupOrphanFilesJobConfig.JOB_NAME));
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError()
+                    .body(Map.of("status", "error", "message", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/thumbnail-backfill")
+    public ResponseEntity<Map<String, String>> runThumbnailBackfill(
+            @RequestHeader(value = "X-Channel", required = false) String channel,
+            @RequestHeader(value = "X-Role", required = false) String role) {
+        RequestContext ctx = RequestContext.fromHeaders(channel, role);
+        if (ctx.getChannel() == null || !Channel.INTERNAL.equals(ctx.getChannel()) || !ctx.isAdmin()) {
+            return ResponseEntity.status(403).build();
+        }
+
+        try {
+            JobParameters params = new JobParametersBuilder()
+                    .addLong("runAt", System.currentTimeMillis())
+                    .toJobParameters();
+            jobLauncher.run(thumbnailBackfillJob, params);
+            return ResponseEntity.ok(Map.of("status", "started", "job", ThumbnailBackfillJobConfig.JOB_NAME));
         } catch (Exception e) {
             return ResponseEntity.internalServerError()
                     .body(Map.of("status", "error", "message", e.getMessage()));
