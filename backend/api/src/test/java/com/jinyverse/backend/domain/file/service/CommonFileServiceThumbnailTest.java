@@ -216,6 +216,68 @@ class CommonFileServiceThumbnailTest {
     }
 
     @Test
+    @DisplayName("getResourceForThumbnail: thumbnailPath null인 이미지 → 지연 생성 후 썸네일 반환")
+    void getResourceForThumbnail_지연생성_썸네일반환() throws IOException {
+        UUID fileId = UUID.randomUUID();
+        CommonFile entity = new CommonFile();
+        entity.setFilePath("2025/01/01/uuid.jpg");
+        entity.setMimeType("image/jpeg");
+        entity.setThumbnailPath(null);
+
+        Path fakeOriginal = tempDir.resolve("uuid.jpg");
+        Files.createFile(fakeOriginal);
+        Path fakeThumb = tempDir.resolve("_thumb/uuid_thumb.jpg");
+        Files.createDirectories(fakeThumb.getParent());
+        Files.createFile(fakeThumb);
+
+        FileSystemResource originalResource = new FileSystemResource(fakeOriginal.toFile());
+        FileSystemResource thumbResource = new FileSystemResource(fakeThumb.toFile());
+
+        when(commonFileRepository.findById(fileId)).thenReturn(Optional.of(entity));
+        when(fileStorage.getResource("2025/01/01/uuid.jpg")).thenReturn(originalResource);
+        when(imageResizeService.isResizable("image/jpeg")).thenReturn(true);
+        when(imageResizeService.generateThumbnail(any(Path.class))).thenReturn(fakeThumb);
+        when(imageResizeService.deriveRelativeThumbnailPath("2025/01/01/uuid.jpg"))
+                .thenReturn("2025/01/01/_thumb/uuid_thumb.jpg");
+        when(fileStorage.getResource("2025/01/01/_thumb/uuid_thumb.jpg")).thenReturn(thumbResource);
+        when(commonFileRepository.save(any(CommonFile.class))).thenReturn(entity);
+
+        var result = getResourceForThumbnail_썸네일반환_실행(fileId);
+
+        assertThat(result).isSameAs(thumbResource);
+        assertThat(entity.getThumbnailPath()).isEqualTo("2025/01/01/_thumb/uuid_thumb.jpg");
+        verify(commonFileRepository).save(entity);
+    }
+
+    private org.springframework.core.io.Resource getResourceForThumbnail_썸네일반환_실행(UUID fileId) throws IOException {
+        return commonFileService.getResourceForThumbnail(fileId);
+    }
+
+    @Test
+    @DisplayName("getResourceForThumbnail: thumbnailPath null인 비이미지 → 원본 반환 (지연 생성 안 함)")
+    void getResourceForThumbnail_비이미지_지연생성없음() throws IOException {
+        UUID fileId = UUID.randomUUID();
+        CommonFile entity = new CommonFile();
+        entity.setFilePath("2025/01/01/doc.pdf");
+        entity.setMimeType("application/pdf");
+        entity.setThumbnailPath(null);
+
+        Path fakePdf = tempDir.resolve("doc.pdf");
+        Files.createFile(fakePdf);
+        FileSystemResource originalResource = new FileSystemResource(fakePdf.toFile());
+
+        when(commonFileRepository.findById(fileId)).thenReturn(Optional.of(entity));
+        when(fileStorage.getResource("2025/01/01/doc.pdf")).thenReturn(originalResource);
+        when(imageResizeService.isResizable("application/pdf")).thenReturn(false);
+
+        var result = commonFileService.getResourceForThumbnail(fileId);
+
+        assertThat(result).isSameAs(originalResource);
+        verify(imageResizeService, never()).generateThumbnail(any());
+        verify(commonFileRepository, never()).save(any());
+    }
+
+    @Test
     @DisplayName("getResourceForThumbnail: thumbnailPath 있지만 파일 없으면 원본 fallback")
     void getResourceForThumbnail_썸네일파일없으면_원본반환() throws IOException {
         UUID fileId = UUID.randomUUID();

@@ -185,20 +185,40 @@ public class CommonFileService {
         return resource;
     }
 
-    /** 썸네일 리소스 반환. 썸네일이 없으면 원본으로 fallback. */
+    /** 썸네일 리소스 반환. 썸네일이 없으면 지연 생성 후 DB 업데이트. 이미지가 아니면 원본 fallback. */
+    @Transactional
     public Resource getResourceForThumbnail(UUID id) throws IOException {
         CommonFile file = commonFileRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("CommonFile", id));
+
         if (file.getThumbnailPath() != null) {
             Resource thumb = fileStorage.getResource(file.getThumbnailPath());
             if (thumb != null && thumb.exists()) {
                 return thumb;
             }
         }
+
         Resource original = fileStorage.getResource(file.getFilePath());
         if (original == null || !original.exists()) {
             throw new IOException("File not found in storage: " + file.getFilePath());
         }
+
+        // 기존 파일 지연 생성: 이미지면 썸네일 생성 후 DB 업데이트
+        if (imageResizeService.isResizable(file.getMimeType())) {
+            try {
+                imageResizeService.generateThumbnail(original.getFile().toPath());
+                String relativeThumbPath = imageResizeService.deriveRelativeThumbnailPath(file.getFilePath());
+                file.setThumbnailPath(relativeThumbPath);
+                commonFileRepository.save(file);
+                Resource thumb = fileStorage.getResource(relativeThumbPath);
+                if (thumb != null && thumb.exists()) {
+                    return thumb;
+                }
+            } catch (Exception e) {
+                log.warn("getResourceForThumbnail: 지연 썸네일 생성 실패 {} - {}", file.getFilePath(), e.getMessage());
+            }
+        }
+
         return original;
     }
 
