@@ -18,6 +18,8 @@ FROM base-java AS backend
 COPY backend .
 RUN ./gradlew :api:build -x test
 FROM eclipse-temurin:17-jre-jammy AS backend-runner
+RUN apt-get update && apt-get install -y --no-install-recommends imagemagick \
+    && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=backend /app/api/build/libs/*.jar app.jar
 # Non-root user for security

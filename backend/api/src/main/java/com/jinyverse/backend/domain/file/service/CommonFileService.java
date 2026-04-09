@@ -26,7 +26,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
-import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +43,7 @@ public class CommonFileService {
     private final CommonFileRepository commonFileRepository;
     private final FileStorage fileStorage;
     private final ImageResizeService imageResizeService;
+    private final ThumbnailAsyncService thumbnailAsyncService;
     private final RelTopicFileRepository relTopicFileRepository;
     private final TopicRepository topicRepository;
 
@@ -147,23 +147,12 @@ public class CommonFileService {
                 : "application/octet-stream");
         entity.setFileExt(ext);
 
-        // 이미지 파일인 경우 썸네일 생성
-        if (imageResizeService.isResizable(entity.getMimeType())) {
-            try {
-                Resource originalResource = fileStorage.getResource(relativePath);
-                if (originalResource != null && originalResource.exists()) {
-                    Path thumbAbsPath = imageResizeService.generateThumbnail(originalResource.getFile().toPath());
-                    String relativeThumbPath = imageResizeService.deriveRelativeThumbnailPath(relativePath);
-                    entity.setThumbnailPath(relativeThumbPath);
-                    log.debug("CommonFileService: 썸네일 생성 완료 {}", thumbAbsPath);
-                }
-            } catch (Exception e) {
-                log.warn("CommonFileService: 썸네일 생성 실패 (업로드는 유지) {} - {}", relativePath, e.getMessage());
-            }
-        }
-
         try {
             CommonFile saved = commonFileRepository.save(entity);
+            // 이미지 파일인 경우 비동기로 썸네일 생성 (HTTP 스레드 블로킹 없음)
+            if (imageResizeService.isResizable(saved.getMimeType())) {
+                thumbnailAsyncService.generateAndSave(saved.getId(), relativePath, saved.getMimeType());
+            }
             return saved.toResponseDto();
         } catch (Exception e) {
             try {
@@ -203,20 +192,9 @@ public class CommonFileService {
             throw new IOException("File not found in storage: " + file.getFilePath());
         }
 
-        // 기존 파일 지연 생성: 이미지면 썸네일 생성 후 DB 업데이트
+        // 썸네일 없으면 백그라운드에서 생성 트리거 후 원본 즉시 반환 (HTTP 스레드 블로킹 없음)
         if (imageResizeService.isResizable(file.getMimeType())) {
-            try {
-                imageResizeService.generateThumbnail(original.getFile().toPath());
-                String relativeThumbPath = imageResizeService.deriveRelativeThumbnailPath(file.getFilePath());
-                file.setThumbnailPath(relativeThumbPath);
-                commonFileRepository.save(file);
-                Resource thumb = fileStorage.getResource(relativeThumbPath);
-                if (thumb != null && thumb.exists()) {
-                    return thumb;
-                }
-            } catch (Throwable e) {
-                log.warn("getResourceForThumbnail: 지연 썸네일 생성 실패 {} - {}", file.getFilePath(), e.getMessage());
-            }
+            thumbnailAsyncService.generateAndSave(id, file.getFilePath(), file.getMimeType());
         }
 
         return original;
