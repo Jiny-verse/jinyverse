@@ -7,6 +7,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.springframework.data.domain.Persistable;
 
 import java.time.LocalDateTime;
 
@@ -26,7 +28,7 @@ import java.time.LocalDateTime;
 @Builder
 @DynamicInsert
 @DynamicUpdate
-public class IdempotencyRecord {
+public class IdempotencyRecord implements Persistable<String> {
 
     public enum Status {
         PROCESSING, COMPLETED, FAILED
@@ -60,6 +62,20 @@ public class IdempotencyRecord {
 
     @Column(name = "completed_at")
     private LocalDateTime completedAt;
+
+    @Transient
+    @Builder.Default
+    private boolean newEntity = false;
+
+    @Override
+    public String getId() {
+        return idempotencyKey;
+    }
+
+    @Override
+    public boolean isNew() {
+        return newEntity;
+    }
 
     @PrePersist
     protected void onCreate() {

@@ -24,6 +24,7 @@ public class IdempotencyService {
                 .requestMethod(method)
                 .requestHash(hash)
                 .status(IdempotencyRecord.Status.PROCESSING)
+                .newEntity(true)
                 .build();
         repository.saveAndFlush(record);
     }
