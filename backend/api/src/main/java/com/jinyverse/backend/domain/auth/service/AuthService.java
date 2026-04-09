@@ -209,7 +209,7 @@ public class AuthService {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public LoginResponseDto refresh(String refreshToken) {
         UserSession session = userSessionRepository.findByRefreshTokenAndDeletedAtIsNull(refreshToken)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid refresh token"));
