@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 class ImageResizeServiceTest {
 
@@ -77,6 +78,7 @@ class ImageResizeServiceTest {
     @Test
     @DisplayName("generateThumbnail: PNG 원본 → _thumb 디렉터리에 JPEG 썸네일 생성")
     void generateThumbnail_PNG_썸네일생성() throws IOException {
+        assumeTrue(isImageMagickAvailable(), "ImageMagick(convert)이 설치되지 않아 skip");
         Path originalFile = createTestImage(tempDir, "test.png", 1200, 800);
 
         Path thumbPath = imageResizeService.generateThumbnail(originalFile);
@@ -93,6 +95,7 @@ class ImageResizeServiceTest {
     @Test
     @DisplayName("generateThumbnail: 원본보다 작은 이미지도 정상 처리")
     void generateThumbnail_소형이미지_처리() throws IOException {
+        assumeTrue(isImageMagickAvailable(), "ImageMagick(convert)이 설치되지 않아 skip");
         Path originalFile = createTestImage(tempDir, "small.jpg", 100, 100);
 
         Path thumbPath = imageResizeService.generateThumbnail(originalFile);
@@ -105,6 +108,7 @@ class ImageResizeServiceTest {
     @Test
     @DisplayName("generateThumbnail: 두 번 호출해도 정상 덮어쓰기")
     void generateThumbnail_중복호출_덮어쓰기() throws IOException {
+        assumeTrue(isImageMagickAvailable(), "ImageMagick(convert)이 설치되지 않아 skip");
         Path originalFile = createTestImage(tempDir, "dup.jpg", 800, 600);
 
         Path thumbPath1 = imageResizeService.generateThumbnail(originalFile);
@@ -118,6 +122,14 @@ class ImageResizeServiceTest {
     }
 
     // ===== 헬퍼 =====
+
+    private static boolean isImageMagickAvailable() {
+        try {
+            return new ProcessBuilder("convert", "--version").start().waitFor() == 0;
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
     private Path createTestImage(Path dir, String filename, int width, int height) throws IOException {
         BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
