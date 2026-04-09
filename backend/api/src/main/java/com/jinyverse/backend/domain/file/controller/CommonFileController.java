@@ -95,6 +95,32 @@ public class CommonFileController {
         }
     }
 
+    @GetMapping("/{id}/thumbnail")
+    public ResponseEntity<Resource> thumbnail(@PathVariable UUID id, RequestContext ctx) {
+        try {
+            commonFileService.checkDownloadAccess(id, ctx);
+
+            CommonFileResponseDto meta = commonFileService.getById(id);
+            Resource resource = commonFileService.getResourceForThumbnail(id);
+
+            // 썸네일은 항상 JPEG, 없으면 원본 MIME 사용
+            boolean hasThumbnail = meta.getThumbnailPath() != null;
+            String mimeType = hasThumbnail ? "image/jpeg"
+                    : (meta.getMimeType() != null ? meta.getMimeType() : "application/octet-stream");
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(mimeType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline")
+                    .body(resource);
+        } catch (org.springframework.web.server.ResponseStatusException e) {
+            return ResponseEntity.status(e.getStatusCode()).build();
+        } catch (IOException e) {
+            return ResponseEntity.notFound().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @PostMapping
     public ResponseEntity<CommonFileResponseDto> create(@Valid @RequestBody CommonFileRequestDto requestDto) {
         CommonFileResponseDto response = commonFileService.create(requestDto);

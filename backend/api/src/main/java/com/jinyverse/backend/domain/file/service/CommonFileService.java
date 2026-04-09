@@ -184,6 +184,23 @@ public class CommonFileService {
         return resource;
     }
 
+    /** 썸네일 리소스 반환. 썸네일이 없으면 원본으로 fallback. */
+    public Resource getResourceForThumbnail(UUID id) throws IOException {
+        CommonFile file = commonFileRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("CommonFile", id));
+        if (file.getThumbnailPath() != null) {
+            Resource thumb = fileStorage.getResource(file.getThumbnailPath());
+            if (thumb != null && thumb.exists()) {
+                return thumb;
+            }
+        }
+        Resource original = fileStorage.getResource(file.getFilePath());
+        if (original == null || !original.exists()) {
+            throw new IOException("File not found in storage: " + file.getFilePath());
+        }
+        return original;
+    }
+
     public void checkDownloadAccess(UUID fileId, RequestContext ctx) {
         List<RelTopicFile> fileRels = relTopicFileRepository.findByFileId(fileId);
         if (fileRels.isEmpty())
