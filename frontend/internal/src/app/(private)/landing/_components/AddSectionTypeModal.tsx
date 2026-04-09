@@ -5,9 +5,9 @@ import { useLanguage } from 'common/utils';
 import { useLandingContext } from '../_hooks/useLandingContext';
 
 const SECTION_TYPES = [
-  { type: 'hero', icon: '🦸', label: 'Hero' },
-  { type: 'image', icon: '🖼️', label: 'Image' },
-  { type: 'board_top', icon: '📋', label: 'Board Top' },
+  { type: 'hero', label: 'Hero' },
+  { type: 'image', label: 'Image' },
+  { type: 'board_top', label: 'Board Top' },
 ] as const;
 
 export function AddSectionTypeModal() {
@@ -27,14 +27,13 @@ export function AddSectionTypeModal() {
       size="md"
     >
       <div className="grid grid-cols-2 gap-3">
-        {SECTION_TYPES.map(({ type, icon, label }) => (
+        {SECTION_TYPES.map(({ type, label }) => (
           <button
             key={type}
             type="button"
             onClick={() => handleSelect(type)}
-            className="flex flex-col items-center justify-center gap-2 p-6 border-2 border-border rounded-lg hover:border-primary hover:bg-primary/5 transition-colors cursor-pointer"
+            className="flex items-center justify-center p-4 hover:text-primary transition-colors cursor-pointer"
           >
-            <span className="text-3xl">{icon}</span>
             <span className="text-sm font-medium">{label}</span>
           </button>
         ))}
