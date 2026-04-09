@@ -5,7 +5,7 @@ import type { Topic } from '../../schemas/topic';
 import { Badge } from '../../ui/Badge';
 import { formatRelativeOrAbsolute } from '../../utils/formatDateTime';
 import { getMainFileId, getExcerpt } from '../../utils/post';
-import { useImageUrlFromFileId } from '../../hooks/useImageUrlFromFileId';
+import { getThumbnailUrl } from '../../utils/file';
 
 interface BlogBoardCardProps {
   topic: Topic;
@@ -15,7 +15,7 @@ interface BlogBoardCardProps {
 
 export function BlogBoardCard({ topic, apiOptions, onClick }: BlogBoardCardProps) {
   const mainFileId = getMainFileId(topic);
-  const thumbnailUrl = useImageUrlFromFileId(mainFileId, apiOptions, true);
+  const thumbnailUrl = mainFileId ? getThumbnailUrl(apiOptions, mainFileId) : null;
   const excerpt = getExcerpt(topic.content);
 
   return (

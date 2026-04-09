@@ -5,7 +5,7 @@ import type { Topic } from '../../schemas/topic';
 import { Badge } from '../../ui/Badge';
 import { formatRelativeOrAbsolute } from '../../utils/formatDateTime';
 import { getMainFileId, getExcerpt } from '../../utils/post';
-import { useImageUrlFromFileId } from '../../hooks/useImageUrlFromFileId';
+import { getThumbnailUrl } from '../../utils/file';
 
 interface ProjectBoardCardProps {
   topic: Topic;
@@ -15,7 +15,7 @@ interface ProjectBoardCardProps {
 
 export function ProjectBoardCard({ topic, apiOptions, onClick }: ProjectBoardCardProps) {
   const mainFileId = getMainFileId(topic);
-  const coverUrl = useImageUrlFromFileId(mainFileId, apiOptions, true);
+  const coverUrl = mainFileId ? getThumbnailUrl(apiOptions, mainFileId) : null;
   const excerpt = getExcerpt(topic.content, 100);
 
   return (

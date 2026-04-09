@@ -3,7 +3,7 @@
 import type { ApiOptions } from '../../types/api';
 import type { Topic } from '../../schemas/topic';
 import { getMainFileId } from '../../utils/post';
-import { useImageUrlFromFileId } from '../../hooks/useImageUrlFromFileId';
+import { getThumbnailUrl } from '../../utils/file';
 
 interface GalleryBoardCardProps {
   topic: Topic;
@@ -13,7 +13,7 @@ interface GalleryBoardCardProps {
 
 export function GalleryBoardCard({ topic, apiOptions, onClick }: GalleryBoardCardProps) {
   const mainFileId = getMainFileId(topic);
-  const imageUrl = useImageUrlFromFileId(mainFileId, apiOptions, true);
+  const imageUrl = mainFileId ? getThumbnailUrl(apiOptions, mainFileId) : null;
 
   return (
     <div
