@@ -27,7 +27,7 @@ function ExternalPrivateContent({ children }: { children: React.ReactNode }) {
         rightControls={rightControls}
         showLanguageSelector={false}
       />
-      <main className="relative z-0 px-[4%] pt-20 pb-6">{children}</main>
+      <main className="relative z-0 px-[4%] pb-6">{children}</main>
     </>
   );
 }

@@ -42,7 +42,7 @@ function ExternalPublicContent({ children }: { children: React.ReactNode }) {
         rightControls={rightControls}
         showLanguageSelector={false}
       />
-      <main className="relative z-0 px-[4vw] pt-20 pb-6">{children}</main>
+      <main className="relative z-0 px-[4vw] pb-6">{children}</main>
     </>
   );
 }

@@ -184,7 +184,7 @@ export function Navigation({ items, isLoading = false, rightControls, showLangua
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 10);
+      setIsScrolled(window.scrollY > 56);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
@@ -196,13 +196,14 @@ export function Navigation({ items, isLoading = false, rightControls, showLangua
 
   return (
     <>
+      <div className="h-14" aria-hidden />
       <header className="fixed top-0 left-0 right-0 z-50 flex items-start justify-center pointer-events-none h-0">
         <div
           onMouseLeave={() => setHoveredItemId(null)}
           className={`pointer-events-auto flex flex-col w-full transition-all duration-300 ${
             isScrolled
-              ? 'mt-4 mx-[5%] rounded-[28px] border border-border bg-background/80 backdrop-blur-md shadow-sm px-6'
-              : 'mt-0 mx-0 bg-transparent px-[4%]'
+              ? 'mt-4 mx-[5%] rounded-[28px] border border-border bg-background/85 backdrop-blur-md shadow-sm px-6'
+              : 'bg-background border-b border-border px-[4%]'
           }`}
         >
           {/* Logo + 루트 메뉴 + Controls */}
