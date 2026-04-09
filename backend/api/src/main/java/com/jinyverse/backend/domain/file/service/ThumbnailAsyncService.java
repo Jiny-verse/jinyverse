@@ -38,7 +38,7 @@ public class ThumbnailAsyncService {
             String thumbPath = imageResizeService.deriveRelativeThumbnailPath(filePath);
             commonFileRepository.findById(fileId).ifPresent(f -> {
                 f.setThumbnailPath(thumbPath);
-                commonFileRepository.save(f);
+                commonFileRepository.saveAndFlush(f);
                 log.debug("ThumbnailAsyncService: 썸네일 저장 완료 fileId={}", fileId);
             });
         } catch (Exception e) {

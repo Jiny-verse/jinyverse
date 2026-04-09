@@ -3,13 +3,16 @@ package com.jinyverse.backend.domain.file.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -55,16 +58,34 @@ public class ImageResizeService {
                     .redirectErrorStream(true)
                     .start();
 
-            int exitCode;
+            // 출력 스트림을 별도 스레드에서 소비 → 파이프 버퍼 데드락 방지
+            StringBuilder output = new StringBuilder();
+            Thread outputReader = new Thread(() -> {
+                try (BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(process.getInputStream()))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) output.append(line).append('\n');
+                } catch (IOException ignored) {}
+            });
+            outputReader.setDaemon(true);
+            outputReader.start();
+
+            boolean finished;
             try {
-                exitCode = process.waitFor();
+                finished = process.waitFor(60, TimeUnit.SECONDS);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
+                process.destroyForcibly();
                 throw new IOException("ImageMagick 프로세스 인터럽트", e);
             }
+            if (!finished) {
+                process.destroyForcibly();
+                throw new IOException("ImageMagick 타임아웃 (60s)");
+            }
+            try { outputReader.join(1000); } catch (InterruptedException ignored) { Thread.currentThread().interrupt(); }
+            int exitCode = process.exitValue();
 
             if (exitCode != 0) {
-                String output = new String(process.getInputStream().readAllBytes());
                 throw new IOException("ImageMagick 실패 (exitCode=" + exitCode + "): " + output);
             }
 
