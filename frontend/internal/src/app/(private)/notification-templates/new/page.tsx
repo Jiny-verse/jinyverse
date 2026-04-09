@@ -16,7 +16,7 @@ export default function NewNotificationTemplatePage() {
   };
 
   return (
-    <div>
+    <div className="max-w-2xl">
       <h1 className="text-2xl font-bold mb-6">새 알림 템플릿</h1>
       <TemplateForm onSubmit={handleSubmit} submitLabel="생성" />
     </div>

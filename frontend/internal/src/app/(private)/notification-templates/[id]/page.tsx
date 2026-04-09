@@ -39,7 +39,7 @@ export default function NotificationTemplateDetailPage() {
   if (!template) return null;
 
   return (
-    <div>
+    <div className="max-w-5xl">
       <h1 className="text-2xl font-bold mb-6">템플릿 편집</h1>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <TemplateForm

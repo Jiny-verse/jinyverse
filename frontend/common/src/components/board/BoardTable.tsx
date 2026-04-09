@@ -118,7 +118,7 @@ export function BoardTable({
       selection={onBatchDelete ? { selectedIds, onSelectionChange: setSelectedIds } : undefined}
       onBatchDelete={onBatchDelete && selectedIds.length ? handleBatchDelete : undefined}
       onAdd={onAdd}
-      addButtonLabel={onAdd ? `${t('ui.button.add')} ${t('admin.board.title')}` : undefined}
+      addButtonLabel={onAdd ? `${t('admin.board.title')} ${t('ui.button.add')}` : undefined}
       onRowClick={goToTopics}
     />
   );

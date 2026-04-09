@@ -35,7 +35,7 @@ export function BasePostFormFields({ boardType, state, handlers, apiOptions }: B
 
   return (
     <>
-      <FormSection title={t('board.form.basicInfo')} description={t('board.form.basicInfoDesc')}>
+      <FormSection title={t('board.form.basicInfo')}>
         <FormField label={t('form.label.title')} name="title" required error={state.errors.title} description={t('board.form.titleMaxLen')}>
           <Input
             value={state.title}
@@ -60,7 +60,7 @@ export function BasePostFormFields({ boardType, state, handlers, apiOptions }: B
         )}
       </FormSection>
 
-      <FormSection title={t('board.form.extraSettings')} description={t('board.form.tagDesc')}>
+      <FormSection title={t('board.form.extraSettings')}>
         <FormField label={t('form.label.tags')} name="tags" description={t('board.form.tagDesc')}>
           <TagInput selected={state.tags} onChange={handlers.setTags} maxTags={10} />
         </FormField>
