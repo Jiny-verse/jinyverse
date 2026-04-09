@@ -32,6 +32,8 @@ public class CommonFileResponseDto {
     private String mimeType;
     /** 파일 확장자 */
     private String fileExt;
+    /** 썸네일 저장 경로 (이미지 파일인 경우에만 존재) */
+    private String thumbnailPath;
     /** 업로드 일시 */
     private LocalDateTime createdAt;
 }

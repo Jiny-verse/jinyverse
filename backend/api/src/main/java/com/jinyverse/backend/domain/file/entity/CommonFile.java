@@ -28,6 +28,10 @@ public class CommonFile extends BaseFileEntity {
     @Column(name = "id", columnDefinition = "UUID", nullable = false)
     private UUID id;
 
+    /** 썸네일 저장 경로 (이미지 파일인 경우에만 존재) */
+    @Column(name = "thumbnail_path", length = 500)
+    private String thumbnailPath;
+
     public static CommonFile fromRequestDto(CommonFileRequestDto dto) {
         if (dto == null) throw new IllegalArgumentException("CommonFileRequestDto is null");
         CommonFile commonFile = new CommonFile();
@@ -74,6 +78,7 @@ public class CommonFile extends BaseFileEntity {
                 .fileSize(this.getFileSize())
                 .mimeType(this.getMimeType())
                 .fileExt(this.getFileExt())
+                .thumbnailPath(this.thumbnailPath)
                 .createdAt(this.getCreatedAt())
                 .build();
     }
