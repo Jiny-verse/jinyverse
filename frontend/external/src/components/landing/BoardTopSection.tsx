@@ -30,7 +30,7 @@ function GalleryGrid({ topics, boardId, apiBaseUrl }: { topics: Topic[]; boardId
     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
       {topics.map((topic) => {
         const fileId = getMainFileId(topic);
-        const thumbUrl = fileId ? `${apiBaseUrl}/api/files/${fileId}/download` : null;
+        const thumbUrl = fileId ? `${apiBaseUrl}/api/files/${fileId}/thumbnail` : null;
         return (
           <Link
             key={topic.id}
@@ -59,7 +59,7 @@ function ProjectGrid({ topics, boardId, apiBaseUrl }: { topics: Topic[]; boardId
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
       {topics.map((topic) => {
         const fileId = getMainFileId(topic);
-        const thumbUrl = fileId ? `${apiBaseUrl}/api/files/${fileId}/download` : null;
+        const thumbUrl = fileId ? `${apiBaseUrl}/api/files/${fileId}/thumbnail` : null;
         const excerpt = getExcerpt(topic.content, 100);
         return (
           <Link
@@ -112,7 +112,7 @@ function BlogList({ topics, boardId, apiBaseUrl }: { topics: Topic[]; boardId: s
     <div className="flex flex-col divide-y divide-border">
       {topics.map((topic) => {
         const fileId = getMainFileId(topic);
-        const thumbUrl = fileId ? `${apiBaseUrl}/api/files/${fileId}/download` : null;
+        const thumbUrl = fileId ? `${apiBaseUrl}/api/files/${fileId}/thumbnail` : null;
         const excerpt = getExcerpt(topic.content, 120);
         return (
           <Link
