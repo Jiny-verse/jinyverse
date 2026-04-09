@@ -1,8 +1,12 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import type { LandingSection } from 'common/schemas';
+import Image from 'next/image';
+import type { LandingSection, Board, Topic } from 'common/schemas';
+import { getTopics, getBoard } from 'common/services';
+import { getMainFileId, getExcerpt, formatRelativeOrAbsolute } from 'common/utils';
 import { useLandingContext } from '../_hooks/useLandingContext';
+import { useApiOptions } from '@/app/providers/ApiProvider';
 
 interface SectionPreviewProps {
   section: LandingSection;
@@ -18,6 +22,162 @@ interface SlideSettings {
 }
 
 const FILMSTRIP_TYPES = ['hero', 'image', 'image_link'];
+
+// ── BoardTopPreview ──
+function GalleryGrid({ topics, boardId, apiBaseUrl }: { topics: Topic[]; boardId: string; apiBaseUrl: string }) {
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+      {topics.map((topic) => {
+        const fileId = getMainFileId(topic);
+        const thumbUrl = fileId ? `${apiBaseUrl}/api/files/${fileId}/download` : null;
+        return (
+          <div key={topic.id} className="relative aspect-square overflow-hidden group bg-muted rounded">
+            {thumbUrl ? (
+              <Image src={thumbUrl} alt={topic.title} fill className="object-cover" unoptimized />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-slate-600 to-slate-800" />
+            )}
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/50 transition-colors duration-200 flex items-end p-3">
+              <p className="text-white text-sm font-semibold opacity-0 group-hover:opacity-100 transition-opacity duration-200 line-clamp-2">
+                {topic.title}
+              </p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function ProjectGrid({ topics, boardId, apiBaseUrl }: { topics: Topic[]; boardId: string; apiBaseUrl: string }) {
+  return (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      {topics.map((topic) => {
+        const fileId = getMainFileId(topic);
+        const thumbUrl = fileId ? `${apiBaseUrl}/api/files/${fileId}/download` : null;
+        const excerpt = getExcerpt(topic.content, 100);
+        return (
+          <div key={topic.id} className="rounded-xl overflow-hidden border border-border bg-card">
+            <div className="relative aspect-video bg-muted overflow-hidden">
+              {thumbUrl ? (
+                <Image src={thumbUrl} alt={topic.title} fill className="object-cover" unoptimized />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-slate-600 to-slate-800" />
+              )}
+            </div>
+            {topic.tags && topic.tags.length > 0 && (
+              <div className="flex flex-wrap gap-1 px-4 pt-3">
+                {topic.tags.slice(0, 4).map((tag) => (
+                  <span key={tag.id} className="text-xs text-primary/80">#{tag.name}</span>
+                ))}
+              </div>
+            )}
+            <div className="px-4 pb-4 pt-2">
+              <h3 className="text-base font-semibold text-foreground truncate">{topic.title}</h3>
+              {excerpt && <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{excerpt}</p>}
+              <p className="mt-2 text-xs text-muted-foreground">
+                {topic.author?.nickname ?? '-'} · {formatRelativeOrAbsolute(topic.createdAt)}
+              </p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function BlogList({ topics, boardId, apiBaseUrl }: { topics: Topic[]; boardId: string; apiBaseUrl: string }) {
+  return (
+    <div className="flex flex-col divide-y divide-border">
+      {topics.map((topic) => {
+        const fileId = getMainFileId(topic);
+        const thumbUrl = fileId ? `${apiBaseUrl}/api/files/${fileId}/download` : null;
+        const excerpt = getExcerpt(topic.content, 120);
+        return (
+          <div key={topic.id} className="flex gap-4 py-4">
+            <div className="shrink-0 w-32 h-24 rounded-lg overflow-hidden bg-muted relative">
+              {thumbUrl ? (
+                <Image src={thumbUrl} alt={topic.title} fill className="object-cover" unoptimized />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-br from-slate-600 to-slate-800" />
+              )}
+            </div>
+            <div className="flex flex-col justify-between min-w-0 flex-1">
+              <div>
+                <h3 className="text-base font-semibold text-foreground truncate">{topic.title}</h3>
+                {excerpt && <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{excerpt}</p>}
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {topic.author?.nickname ?? '-'} · {formatRelativeOrAbsolute(topic.createdAt)}
+              </p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function NormalList({ topics }: { topics: Topic[] }) {
+  return (
+    <div className="flex flex-col divide-y divide-border">
+      {topics.map((topic) => {
+        const excerpt = getExcerpt(topic.content, 120);
+        return (
+          <div key={topic.id} className="py-4">
+            <h3 className="text-base font-semibold text-foreground truncate">{topic.title}</h3>
+            {excerpt && <p className="mt-1 text-sm text-muted-foreground line-clamp-2">{excerpt}</p>}
+            <p className="mt-1.5 text-xs text-muted-foreground">
+              {topic.author?.nickname ?? '-'} · {formatRelativeOrAbsolute(topic.createdAt)} · 조회 {topic.viewCount ?? 0}
+            </p>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function renderBoardTopics(board: Board | null, topics: Topic[], boardId: string, apiBaseUrl: string) {
+  switch (board?.type) {
+    case 'gallery': return <GalleryGrid topics={topics} boardId={boardId} apiBaseUrl={apiBaseUrl} />;
+    case 'project': return <ProjectGrid topics={topics} boardId={boardId} apiBaseUrl={apiBaseUrl} />;
+    case 'blog': return <BlogList topics={topics} boardId={boardId} apiBaseUrl={apiBaseUrl} />;
+    default: return <NormalList topics={topics} />;
+  }
+}
+
+function BoardTopPreview({ section, apiBaseUrl }: { section: LandingSection; apiBaseUrl: string | undefined }) {
+  const options = useApiOptions();
+  const [topics, setTopics] = useState<Topic[]>([]);
+  const [board, setBoard] = useState<Board | null>(null);
+  const limit = (section.extraConfig?.limit as number) ?? 5;
+  const base = apiBaseUrl ?? options.baseUrl ?? '';
+
+  useEffect(() => {
+    if (!section.boardId) return;
+    Promise.all([
+      getTopics(options, { boardId: section.boardId, size: limit, page: 0 }),
+      getBoard(options, section.boardId),
+    ]).then(([res, b]) => {
+      setTopics(res.content);
+      setBoard(b);
+    }).catch(() => {});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [section.boardId, limit]);
+
+  return (
+    <div className="w-full py-12 bg-background">
+      <div className="max-w-5xl mx-auto px-4">
+        <h2 className="text-2xl font-bold mb-6 text-foreground">{board?.name ?? '게시글'}</h2>
+        {topics.length === 0 ? (
+          <p className="text-muted-foreground text-sm">게시글이 없습니다</p>
+        ) : (
+          renderBoardTopics(board, topics, section.boardId!, base)
+        )}
+      </div>
+    </div>
+  );
+}
 
 function ImageFilmstrip({
   section,
@@ -279,27 +439,7 @@ export function SectionPreview({ section, apiBaseUrl }: SectionPreviewProps) {
 
   // ── Board Top ──
   if (section.type === 'board_top') {
-    return (
-      <div className="w-full py-12 bg-background">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="h-6 bg-muted rounded mb-6 w-1/3" />
-          <div className="grid grid-cols-3 gap-4">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="rounded-lg border border-border overflow-hidden bg-card">
-                <div className="w-full h-40 bg-gradient-to-br from-slate-600 to-slate-800" />
-                <div className="p-3">
-                  <div className="h-4 bg-muted rounded mb-2 w-3/4" />
-                  <div className="flex items-center justify-between mt-2">
-                    <div className="h-3 bg-muted/50 rounded w-1/3" />
-                    <div className="h-3 bg-muted/50 rounded w-1/4" />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
+    return <BoardTopPreview section={section} apiBaseUrl={base} />;
   }
 
   // ── Fallback ──
