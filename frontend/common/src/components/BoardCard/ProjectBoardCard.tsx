@@ -15,7 +15,7 @@ interface ProjectBoardCardProps {
 
 export function ProjectBoardCard({ topic, apiOptions, onClick }: ProjectBoardCardProps) {
   const mainFileId = getMainFileId(topic);
-  const coverUrl = useImageUrlFromFileId(mainFileId, apiOptions);
+  const coverUrl = useImageUrlFromFileId(mainFileId, apiOptions, true);
   const excerpt = getExcerpt(topic.content, 100);
 
   return (

@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState } from 'react';
 import type { ApiOptions } from '../types/api';
-import { fetchFileAsBlob } from '../services/file';
+import { fetchFileAsBlob, fetchThumbnailAsBlob } from '../services/file';
 
 export function useImageUrlFromFileId(
   fileId: string | null | undefined,
-  apiOptions: ApiOptions | null | undefined
+  apiOptions: ApiOptions | null | undefined,
+  useThumbnail?: boolean
 ): string | null {
   const [url, setUrl] = useState<string | null>(null);
   const urlRef = useRef<string | null>(null);
@@ -22,7 +23,8 @@ export function useImageUrlFromFileId(
     }
 
     let cancelled = false;
-    fetchFileAsBlob(apiOptions, fileId)
+    const fetcher = useThumbnail ? fetchThumbnailAsBlob : fetchFileAsBlob;
+    fetcher(apiOptions, fileId)
       .then((blob) => {
         if (cancelled) {
           URL.revokeObjectURL(URL.createObjectURL(blob));
@@ -47,7 +49,7 @@ export function useImageUrlFromFileId(
       }
       setUrl(null);
     };
-  }, [fileId, apiOptions?.baseUrl, apiOptions?.channel]);
+  }, [fileId, apiOptions?.baseUrl, apiOptions?.channel, useThumbnail]);
 
   return url;
 }

@@ -11,6 +11,7 @@ export const commonFileSchema = z.object({
   fileSize: z.number(),
   mimeType: z.string().max(100),
   fileExt: z.string().max(20).nullable(),
+  thumbnailPath: z.string().nullable().optional(),
   createdAt: z.string(),
 });
 

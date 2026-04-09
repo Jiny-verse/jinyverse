@@ -13,7 +13,7 @@ interface GalleryBoardCardProps {
 
 export function GalleryBoardCard({ topic, apiOptions, onClick }: GalleryBoardCardProps) {
   const mainFileId = getMainFileId(topic);
-  const imageUrl = useImageUrlFromFileId(mainFileId, apiOptions);
+  const imageUrl = useImageUrlFromFileId(mainFileId, apiOptions, true);
 
   return (
     <div

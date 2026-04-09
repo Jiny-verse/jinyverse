@@ -15,7 +15,7 @@ interface BlogBoardCardProps {
 
 export function BlogBoardCard({ topic, apiOptions, onClick }: BlogBoardCardProps) {
   const mainFileId = getMainFileId(topic);
-  const thumbnailUrl = useImageUrlFromFileId(mainFileId, apiOptions);
+  const thumbnailUrl = useImageUrlFromFileId(mainFileId, apiOptions, true);
   const excerpt = getExcerpt(topic.content);
 
   return (

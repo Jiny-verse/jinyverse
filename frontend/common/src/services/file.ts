@@ -40,6 +40,11 @@ export async function fetchFileAsBlob(options: ApiOptions, fileId: string): Prom
   return apiGetBlob(options, `${FILES_PATH}/${fileId}/download`);
 }
 
+/** 썸네일을 Blob으로 조회. 썸네일 없으면 서버에서 원본 fallback. */
+export async function fetchThumbnailAsBlob(options: ApiOptions, fileId: string): Promise<Blob> {
+  return apiGetBlob(options, `${FILES_PATH}/${fileId}/thumbnail`);
+}
+
 export async function deleteFile(options: ApiOptions, id: string): Promise<void> {
   return apiDelete(options, `${FILES_PATH}/${id}`);
 }
