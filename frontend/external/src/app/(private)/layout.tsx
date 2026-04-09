@@ -14,7 +14,7 @@ function ExternalPrivateContent({ children }: { children: React.ReactNode }) {
 
   const rightControls = (
     <div className="flex items-center gap-4">
-      <NotificationWidget apiOptions={options} />
+      {options.role && <NotificationWidget apiOptions={options} />}
       <UserWidget apiOptions={options} />
     </div>
   );

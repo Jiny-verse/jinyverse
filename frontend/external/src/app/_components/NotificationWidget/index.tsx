@@ -20,10 +20,11 @@ export function NotificationWidget({ apiOptions }: NotificationWidgetProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const fetchUnreadCount = useCallback(() => {
+    if (!apiOptions.role) return;
     getUnreadCount(apiOptions)
       .then((res) => setUnreadCount(res.count))
       .catch((err) => { console.warn('[NotificationWidget] 미읽음 수 로드 실패:', err); });
-  }, [apiOptions.baseUrl, apiOptions.channel]);
+  }, [apiOptions.baseUrl, apiOptions.channel, apiOptions.role]);
 
   // 초기 + 30초 폴링
   useEffect(() => {
