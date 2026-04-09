@@ -4,6 +4,7 @@ import com.jinyverse.backend.batch.job.CleanupOrphanFilesJobConfig;
 import com.jinyverse.backend.batch.job.ThumbnailBackfillJobConfig;
 import com.jinyverse.backend.domain.common.util.Channel;
 import com.jinyverse.backend.domain.common.util.RequestContext;
+import com.jinyverse.backend.domain.file.repository.CommonFileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParameters;
@@ -11,11 +12,13 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -30,6 +33,28 @@ public class BatchJobController {
 
     @Qualifier(ThumbnailBackfillJobConfig.JOB_NAME)
     private final Job thumbnailBackfillJob;
+
+    private final CommonFileRepository commonFileRepository;
+
+    private static final List<String> RESIZABLE_TYPES =
+            List.of("image/jpeg", "image/jpg", "image/png", "image/webp");
+
+    @GetMapping("/thumbnail-status")
+    public ResponseEntity<Map<String, Long>> getThumbnailStatus(
+            @RequestHeader(value = "X-Channel", required = false) String channel,
+            @RequestHeader(value = "X-Role", required = false) String role) {
+        RequestContext ctx = RequestContext.fromHeaders(channel, role);
+        if (ctx.getChannel() == null || !Channel.INTERNAL.equals(ctx.getChannel()) || !ctx.isAdmin()) {
+            return ResponseEntity.status(403).build();
+        }
+        long total = commonFileRepository.countByMimeTypeIn(RESIZABLE_TYPES);
+        long withThumbnail = commonFileRepository.countByThumbnailPathIsNotNullAndMimeTypeIn(RESIZABLE_TYPES);
+        return ResponseEntity.ok(Map.of(
+                "total", total,
+                "withThumbnail", withThumbnail,
+                "withoutThumbnail", total - withThumbnail
+        ));
+    }
 
     @PostMapping("/cleanup-orphan-files")
     public ResponseEntity<Map<String, String>> runCleanupOrphanFiles(

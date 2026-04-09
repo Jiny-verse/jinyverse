@@ -14,3 +14,4 @@ export * from './notificationTemplate';
 export * from './notification';
 export * from './inquiry';
 export * from './landing';
+export * from './batch';

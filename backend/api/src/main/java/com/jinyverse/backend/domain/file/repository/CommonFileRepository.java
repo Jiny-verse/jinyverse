@@ -25,4 +25,8 @@ public interface CommonFileRepository extends JpaRepository<CommonFile, UUID>, J
 
     @Query("SELECT f FROM CommonFile f WHERE f.thumbnailPath IS NULL AND f.mimeType IN :mimeTypes")
     List<CommonFile> findByThumbnailPathIsNullAndMimeTypeIn(@Param("mimeTypes") List<String> mimeTypes);
+
+    long countByMimeTypeIn(List<String> mimeTypes);
+
+    long countByThumbnailPathIsNotNullAndMimeTypeIn(List<String> mimeTypes);
 }
