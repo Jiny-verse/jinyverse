@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useTheme } from 'next-themes';
 import { LandingCta } from './LandingCta';
 import type { LandingSection } from 'common/schemas';
 
@@ -39,12 +40,18 @@ interface HeroSectionProps {
 }
 
 export function HeroSection({ section, apiBaseUrl }: HeroSectionProps) {
-  const fileIds = section.fileIds ?? [];
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
+
   const extraConfig = section.extraConfig ?? {};
   const slideSettings = (extraConfig.slideSettings ?? {}) as SlideSettings;
   const fileLinks = (extraConfig.fileLinks ?? {}) as Record<string, string>;
+  const darkFileId = extraConfig.darkFileId as string | undefined;
 
-  const isCarousel = slideSettings.enabled === true && fileIds.length > 1;
+  // 다크모드 + darkFileId 있으면 단일 이미지로 대체
+  const fileIds = isDark && darkFileId ? [darkFileId] : (section.fileIds ?? []);
+  const isCarousel = !isDark && slideSettings.enabled === true && (section.fileIds ?? []).length > 1;
+
   const [currentIndex, setCurrentIndex] = useState(0);
 
   useEffect(() => {
@@ -55,6 +62,11 @@ export function HeroSection({ section, apiBaseUrl }: HeroSectionProps) {
     }, ms);
     return () => clearInterval(timer);
   }, [isCarousel, slideSettings.autoPlay, slideSettings.interval, fileIds.length]);
+
+  // 다크모드 전환 시 인덱스 리셋
+  useEffect(() => {
+    setCurrentIndex(0);
+  }, [isDark]);
 
   const renderSlideContent = (fileId: string, priority: boolean) => {
     const rawHref = fileLinks[fileId];
@@ -82,31 +94,54 @@ export function HeroSection({ section, apiBaseUrl }: HeroSectionProps) {
   };
 
   const customHeight = extraConfig.customHeight as number | undefined;
+  // 캐러셀 또는 customHeight 지정 시: 고정 높이 + object-cover
+  const useFixedHeight = isCarousel || !!customHeight;
   const heightStyle: React.CSSProperties = customHeight
     ? { height: `${customHeight}px` }
-    : { minHeight: '100dvh' };
+    : { minHeight: 'calc(100dvh - 3.5rem)' };
 
   return (
-    <section className="relative w-full bg-slate-800" style={heightStyle}>
+    <section
+      className="relative w-full bg-slate-800"
+      style={useFixedHeight ? heightStyle : undefined}
+    >
       {/* Background image(s) */}
-      <div className="absolute inset-0 overflow-hidden">
-        {isCarousel ? (
-          fileIds.map((fileId, idx) => (
-            <div
-              key={fileId}
-              className={`absolute inset-0 transition-opacity duration-700 ${idx === currentIndex ? 'opacity-100' : 'opacity-0'}`}
-            >
-              {renderSlideContent(fileId, idx === currentIndex)}
-            </div>
-          ))
-        ) : fileIds[0] ? (
-          renderSlideContent(fileIds[0], true)
-        ) : null}
-      </div>
-
-      {/* Top gradient overlay for nav readability */}
-      <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-white/50 to-transparent dark:hidden z-[1] pointer-events-none" />
-      <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/50 to-transparent hidden dark:block z-[1] pointer-events-none" />
+      {useFixedHeight ? (
+        <div className="absolute inset-0 overflow-hidden">
+          {isCarousel ? (
+            fileIds.map((fileId, idx) => (
+              <div
+                key={fileId}
+                className={`absolute inset-0 transition-opacity duration-700 ${idx === currentIndex ? 'opacity-100' : 'opacity-0'}`}
+              >
+                {renderSlideContent(fileId, idx === currentIndex)}
+              </div>
+            ))
+          ) : fileIds[0] ? (
+            renderSlideContent(fileIds[0], true)
+          ) : null}
+        </div>
+      ) : fileIds[0] ? (
+        // 단일 이미지 + customHeight 없음: 자연 높이
+        (() => {
+          const rawHref = fileLinks[fileIds[0]];
+          const img = (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={`${apiBaseUrl}/api/files/${fileIds[0]}/download`}
+              alt="Hero"
+              style={{ width: '100%', height: 'auto', display: 'block' }}
+            />
+          );
+          if (!rawHref) return img;
+          const { external, href } = resolveLink(rawHref);
+          return external ? (
+            <a href={href} className="block" target="_blank" rel="noopener noreferrer">{img}</a>
+          ) : (
+            <Link href={href} className="block">{img}</Link>
+          );
+        })()
+      ) : null}
 
       {/* Carousel prev/next controls */}
       {isCarousel && (slideSettings.showControls ?? true) && (

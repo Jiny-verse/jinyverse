@@ -34,48 +34,67 @@ export function DescriptionImageSection({ section, apiBaseUrl }: DescriptionImag
   const imgUrl = imgFileId ? `${apiBaseUrl}/api/files/${imgFileId}/download` : null;
   const fileLinks = (section.extraConfig?.fileLinks ?? {}) as Record<string, string>;
   const hrefRaw = imgFileId ? fileLinks[imgFileId] : undefined;
+  const customHeight = section.extraConfig?.customHeight as number | undefined;
 
-  const imageContent = imgUrl ? (
-    <Image
-      src={imgUrl}
-      alt="Image"
-      fill
-      className="object-cover"
-      unoptimized
-    />
-  ) : (
-    <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900" />
-  );
-
-  const renderImageWrapper = () => {
-    if (!hrefRaw) return imageContent;
+  const wrapWithLink = (content: React.ReactNode) => {
+    if (!hrefRaw) return <>{content}</>;
     const { external, href } = resolveLink(hrefRaw);
     return external ? (
-      <a href={href} className="block absolute inset-0" target="_blank" rel="noopener noreferrer">
-        {imageContent}
+      <a href={href} className="block" target="_blank" rel="noopener noreferrer">
+        {content}
       </a>
     ) : (
-      <Link href={href} className="block absolute inset-0">
-        {imageContent}
+      <Link href={href} className="block">
+        {content}
       </Link>
     );
   };
 
-  const customHeight = section.extraConfig?.customHeight as number | undefined;
-  const heightStyle: React.CSSProperties = customHeight
-    ? { height: `${customHeight}px` }
-    : { minHeight: '100dvh' };
+  // customHeight 지정 시: 고정 높이 + object-cover
+  if (customHeight) {
+    return (
+      <section
+        className="relative w-full bg-muted"
+        style={{ height: `${customHeight}px` }}
+      >
+        <div className="absolute inset-0 overflow-hidden">
+          {imgUrl
+            ? wrapWithLink(
+                <Image
+                  src={imgUrl}
+                  alt="Image"
+                  fill
+                  className="object-cover"
+                  unoptimized
+                />
+              )
+            : <div className="absolute inset-0 bg-gradient-to-br from-slate-700 to-slate-900" />}
+        </div>
+        {section.ctas.map((cta) => (
+          <LandingCta
+            key={cta.id}
+            type={cta.type as 'text' | 'button' | 'image'}
+            href={cta.href}
+            label={cta.label}
+            imageUrl={cta.imageFileId ? `${apiBaseUrl}/api/files/${cta.imageFileId}/download` : undefined}
+            className={cta.className || ''}
+            positionStyle={buildPositionStyle(cta)}
+            styleConfig={cta.styleConfig as Record<string, unknown> | null | undefined}
+          />
+        ))}
+      </section>
+    );
+  }
 
+  // customHeight 없음: 이미지 자연 높이 그대로 표시
   return (
-    <section className="relative w-full bg-muted" style={heightStyle}>
-      {/* Background image — isolated so overflow-hidden doesn't clip CTAs */}
-      <div className="absolute inset-0 overflow-hidden">
-        {renderImageWrapper()}
-      </div>
-      {/* Top gradient overlay for nav readability */}
-      <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-white/50 to-transparent dark:hidden z-[1] pointer-events-none" />
-      <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/50 to-transparent hidden dark:block z-[1] pointer-events-none" />
-
+    <section className="relative w-full bg-muted">
+      {imgUrl
+        ? wrapWithLink(
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={imgUrl} alt="Image" style={{ width: '100%', height: 'auto', display: 'block' }} />
+          )
+        : <div className="w-full h-64 bg-gradient-to-br from-slate-700 to-slate-900" />}
       {section.ctas.map((cta) => (
         <LandingCta
           key={cta.id}

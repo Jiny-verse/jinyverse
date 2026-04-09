@@ -38,9 +38,11 @@ export function SectionFormPanel() {
   const [ctaLabel, setCtaLabel] = useState('');
   const [isAddingCta, setIsAddingCta] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isDarkUploading, setIsDarkUploading] = useState(false);
   const [boards, setBoards] = useState<BoardOption[]>([]);
   const [boardsLoaded, setBoardsLoaded] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const darkFileInputRef = useRef<HTMLInputElement>(null);
 
   if (!selectedSection) return null;
 
@@ -70,6 +72,21 @@ export function SectionFormPanel() {
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleDarkImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsDarkUploading(true);
+    try {
+      const result = await uploadFile(apiOptions, file);
+      updateSection(selectedSection.id, {
+        extraConfig: { ...extraConfig, darkFileId: result.id },
+      });
+    } finally {
+      setIsDarkUploading(false);
+      if (darkFileInputRef.current) darkFileInputRef.current.value = '';
     }
   };
 
@@ -215,6 +232,53 @@ export function SectionFormPanel() {
             >
               {isUploading ? t('ui.button.uploading') : t('admin.landing.section.uploadImage')}
             </button>
+
+            {/* Dark mode image (hero only) */}
+            {selectedSection.type === 'hero' && (
+              <div className="pt-2 border-t border-border space-y-2">
+                <h4 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                  Dark Mode Image
+                </h4>
+                {extraConfig.darkFileId ? (
+                  <div className="relative rounded border border-border p-1">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={`${apiBaseUrl}/api/files/${extraConfig.darkFileId}/download`}
+                      alt="dark mode"
+                      className="h-20 w-full object-cover rounded"
+                    />
+                    <button
+                      type="button"
+                      onClick={() =>
+                        updateSection(selectedSection.id, {
+                          extraConfig: { ...extraConfig, darkFileId: undefined },
+                        })
+                      }
+                      className="absolute top-2 right-2 w-5 h-5 rounded-full bg-black/60 text-white text-xs flex items-center justify-center hover:bg-black/80"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground">{t('common.noData')}</p>
+                )}
+                <input
+                  ref={darkFileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleDarkImageUpload}
+                />
+                <button
+                  type="button"
+                  disabled={isDarkUploading}
+                  onClick={() => darkFileInputRef.current?.click()}
+                  className="w-full px-3 py-1.5 border border-border text-sm rounded hover:bg-muted disabled:opacity-50 transition-colors"
+                >
+                  {isDarkUploading ? t('ui.button.uploading') : 'Upload Dark Image'}
+                </button>
+              </div>
+            )}
 
             {/* Slider settings (for hero type with multiple images) */}
             {selectedSection.type === 'hero' && (selectedSection.fileIds?.length ?? 0) > 0 && (
