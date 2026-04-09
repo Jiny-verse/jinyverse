@@ -17,5 +17,14 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.28.1"
+  "packageManager": "pnpm@10.28.1",
+  "pnpm": {
+    "overrides": {
+      "flatted": ">=3.4.2",
+      "minimatch": ">=9.0.7",
+      "picomatch": ">=4.0.4",
+      "ajv": ">=6.14.0",
+      "brace-expansion": ">=2.0.3"
+    }
+  }
 }
