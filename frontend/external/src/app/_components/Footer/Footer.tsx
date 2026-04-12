@@ -15,18 +15,15 @@ export function Footer({ items }: Props) {
   return (
     <footer className="border-t border-border bg-background mt-12">
       <div className="px-[4%] py-12">
-        <div className="flex flex-col md:flex-row gap-8">
+        <div className="flex flex-col md:flex-row gap-12">
           {/* Brand */}
-          <div className="shrink-0">
+          <div className="shrink-0 md:mr-auto">
             <Link
               href="/"
               className="text-lg font-black tracking-[-0.5px] text-foreground no-underline"
             >
               JINYVERSE
             </Link>
-            <p className="mt-3 text-sm text-muted-foreground">
-              &copy; {year} JINYVERSE. All rights reserved.
-            </p>
           </div>
 
           {/* Menu columns — 원래 순서 유지 */}
@@ -54,6 +51,12 @@ export function Footer({ items }: Props) {
               )}
             </div>
           ))}
+        </div>
+
+        <div className="mt-8 border-t border-border pt-6 text-right">
+          <p className="text-sm text-muted-foreground">
+            &copy; {year} JINYVERSE. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
