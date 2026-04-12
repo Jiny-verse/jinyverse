@@ -18,9 +18,9 @@ export function Footer({ items }: Props) {
   return (
     <footer className="border-t border-border bg-background mt-12">
       <div className="px-[4%] py-12">
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-[1.2fr_repeat(auto-fit,1fr)]">
+        <div className="flex flex-col md:flex-row gap-8">
           {/* Brand */}
-          <div className="col-span-2 md:col-span-1">
+          <div className="shrink-0">
             <Link
               href="/"
               className="text-lg font-black tracking-[-0.5px] text-foreground no-underline"
