@@ -10,9 +10,6 @@ interface Props {
 export function Footer({ items }: Props) {
   const year = new Date().getFullYear();
 
-  const menuColumns = items.filter((item) => item.children && item.children.length > 0);
-  const standaloneItems = items.filter((item) => !item.children || item.children.length === 0);
-
   if (items.length === 0) return null;
 
   return (
@@ -32,8 +29,8 @@ export function Footer({ items }: Props) {
             </p>
           </div>
 
-          {/* Menu columns */}
-          {menuColumns.map((item) => (
+          {/* Menu columns — 원래 순서 유지 */}
+          {items.map((item) => (
             <div key={item.id}>
               <Link
                 href={item.href}
@@ -41,38 +38,22 @@ export function Footer({ items }: Props) {
               >
                 {item.label}
               </Link>
-              <ul className="mt-3 flex flex-col gap-2 list-none p-0 m-0">
-                {item.children!.map((child) => (
-                  <li key={child.id}>
-                    <Link
-                      href={child.href}
-                      className="text-sm text-muted-foreground no-underline transition-colors hover:text-foreground"
-                    >
-                      {child.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+              {item.children && item.children.length > 0 && (
+                <ul className="mt-3 flex flex-col gap-2 list-none p-0 m-0">
+                  {item.children.map((child) => (
+                    <li key={child.id}>
+                      <Link
+                        href={child.href}
+                        className="text-sm text-muted-foreground no-underline transition-colors hover:text-foreground"
+                      >
+                        {child.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
           ))}
-
-          {/* Standalone items (no children) */}
-          {standaloneItems.length > 0 && (
-            <div>
-              <ul className="flex flex-col gap-2 list-none p-0 m-0">
-                {standaloneItems.map((item) => (
-                  <li key={item.id}>
-                    <Link
-                      href={item.href}
-                      className="text-sm text-muted-foreground no-underline transition-colors hover:text-foreground"
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
         </div>
       </div>
     </footer>
