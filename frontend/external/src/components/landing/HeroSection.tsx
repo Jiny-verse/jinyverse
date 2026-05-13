@@ -47,9 +47,13 @@ export function HeroSection({ section, apiBaseUrl }: HeroSectionProps) {
   const slideSettings = (extraConfig.slideSettings ?? {}) as SlideSettings;
   const fileLinks = (extraConfig.fileLinks ?? {}) as Record<string, string>;
   const darkFileId = extraConfig.darkFileId as string | undefined;
+  const normalizedDarkFileId = typeof darkFileId === 'string' && darkFileId.trim() ? darkFileId : undefined;
 
   // 다크모드 + darkFileId 있으면 단일 이미지로 대체
-  const fileIds = isDark && darkFileId ? [darkFileId] : (section.fileIds ?? []);
+  const baseFileIds = section.fileIds ?? [];
+  const [darkImageFailed, setDarkImageFailed] = useState(false);
+  const useDarkImage = isDark && !!normalizedDarkFileId && !darkImageFailed;
+  const fileIds = useDarkImage ? [normalizedDarkFileId!] : baseFileIds;
   const isCarousel = !isDark && slideSettings.enabled === true && (section.fileIds ?? []).length > 1;
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -68,6 +72,10 @@ export function HeroSection({ section, apiBaseUrl }: HeroSectionProps) {
     setCurrentIndex(0);
   }, [isDark]);
 
+  useEffect(() => {
+    setDarkImageFailed(false);
+  }, [normalizedDarkFileId]);
+
   const renderSlideContent = (fileId: string, priority: boolean) => {
     const rawHref = fileLinks[fileId];
     const img = (
@@ -78,6 +86,11 @@ export function HeroSection({ section, apiBaseUrl }: HeroSectionProps) {
         className="object-cover"
         priority={priority}
         unoptimized
+        onError={() => {
+          if (useDarkImage && fileId === normalizedDarkFileId) {
+            setDarkImageFailed(true);
+          }
+        }}
       />
     );
     if (!rawHref) return img;
@@ -131,6 +144,11 @@ export function HeroSection({ section, apiBaseUrl }: HeroSectionProps) {
               src={`${apiBaseUrl}/api/files/${fileIds[0]}/download`}
               alt="Hero"
               style={{ width: '100%', height: 'auto', display: 'block' }}
+              onError={() => {
+                if (useDarkImage && fileIds[0] === normalizedDarkFileId) {
+                  setDarkImageFailed(true);
+                }
+              }}
             />
           );
           if (!rawHref) return img;

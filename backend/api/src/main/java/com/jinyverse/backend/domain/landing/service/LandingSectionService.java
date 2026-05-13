@@ -1,5 +1,6 @@
 package com.jinyverse.backend.domain.landing.service;
 
+import com.jinyverse.backend.domain.file.repository.CommonFileRepository;
 import com.jinyverse.backend.domain.landing.dto.LandingCtaResponseDto;
 import com.jinyverse.backend.domain.landing.dto.LandingSectionRequestDto;
 import com.jinyverse.backend.domain.landing.dto.LandingSectionResponseDto;
@@ -24,6 +25,7 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class LandingSectionService {
 
+    private final CommonFileRepository commonFileRepository;
     private final LandingSectionRepository sectionRepository;
     private final LandingSectionFileRepository sectionFileRepository;
 
@@ -94,6 +96,12 @@ public class LandingSectionService {
                 .isMain(isMain)
                 .build();
         sectionFileRepository.save(rel);
+        commonFileRepository.findById(fileId).ifPresent(file -> {
+            if (file.getSessionId() != null) {
+                file.setSessionId(null);
+                commonFileRepository.save(file);
+            }
+        });
         // reload
         LandingSection reloaded = findActive(sectionId);
         List<LandingCtaResponseDto> ctas = reloaded.getCtas().stream()
