@@ -44,7 +44,7 @@ public class CleanupOrphanFilesTasklet implements Tasklet {
             commonFileRepository.delete(file);
         }
 
-        log.info("CleanupOrphanFiles: deleted {} orphan file(s) (session_id, created before {})", count, before);
+        log.info("CleanupOrphanFiles: deleted {} orphan file(s) (unreferenced, created before {})", count, before);
         return RepeatStatus.FINISHED;
     }
 }
