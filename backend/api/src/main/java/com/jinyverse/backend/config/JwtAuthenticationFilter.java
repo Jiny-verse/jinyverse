@@ -105,6 +105,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (path.startsWith("/api/topics/") && path.indexOf('/', 12) < 0) return true; // /api/topics/{id} 단건만
         if (path.equals("/api/comments")) return true;
         if (path.equals("/api/landing/sections")) return true;
+        if (path.equals("/api/health")) return true;
         if (path.matches("/api/files/[^/]+/download")) return true;
         if (path.matches("/api/files/[^/]+/thumbnail")) return true;
         if (path.equals("/api/auth/check-username")) return true;

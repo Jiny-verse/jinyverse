@@ -15,7 +15,7 @@ spring:
     hibernate:
       ddl-auto: validate
     defer-datasource-initialization: true
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
@@ -51,6 +51,11 @@ spring:
 
 server:
   port: 8080
+
+logging:
+  level:
+    org.hibernate.SQL: off
+    org.hibernate.orm.jdbc.bind: off
 
 # JWT (환경변수 필수, 기본값 없음)
 app:
