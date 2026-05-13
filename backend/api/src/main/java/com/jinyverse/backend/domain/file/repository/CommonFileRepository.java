@@ -14,13 +14,26 @@ import java.util.UUID;
 @Repository
 public interface CommonFileRepository extends JpaRepository<CommonFile, UUID>, JpaSpecificationExecutor<CommonFile> {
 
-    @Query("""
-            SELECT f FROM CommonFile f
-            WHERE (f.sessionId IS NOT NULL AND f.createdAt < :before)
-               OR (f.sessionId IS NULL
-                   AND NOT EXISTS (SELECT r FROM RelTopicFile r WHERE r.fileId = f.id)
-                   AND NOT EXISTS (SELECT u FROM RelUserFile u WHERE u.fileId = f.id))
-            """)
+    @Query(value = """
+            SELECT f.*
+            FROM common_file f
+            WHERE f.created_at < :before
+              AND NOT EXISTS (SELECT 1 FROM rel__topic_file rtf WHERE rtf.file_id = f.id)
+              AND NOT EXISTS (SELECT 1 FROM rel__user_file ruf WHERE ruf.file_id = f.id)
+              AND NOT EXISTS (SELECT 1 FROM rel__landing_section_file rlsf WHERE rlsf.file_id = f.id)
+              AND NOT EXISTS (
+                SELECT 1
+                FROM landing_cta lc
+                WHERE lc.image_file_id = f.id
+                  AND lc.deleted_at IS NULL
+              )
+              AND NOT EXISTS (
+                SELECT 1
+                FROM landing_section ls
+                WHERE ls.deleted_at IS NULL
+                  AND ls.extra_config ->> 'darkFileId' = f.id::text
+              )
+            """, nativeQuery = true)
     List<CommonFile> findOrphanFilesCreatedBefore(@Param("before") LocalDateTime before);
 
     @Query("SELECT f FROM CommonFile f WHERE f.thumbnailPath IS NULL AND f.mimeType IN :mimeTypes")

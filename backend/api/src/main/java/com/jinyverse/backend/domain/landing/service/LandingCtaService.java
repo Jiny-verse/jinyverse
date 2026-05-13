@@ -1,5 +1,6 @@
 package com.jinyverse.backend.domain.landing.service;
 
+import com.jinyverse.backend.domain.file.repository.CommonFileRepository;
 import com.jinyverse.backend.domain.landing.dto.LandingCtaRequestDto;
 import com.jinyverse.backend.domain.landing.dto.LandingCtaResponseDto;
 import com.jinyverse.backend.domain.landing.entity.LandingCta;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class LandingCtaService {
 
+    private final CommonFileRepository commonFileRepository;
     private final LandingCtaRepository ctaRepository;
     private final LandingSectionRepository sectionRepository;
 
@@ -30,6 +32,7 @@ public class LandingCtaService {
         sectionRepository.findByIdAndDeletedAtIsNull(sectionId)
                 .orElseThrow(() -> new ResourceNotFoundException("LandingSection", sectionId));
         LandingCta saved = ctaRepository.save(LandingCta.fromRequestDto(sectionId, dto));
+        finalizeImageFileSession(saved.getImageFileId());
         return saved.toResponseDto();
     }
 
@@ -38,7 +41,9 @@ public class LandingCtaService {
         requireAdmin(ctx);
         LandingCta cta = findActive(id);
         cta.applyUpdate(dto);
-        return ctaRepository.save(cta).toResponseDto();
+        LandingCta saved = ctaRepository.save(cta);
+        finalizeImageFileSession(saved.getImageFileId());
+        return saved.toResponseDto();
     }
 
     @Transactional
@@ -58,5 +63,15 @@ public class LandingCtaService {
         if (ctx == null || !ctx.isAdmin() || ctx.getChannel() != Channel.INTERNAL) {
             throw new ForbiddenException("Landing CTA management requires ADMIN on INTERNAL channel");
         }
+    }
+
+    private void finalizeImageFileSession(UUID fileId) {
+        if (fileId == null) return;
+        commonFileRepository.findById(fileId).ifPresent(file -> {
+            if (file.getSessionId() != null) {
+                file.setSessionId(null);
+                commonFileRepository.save(file);
+            }
+        });
     }
 }
